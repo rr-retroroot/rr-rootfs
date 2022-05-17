@@ -1,0 +1,8 @@
+#!/bin/bash
+
+export RR_SERVICES="\
+  systemd-networkd
+  systemd-resolved \
+  sshd
+"
+

@@ -32,10 +32,9 @@ trap cleanup EXIT
 minfo "rr: platform: ${RR_PLATFORM}"
 minfo "rr: arch: ${RR_ARCH}"
 
-# first build base rootfs, will be used for later builds
+# first build base rootfs if needed, will be used for later builds
 RR_BOOTFS_TARBALL="${RR_OUTPUT_DIR}/arch-bootfs-${RR_PLATFORM}-${RR_ARCH}.tgz"
 RR_ROOTFS_TARBALL="${RR_OUTPUT_DIR}/arch-rootfs-${RR_PLATFORM}-${RR_ARCH}.tgz"
-
 if [[ ! -f "${RR_ROOTFS_TARBALL}" ]]; then
   ./arch-rootfs/arch-bootstrap.sh \
     -a ${RR_ARCH} "${RR_OUTPUT_DIR}/arch-rootfs-${RR_PLATFORM}-${RR_ARCH}"
@@ -48,16 +47,12 @@ if [[ ! -f "${RR_ROOTFS_TARBALL}" ]]; then
   tar czf "${RR_ROOTFS_TARBALL}" \
     --directory="${RR_OUTPUT_DIR}/arch-rootfs-${RR_PLATFORM}-${RR_ARCH}" .
   chmod 777 ${RR_BOOTFS_TARBALL} ${RR_ROOTFS_TARBALL}
+  rm -rf "${RR_OUTPUT_DIR}/arch-rootfs-${RR_PLATFORM}-${RR_ARCH}"
 fi
-
-exit 1
 
 # set output image path
 OUTPUT_IMG=${RR_OUTPUT_DIR}/retroroot-${RR_PLATFORM}-${RR_ARCH}.img
-
-# set mount paths
-MOUNT_ROOT=${RR_OUTPUT_DIR}/rootfs
-MOUNT_BOOT=${MOUNT_ROOT}/boot
+chmod 777 ${OUTPUT_IMG}
 
 # create image and partitions
 dd if=/dev/zero of=$OUTPUT_IMG bs=1M count=2048
@@ -74,28 +69,37 @@ ROOT_DEV="$LOOP_DEV"p2
 mkfs.fat -F32 -n RR-BOOT "$BOOT_DEV"
 mkfs.ext4 -L RR-ROOT "$ROOT_DEV"
 
+# set mount paths
+MOUNT_ROOT=/tmp/rootfs
+MOUNT_BOOT=/tmp/rootfs/boot
+rm -rf ${MOUNT_BOOT}
+
 # mount partitions
 mkdir -p ${MOUNT_ROOT}
 mount --make-private ${ROOT_DEV} ${MOUNT_ROOT}
 mkdir -p ${MOUNT_BOOT}
 mount --make-private ${BOOT_DEV} ${MOUNT_BOOT}
 
+# extract base rootfs
+tar zxf "${RR_BOOTFS_TARBALL}" -C ${MOUNT_BOOT}
+tar zxf "${RR_ROOTFS_TARBALL}" -C ${MOUNT_ROOT}
+
 # mount binding
-mkdir -p ${MOUNT_ROOT}/proc ${MOUNT_ROOT}/sys
 mount --bind /proc ${MOUNT_ROOT}/proc
 mount --bind /sys ${MOUNT_ROOT}/sys
-
-# extract base rootfs
-tar zxf "${RR_ROOTFS_TARBALL}" -C ${MOUNT_ROOT}
-tar zxf "${RR_ROOTFS_TARBALL}" -C ${MOUNT_ROOT}/boot
-
-# copy platform config and bootstrap files
-cp -r configs ${MOUNT_ROOT}
-cp -r overlays ${MOUNT_ROOT}
-cp -r bootstrap ${MOUNT_ROOT}
-
-# chroot
 mount --bind /dev ${MOUNT_ROOT}/dev
 mount --bind /dev/pts ${MOUNT_ROOT}/dev/pts
+
+# copy platform config and bootstrap files
+cp -r bootstrap ${MOUNT_ROOT}
+cp -r configs ${MOUNT_ROOT}
+cp -r overlays ${MOUNT_ROOT}
+
+# process retroroot installation and configuration
 chroot ${MOUNT_ROOT} run-parts --exit-on-error -a ${RR_PLATFORM} -a ${RR_ARCH} /bootstrap/
+
+# final cleanup
+rm -rf ${MOUNT_ROOT}/bootstrap
+rm -rf ${MOUNT_ROOT}/configs
+rm -rf ${MOUNT_ROOT}/overlays
 

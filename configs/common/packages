@@ -3,5 +3,7 @@
 export RR_PACKAGES="\
   base \
   net-tools \
+  nano \
+  openssh
 "
 

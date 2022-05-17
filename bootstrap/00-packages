@@ -17,11 +17,6 @@ pacman --noconfirm --needed -S ${RR_PACKAGES}
 source /configs/${RR_PLATFORM}/packages
 pacman --noconfirm --needed -S ${RR_PACKAGES}
 
-# desktop bootloader (mbr for now)
-if [ "${RR_PLATFORM}" == "desktop" ]; then
-  syslinux-install_update -iam
-fi
-
 # cleanup
 rm -rf /var/cache/pacman/pkg
 

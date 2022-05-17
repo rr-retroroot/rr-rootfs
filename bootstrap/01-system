@@ -9,3 +9,22 @@ echo "rr-run-parts: $(basename $0)"
 # copy common overlay
 cp -r /overlays/common/. .
 
+# copy platform overlay
+cp -r /overlays/${RR_PLATFORM}/. .
+
+# root passwd
+echo "root:retroroot" | chpasswd
+
+# enable services
+source /configs/common/services
+systemctl enable ${RR_SERVICES}
+
+# systemd-networkd resolv.conf handling
+rm /etc/resolv.conf
+ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+
+# desktop bootloader (mbr for now)
+if [ "${RR_PLATFORM}" == "desktop" ]; then
+  syslinux-install_update -iam
+fi
+
