@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -xe
+
+source /configs/common/vars
+
+echo "rr-run-parts: $(basename $0)"
+
+# copy common overlay
+cp -r /overlays/common/. .
+
