@@ -3,7 +3,13 @@
 export RR_PACKAGES="\
   base \
   net-tools \
+  parted \
+  e2fsprogs \
   nano \
-  openssh
+  wget \
+  openssh \
+  mesa
+  mesa-vdpau
+  libva-mesa-driver
 "
 
