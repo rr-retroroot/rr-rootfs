@@ -55,7 +55,7 @@ OUTPUT_IMG=${RR_OUTPUT_DIR}/retroroot-${RR_PLATFORM}-${RR_ARCH}.img
 chmod 777 ${OUTPUT_IMG}
 
 # create image and partitions
-dd if=/dev/zero of=$OUTPUT_IMG bs=1M count=2048
+dd if=/dev/zero of=${OUTPUT_IMG} bs=1M count=2048
 parted ${OUTPUT_IMG} -- \
   mklabel msdos \
   mkpart primary fat32 1 256 \
@@ -102,4 +102,7 @@ chroot ${MOUNT_ROOT} run-parts --exit-on-error -a ${RR_PLATFORM} -a ${RR_ARCH} /
 rm -rf ${MOUNT_ROOT}/bootstrap
 rm -rf ${MOUNT_ROOT}/configs
 rm -rf ${MOUNT_ROOT}/overlays
+
+# run option (TODO: args)
+# qemu-system-x86_64 -m 2048 -drive format=raw,file=${OUTPUT_IMG}
 

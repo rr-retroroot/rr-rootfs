@@ -5,5 +5,4 @@ export RR_PACKAGES="\
   intel-ucode \
   syslinux \
 "
-# nvidia
 
