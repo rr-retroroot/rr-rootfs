@@ -2,14 +2,119 @@
 
 export RR_PACKAGES="\
   base \
+  bash-completion \
   net-tools \
   parted \
   e2fsprogs \
   nano \
   wget \
   openssh \
-  mesa
-  mesa-vdpau
+  mesa \
+  mesa-vdpau \
   libva-mesa-driver
+"
+
+# devel
+export RR_PACKAGES=${RR_PACKAGES}"\
+  base-devel \
+  cmake \
+  git \
+  ninja
+"
+
+# "portlibs"
+export RR_PACKAGES=${RR_PACKAGES}"\
+  asio \
+  boost \
+  box2d \
+  bullet \
+  bzip2 \
+  curl \
+  enet \
+  expat \
+  ffmpeg \
+  flac \
+  fmt \
+  fontconfig \
+  freetype2 \
+  fribidi \
+  fftw \
+  gd \
+  giflib \
+  glm \
+  harfbuzz \
+  hidapi \
+  icu \
+  jack \
+  jansson \
+  json-c \
+  jsoncpp \
+  lame \
+  libass \
+  libarchive \
+  libconfig \
+  libexif \
+  libimagequant \
+  libjpeg-turbo \
+  libmad \
+  libmikmod \
+  libmodplug \
+  libmpeg2 \
+  libogg \
+  libpng \
+  libpulse \
+  libsamplerate \
+  libsigc++ \
+  libsigc++-3.0 \
+  libsndfile \
+  libsodium \
+  libssh2 \
+  libtheora \
+  libunrar \
+  libusb \
+  libvorbis \
+  libvpx \
+  libwebp \
+  libwslay \
+  libxext \
+  libxml2 \
+  love \
+  lua \
+  lz4 \
+  lzo \
+  mbedtls \
+  miniupnpc \
+  minizip \
+  mpg123 \
+  mpv \
+  ode \
+  oniguruma \
+  openal \
+  openssl \
+  opus \
+  opusfile \
+  pcre2 \
+  physfs \
+  sdl \
+  sdl_gfx \
+  sdl_image \
+  sdl_mixer \
+  sdl_net \
+  sdl_ttf \
+  sdl2 \
+  sdl2_gfx \
+  sdl2_image \
+  sdl2_mixer \
+  sdl2_net \
+  sdl2_ttf \
+  smpeg \
+  speexdsp \
+  timidity++ \
+  tinyxml2 \
+  xz \
+  yaml-cpp \
+  zlib \
+  zstd \
+  zziplib
 "
 

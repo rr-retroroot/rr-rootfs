@@ -32,6 +32,9 @@ trap cleanup EXIT
 minfo "rr: platform: ${RR_PLATFORM}"
 minfo "rr: arch: ${RR_ARCH}"
 
+# ...
+chmod -R 777 ${RR_OUTPUT_DIR}
+
 # first build base rootfs if needed, will be used for later builds
 RR_BOOTFS_TARBALL="${RR_OUTPUT_DIR}/arch-bootfs-${RR_PLATFORM}-${RR_ARCH}.tgz"
 RR_ROOTFS_TARBALL="${RR_OUTPUT_DIR}/arch-rootfs-${RR_PLATFORM}-${RR_ARCH}.tgz"
@@ -39,23 +42,24 @@ if [[ ! -f "${RR_ROOTFS_TARBALL}" ]]; then
   ./arch-rootfs/arch-bootstrap.sh \
     -a ${RR_ARCH} "${RR_OUTPUT_DIR}/arch-rootfs-${RR_PLATFORM}-${RR_ARCH}"
   # create bootfs and rootfs tarball
+  mv "${RR_OUTPUT_DIR}/arch-rootfs-${RR_PLATFORM}-${RR_ARCH}/boot/initramfs-linux-fallback.img" \
+    "${RR_OUTPUT_DIR}/arch-rootfs-${RR_PLATFORM}-${RR_ARCH}/boot/initramfs-linux.img"
   tar czf "${RR_BOOTFS_TARBALL}" \
     --directory="${RR_OUTPUT_DIR}/arch-rootfs-${RR_PLATFORM}-${RR_ARCH}/boot" .
-  # cleanup rootfs
   rm -rf "${RR_OUTPUT_DIR}/arch-rootfs-${RR_PLATFORM}-${RR_ARCH}/boot"
   rm -rf "${RR_OUTPUT_DIR}/arch-rootfs-${RR_PLATFORM}-${RR_ARCH}/var/cache/pacman/pkg"
   tar czf "${RR_ROOTFS_TARBALL}" \
     --directory="${RR_OUTPUT_DIR}/arch-rootfs-${RR_PLATFORM}-${RR_ARCH}" .
-  chmod 777 ${RR_BOOTFS_TARBALL} ${RR_ROOTFS_TARBALL}
+  chmod 777 ${RR_BOOTFS_TARBALL}
+  chmod 777 ${RR_ROOTFS_TARBALL}
   rm -rf "${RR_OUTPUT_DIR}/arch-rootfs-${RR_PLATFORM}-${RR_ARCH}"
 fi
 
 # set output image path
 OUTPUT_IMG=${RR_OUTPUT_DIR}/retroroot-${RR_PLATFORM}-${RR_ARCH}.img
-chmod 777 ${OUTPUT_IMG}
 
 # create image and partitions
-dd if=/dev/zero of=${OUTPUT_IMG} bs=1M count=2048
+dd if=/dev/zero of=${OUTPUT_IMG} bs=1M count=4096
 parted ${OUTPUT_IMG} -- \
   mklabel msdos \
   mkpart primary fat32 1 256 \
@@ -63,6 +67,7 @@ parted ${OUTPUT_IMG} -- \
   unit B
 
 # format partitions
+chmod 777 ${OUTPUT_IMG}
 LOOP_DEV=$(losetup --partscan --show --find "${OUTPUT_IMG}")
 BOOT_DEV="$LOOP_DEV"p1
 ROOT_DEV="$LOOP_DEV"p2
@@ -80,7 +85,7 @@ mount --make-private ${ROOT_DEV} ${MOUNT_ROOT}
 mkdir -p ${MOUNT_BOOT}
 mount --make-private ${BOOT_DEV} ${MOUNT_BOOT}
 
-# extract base rootfs
+# extract base bootfs and rootfs
 tar zxf "${RR_BOOTFS_TARBALL}" -C ${MOUNT_BOOT}
 tar zxf "${RR_ROOTFS_TARBALL}" -C ${MOUNT_ROOT}
 
@@ -102,6 +107,7 @@ chroot ${MOUNT_ROOT} run-parts --exit-on-error -a ${RR_PLATFORM} -a ${RR_ARCH} /
 rm -rf ${MOUNT_ROOT}/bootstrap
 rm -rf ${MOUNT_ROOT}/configs
 rm -rf ${MOUNT_ROOT}/overlays
+chmod -R 777 ${RR_OUTPUT_DIR}
 
 # run option (TODO: args)
 # qemu-system-x86_64 -m 2048 -drive format=raw,file=${OUTPUT_IMG}

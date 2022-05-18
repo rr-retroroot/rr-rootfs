@@ -13,7 +13,25 @@ cp -r /overlays/common/. .
 cp -r /overlays/${RR_PLATFORM}/. .
 
 # root passwd
-echo "root:retroroot" | chpasswd
+echo "root:${RR_ROOT_PASSWORD}" | chpasswd
+
+# create user and groups
+useradd -m ${RR_USERNAME}
+for GRP in autologin spi i2c gpio; do
+	groupadd -r --system $GRP
+done
+for GRP in adm dialout cdrom audio users video games input tty gpio spi i2c netdev; do
+  usermod -aG $GRP ${RR_USERNAME}
+done
+echo "${RR_USERNAME}:${RR_USERNAME}" | chpasswd
+echo "
+root ALL=(ALL) ALL
+${USERNAME} ALL=(ALL) ALL
+#includedir /etc/sudoers.d
+" > /etc/sudoers
+
+# update locales
+locale-gen
 
 # enable services
 source /configs/common/services
@@ -23,8 +41,10 @@ systemctl enable ${RR_SERVICES}
 rm /etc/resolv.conf
 ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
 
-# desktop bootloader (mbr for now)
+# install desktop bootloader (mbr for now)
 if [ "${RR_PLATFORM}" == "desktop" ]; then
   syslinux-install_update -iam
+  # update initramfs including overlay
+  mkinitcpio -p linux
 fi
 
