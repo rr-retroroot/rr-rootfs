@@ -1,0 +1,30 @@
+#!/bin/bash
+
+if [ -z "$1" ]
+then
+    echo "error: missing exec path"
+    exit 1
+fi
+
+if [ -z "$2" ]
+then
+    echo "error: missing app name"
+    exit 2
+fi
+
+DATA_PATH="/home/rr/data"
+EXEC_PATH="$1"
+APP_NAME="$2"
+
+if [ ! -d "${DATA_PATH}/${APP_NAME}" ] 
+then
+  mkdir -p "${DATA_PATH}/${APP_NAME}"
+fi
+
+export XDG_CONFIG_HOME="${DATA_PATH}"
+export HOME="${DATA_PATH}/${APP_NAME}"
+export SDL_VIDEODRIVER="kmsdrm"
+export SDL_AUDIODRIVER="pulse"
+
+exec ${EXEC_PATH}
+

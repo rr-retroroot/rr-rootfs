@@ -1,0 +1,57 @@
+#!/bin/bash
+
+
+if [ -z "$1" ]
+then
+    echo "error: missing srcdir"
+    exit 1
+fi
+PKGDIR="$1"
+
+if [ -z "$1" ]
+then
+    echo "error: missing pkgdir"
+    exit 1
+fi
+PKGDIR="$1"
+
+if [ -z "$2" ]
+then
+    echo "error: missing pkgname"
+    exit 2
+fi
+PKG_NAME="$2"
+
+if [ -z "$3" ]
+then
+    echo "error: missing app description"
+    exit 3
+fi
+APP_DESC="$3"
+
+if [ -z "$4" ]
+then
+    echo "error: missing app icon"
+    exit 4
+fi
+APP_ICON="$4"
+
+if [ -z "$5" ]
+then
+    echo "error: missing app preview image"
+    exit 5
+fi
+APP_PREVIEW="$5"
+
+if [ -z "$6" ]
+then
+    echo "error: missing exec path"
+    exit 6
+fi
+APP_EXEC_PATH="$6"
+
+APP_HOME="$PKGDIR/home/rr/apps/$APP_NAME/"
+
+mkdir -p "$APP_HOME"
+echo "[app]" > "$APP_HOME/app.desc"
+

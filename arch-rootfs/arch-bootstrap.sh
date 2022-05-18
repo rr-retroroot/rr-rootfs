@@ -23,7 +23,7 @@ set -e -u -o pipefail
 # Packages needed by pacman (see get-pacman-dependencies.sh)
 PACMAN_PACKAGES=(
   acl archlinux-keyring attr brotli bzip2 curl expat glibc gpgme libarchive run-parts
-  libassuan libgpg-error libnghttp2 libssh2 lzo openssl pacman pacman-mirrorlist xz zlib
+  libassuan libgpg-error libnghttp2 libssh2 lzo openssl pacman xz zlib pacman-mirrorlist
   krb5 e2fsprogs keyutils libidn2 libunistring gcc-libs lz4 libpsl icu libunistring zstd
 )
 BASIC_PACKAGES=(${PACMAN_PACKAGES[*]} filesystem)
@@ -232,7 +232,10 @@ main() {
   install_packages "$ARCH" "$DEST" "${BASIC_PACKAGES[*]} ${EXTRA_PACKAGES[*]}"
   configure_pacman "$DEST" "$ARCH" # Pacman must be re-configured
   [[ -z "$PRESERVE_DOWNLOAD_DIR" ]] && rm -rf "$DOWNLOAD_DIR"
-  # retroroot: umount bindings
+  # retroroot: add custom repo and umount bindings
+  echo "[retroroot]
+SigLevel = Optional TrustAll
+Server = http://us.retroroot.mydedibox.fr/packages/$ARCH/" >> "$DEST/etc/pacman.conf"
   umount "$DEST/proc"
   umount "$DEST/sys"
   umount "$DEST/dev/pts"

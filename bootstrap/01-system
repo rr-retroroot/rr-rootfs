@@ -17,7 +17,7 @@ echo "root:${RR_ROOT_PASSWORD}" | chpasswd
 
 # create user and groups
 useradd -m ${RR_USERNAME}
-for GRP in autologin spi i2c gpio; do
+for GRP in autologin dialout cdrom spi i2c gpio netdev; do
 	groupadd -r --system $GRP
 done
 for GRP in adm dialout cdrom audio users video games input tty gpio spi i2c netdev; do
