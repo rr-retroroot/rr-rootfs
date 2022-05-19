@@ -24,6 +24,7 @@ run() {
   fi
   
   qemu-system-x86_64 -m 2048 -device virtio-vga-gl -display sdl,gl=on \
+    -device e1000,netdev=net0 -netdev user,id=net0,hostfwd=tcp::5555-:22 \
     -drive format=raw,file="output/retroroot-$1-$ARCH.img"
 }
 
