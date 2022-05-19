@@ -232,10 +232,7 @@ main() {
   install_packages "$ARCH" "$DEST" "${BASIC_PACKAGES[*]} ${EXTRA_PACKAGES[*]}"
   configure_pacman "$DEST" "$ARCH" # Pacman must be re-configured
   [[ -z "$PRESERVE_DOWNLOAD_DIR" ]] && rm -rf "$DOWNLOAD_DIR"
-  # retroroot: add custom repo and umount bindings
-  echo "[retroroot]
-SigLevel = Optional TrustAll
-Server = http://us.retroroot.mydedibox.fr/packages/$ARCH/" >> "$DEST/etc/pacman.conf"
+  # retroroot: umount bindings
   umount "$DEST/proc"
   umount "$DEST/sys"
   umount "$DEST/dev/pts"

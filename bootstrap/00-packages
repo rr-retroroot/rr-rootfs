@@ -17,6 +17,15 @@ pacman --noconfirm --needed -S ${RR_PACKAGES}
 source /configs/${RR_PLATFORM}/packages
 pacman --noconfirm --needed -S ${RR_PACKAGES}
 
+# disable arch repo (we don't want system updates) and enable retroroot repo
+rm /etc/pacman.conf.pacnew
+mv /etc/pacman.d/mirrorlist.pacnew /etc/pacman.d/mirrorlist
+cp /overlays/${RR_PLATFORM}/etc/pacman.conf /etc/pacman.conf
+
+# install retroroot packages
+pacman --noconfirm -Syy
+# TODO
+
 # cleanup
 rm -rf /var/cache/pacman/pkg
 

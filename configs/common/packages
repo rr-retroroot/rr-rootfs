@@ -14,7 +14,7 @@ export RR_PACKAGES="\
   libva-mesa-driver
 "
 
-# devel
+# devel (TODO: remove, use cross toolchain)
 export RR_PACKAGES=${RR_PACKAGES}"\
   base-devel \
   cmake \
@@ -117,4 +117,3 @@ export RR_PACKAGES=${RR_PACKAGES}"\
   zstd \
   zziplib
 "
-
