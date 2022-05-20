@@ -45,13 +45,39 @@ pack_sysroot() {
   cp -r ${MOUNT_ROOT}/usr/share/pkgconfig ${OUTPUT_SYS}/usr/share
   cp -r ${MOUNT_ROOT}/usr/share/cmake ${OUTPUT_SYS}/usr/share
 
-  # remove unwanted files
+  # cleanup
   rm -f ${OUTPUT_SYS}/usr/bin/i686-pc-linux-gnu-pkg-config
   rm -f ${OUTPUT_SYS}/usr/bin/x86_64-pc-linux-gnu-pkg-config
   rm -f ${OUTPUT_SYS}/usr/bin/pkg-config
   rm -f ${OUTPUT_SYS}/usr/bin/alsoft-config
+  rm -rf ${OUTPUT_SYS}/usr/lib/awk
+  rm -rf ${OUTPUT_SYS}/usr/lib/bash
+  rm -rf ${OUTPUT_SYS}/usr/lib/binfmt.d
+  rm -rf ${OUTPUT_SYS}/usr/lib/depmod.d
+  rm -rf ${OUTPUT_SYS}/usr/lib/dri
+  rm -rf ${OUTPUT_SYS}/usr/lib/e2fsprogs
+  rm -rf ${OUTPUT_SYS}/usr/lib/environment.d
+  rm -rf ${OUTPUT_SYS}/usr/lib/firmware
+  rm -rf ${OUTPUT_SYS}/usr/lib/gnupg
+  rm -rf ${OUTPUT_SYS}/usr/lib/initcpio
+  rm -rf ${OUTPUT_SYS}/usr/lib/kernel
+  rm -rf ${OUTPUT_SYS}/usr/lib/modules
+  rm -rf ${OUTPUT_SYS}/usr/lib/p11-kit
+  rm -rf ${OUTPUT_SYS}/usr/lib/syslinux
+  rm -rf ${OUTPUT_SYS}/usr/lib/systemd
+  rm -rf ${OUTPUT_SYS}/usr/lib/tmpfiles.d
+  rm -rf ${OUTPUT_SYS}/usr/lib/udev
+  rm -rf ${OUTPUT_SYS}/usr/lib/xkbcommon
 
-  # fix paths
+  # fix links
+  rm -f ${OUTPUT_SYS}/usr/lib/libGLX_indirect.so.0
+  ln -s libGLX_mesa.so.0 ${OUTPUT_SYS}/usr/lib/libGLX_indirect.so.0
+  rm -f ${OUTPUT_SYS}/usr/lib/libkeyutils.so
+  ln -s libkeyutils.so.1 ${OUTPUT_SYS}/usr/lib/libkeyutils.so
+  rm -f ${OUTPUT_SYS}/usr/lib/liblua5.4.so
+  ln -s liblua.so.5.4.4 ${OUTPUT_SYS}/usr/lib/liblua5.4.so
+
+  # fix pkgconfig/cmake paths
   find ${OUTPUT_SYS}/usr/bin -type f -print0 | xargs -0 sed -i \
     "s|/usr|/opt/pacbrew/retroroot/target/${RR_ARCH}/usr|g"
   find ${OUTPUT_SYS}/usr/lib/cmake -type f -print0 | xargs -0 sed -i \
