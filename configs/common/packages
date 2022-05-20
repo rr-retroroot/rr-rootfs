@@ -8,6 +8,7 @@ export RR_PACKAGES="\
   parted \
   e2fsprogs \
   dosfstools \
+  sudo \
   bash-completion \
   nano \
   wget \
