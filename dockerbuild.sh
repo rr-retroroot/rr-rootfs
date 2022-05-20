@@ -61,7 +61,7 @@ pack_sysroot() {
 
   # pack sysroot
   tar cfJ "${OUTPUT_TARBALL}" --directory="${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_PLATFORM}-${RR_ARCH}" .
-  rm -rf "${OUTPUT_SYS}"
+  rm -rf "${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_PLATFORM}-${RR_ARCH}"
 }
 
 main() {
