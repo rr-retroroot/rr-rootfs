@@ -6,25 +6,27 @@ then
     exit 1
 fi
 
-if [ -z "$2" ]
-then
-    echo "error: missing app name"
-    exit 2
-fi
+APP_PATH="$1"
+APP_NAME="$(basename $APP_PATH)"
+DATA_PATH="${HOME}/data"
 
-DATA_PATH="/home/rr/data"
-EXEC_PATH="$1"
-APP_NAME="$2"
+echo "rr-exec: running ${APP_NAME} (data path: ${DATA_PATH}/${APP_NAME})"
 
 if [ ! -d "${DATA_PATH}/${APP_NAME}" ] 
 then
   mkdir -p "${DATA_PATH}/${APP_NAME}"
 fi
 
+# cache and such
+export XDG_CACHE_HOME=${HOME}/.cache
+export XDG_RUNTIME_DIR=${HOME}/.runtime
+
+# app data
+export XDG_DATA_HOME="${DATA_PATH}"
 export XDG_CONFIG_HOME="${DATA_PATH}"
 export HOME="${DATA_PATH}/${APP_NAME}"
+
 export SDL_VIDEODRIVER="kmsdrm"
 export SDL_AUDIODRIVER="pulse"
 
-exec ${EXEC_PATH}
-
+exec ${APP_PATH}
