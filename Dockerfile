@@ -1,10 +1,12 @@
-FROM ubuntu:focal
+FROM archlinux:latest
 LABEL contributor="cpasjuste@gmail.com"
 
+# get desired packages arguments
+ARG RR_PACKAGES
+
 # update and install build requirements
-RUN apt-get update && apt-get install -y \
-  parted e2fsprogs dosfstools udev wget curl \
-  zstd xz-utils qemu-user-static binfmt-support
+RUN pacman -Syu --noconfirm
+RUN pacman -S --needed --noconfirm $RR_PACKAGES
 
 # add repo to build directory
 ADD . /build
@@ -13,5 +15,6 @@ ADD . /build
 ENV RR_OUTPUT_DIR /output
 WORKDIR /build
 
+# let's go !
 ENTRYPOINT ["/build/dockerbuild.sh"]
 

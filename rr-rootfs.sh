@@ -1,21 +1,35 @@
 #!/bin/bash
 
 build() {
+  local PLATFORM=$1
   local ARCH=
-  if [ "$1" == "desktop" ]; then
+  if [ "${PLATFORM}" == "desktop" ]; then
     ARCH=x86_64
   else
     ARCH=aarch64
   fi
-  
-  docker build . -t retroroot
+
+  # pull arch linux image
+  docker pull archlinux/archlinux:latest
+
+  # install desired packages on docker image so caching is used in pacstrap
+  source configs/common/packages
+  source configs/${PLATFORM}/packages
+
+  # build image with packages as argument
+  docker build --build-arg RR_PACKAGES="${RR_PACKAGES}" . \
+    -t retroroot-${PLATFORM}-${ARCH}
+
+  # let's go !
   docker run --rm -v /dev:/dev:ro -v $(pwd)/output:/output --privileged=true \
-    -e RR_PLATFORM=$1 \
-    -e RR_ARCH=$ARCH \
-    retroroot
+    -e RR_PLATFORM=${PLATFORM} \
+    -e RR_ARCH=${ARCH} \
+    -e RR_PACKAGES="${RR_PACKAGES}" \
+    retroroot-${PLATFORM}-${ARCH}
 }
 
 run() {
+  local PLATFORM=$1
   local ARCH=
   if [ "$1" == "desktop" ]; then
     ARCH=x86_64
@@ -25,7 +39,7 @@ run() {
   
   qemu-system-x86_64 -m 2048 -device virtio-vga-gl -display sdl,gl=on \
     -device e1000,netdev=net0 -netdev user,id=net0,hostfwd=tcp::5555-:22 \
-    -drive format=raw,file="output/retroroot-$1-$ARCH.img"
+    -drive format=raw,file="output/retroroot-${PLATFORM}-${ARCH}.img"
 }
 
 show_usage() {

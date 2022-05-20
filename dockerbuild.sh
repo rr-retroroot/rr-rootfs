@@ -16,19 +16,45 @@ function cleanup {
   if [ $? -ne 0 ]; then
     merror 'something went wrong, exiting...'
   fi
-  rm -rf "${RR_ROOTFS_BOOTSTRAP}"
   chmod -R 777 ${RR_OUTPUT_DIR}
-  umount -lf ${MOUNT_ROOT}/dev/pts
-  umount -lf ${MOUNT_ROOT}/dev
-  umount -lf ${MOUNT_ROOT}/sys
-  umount -lf ${MOUNT_ROOT}/proc
-  umount -lf ${MOUNT_BOOT}
-  umount -lf ${MOUNT_ROOT}
-  losetup -d "$LOOP_DEV"
+  umount -lf ${MOUNT_BOOT} > /dev/null 2>&1 || :
+  umount -lf ${MOUNT_ROOT} > /dev/null 2>&1 || :
+  losetup -d "$LOOP_DEV" > /dev/null 2>&1 || :
 }
 
 # set exit trap
 trap cleanup EXIT
+
+pack_sysroot() {
+  OUTPUT_SYS=${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_PLATFORM}-${RR_ARCH}.tgz
+  
+  rm -rf /opt/pacbrew/retroroot/target/${RR_ARCH}
+
+  # create target directories
+  mkdir -p /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/bin
+  mkdir -p /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/share
+
+  # copy sysroot files
+  cp -r /media/cpasjuste/RR-ROOT/usr/lib /opt/pacbrew/retroroot/target/${RR_ARCH}/usr
+  cp -r /media/cpasjuste/RR-ROOT/usr/include /opt/pacbrew/retroroot/target/${RR_ARCH}/usr
+  cp -r /media/cpasjuste/RR-ROOT/usr/bin/*-config /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/bin/
+  cp -r /media/cpasjuste/RR-ROOT/usr/share/pkgconfig /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/share
+  cp -r /media/cpasjuste/RR-ROOT/usr/share/cmake /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/share
+
+  # remove unwanted files
+  rm -f /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/bin/i686-pc-linux-gnu-pkg-config
+  rm -f /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/bin/x86_64-pc-linux-gnu-pkg-config
+  rm -f /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/bin/pkg-config
+  rm -f /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/bin/alsoft-config
+
+  # fix paths
+  sudo find /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/bin -type f -print0 | sudo xargs -0 sed -i \
+    "s|/usr|/opt/pacbrew/retroroot/target/${RR_ARCH}/usr|g"
+  sudo find /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/lib/cmake -type f -print0 | sudo xargs -0 sed -i \
+    "s|/usr|/opt/pacbrew/retroroot/target/${RR_ARCH}/usr|g"
+  sudo find /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/share/cmake -type f -print0 | sudo xargs -0 sed -i \
+    "s|/usr|/opt/pacbrew/retroroot/target/${RR_ARCH}/usr|g"
+}
 
 main() {
   # let's go...
@@ -37,24 +63,6 @@ main() {
 
   # ...
   chmod -R 777 ${RR_OUTPUT_DIR}
-
-  # first build minimal rootfs bootstrap if needed, will be used for later builds
-  RR_BOOTFS_TARBALL="${RR_OUTPUT_DIR}/arch-bootfs-bootstrap-${RR_PLATFORM}-${RR_ARCH}.tgz"
-  RR_ROOTFS_TARBALL="${RR_OUTPUT_DIR}/arch-rootfs-bootstrap-${RR_PLATFORM}-${RR_ARCH}.tgz"
-  RR_ROOTFS_BOOTSTRAP="${RR_OUTPUT_DIR}/arch-rootfs-bootstrap-${RR_PLATFORM}-${RR_ARCH}"
-  if [[ ! -f "${RR_ROOTFS_TARBALL}" ]]; then
-    ./arch-rootfs/arch-bootstrap.sh -a ${RR_ARCH} "${RR_ROOTFS_BOOTSTRAP}"
-    # create bootfs and rootfs tarball
-    mv "${RR_ROOTFS_BOOTSTRAP}/boot/initramfs-linux-fallback.img" \
-      "${RR_ROOTFS_BOOTSTRAP}/boot/initramfs-linux.img"
-    tar czf "${RR_BOOTFS_TARBALL}" --directory="${RR_ROOTFS_BOOTSTRAP}/boot" .
-    rm -rf "${RR_ROOTFS_BOOTSTRAP}/boot"
-    rm -rf "${RR_ROOTFS_BOOTSTRAP}/var/cache/pacman/pkg"
-    tar czf "${RR_ROOTFS_TARBALL}" --directory="${RR_ROOTFS_BOOTSTRAP}" .
-    chmod 777 ${RR_BOOTFS_TARBALL}
-    chmod 777 ${RR_ROOTFS_TARBALL}
-    rm -rf "${RR_ROOTFS_BOOTSTRAP}"
-  fi
 
   # set output image path
   OUTPUT_IMG=${RR_OUTPUT_DIR}/retroroot-${RR_PLATFORM}-${RR_ARCH}.img
@@ -86,15 +94,7 @@ main() {
   mkdir -p ${MOUNT_BOOT}
   mount --make-private ${BOOT_DEV} ${MOUNT_BOOT}
 
-  # extract base bootfs and rootfs
-  tar zxf "${RR_BOOTFS_TARBALL}" -C ${MOUNT_BOOT}
-  tar zxf "${RR_ROOTFS_TARBALL}" -C ${MOUNT_ROOT}
-
-  # mount binding
-  mount --bind /proc ${MOUNT_ROOT}/proc
-  mount --bind /sys ${MOUNT_ROOT}/sys
-  mount --bind /dev ${MOUNT_ROOT}/dev
-  mount --bind /dev/pts ${MOUNT_ROOT}/dev/pts
+  pacstrap -c ${MOUNT_ROOT} ${RR_PACKAGES}
 
   # copy platform config and bootstrap files
   cp -r bootstrap ${MOUNT_ROOT}
@@ -102,15 +102,10 @@ main() {
   cp -r overlays ${MOUNT_ROOT}
 
   # process retroroot installation and configuration
-  chroot ${MOUNT_ROOT} run-parts --exit-on-error -a ${RR_PLATFORM} -a ${RR_ARCH} /bootstrap/
+  arch-chroot ${MOUNT_ROOT} run-parts --exit-on-error -a ${RR_PLATFORM} -a ${RR_ARCH} /bootstrap/
   
   # package toolchain
-  # TODO
-
-  # final cleanup
-  rm -rf ${MOUNT_ROOT}/bootstrap
-  rm -rf ${MOUNT_ROOT}/configs
-  rm -rf ${MOUNT_ROOT}/overlays
+  pack_sysroot
 }
 
 main "$@"

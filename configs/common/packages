@@ -2,24 +2,19 @@
 
 export RR_PACKAGES="\
   base \
-  bash-completion \
+  arch-install-scripts \
+  run-parts \
   net-tools \
   parted \
   e2fsprogs \
+  dosfstools \
+  bash-completion \
   nano \
   wget \
   openssh \
   mesa \
   mesa-vdpau \
   libva-mesa-driver
-"
-
-# devel (TODO: remove, use cross toolchain)
-export RR_PACKAGES=${RR_PACKAGES}"\
-  base-devel \
-  cmake \
-  git \
-  ninja
 "
 
 # "portlibs"

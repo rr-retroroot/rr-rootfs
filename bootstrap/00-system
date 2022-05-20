@@ -6,6 +6,18 @@ source /configs/common/vars
 
 echo "rr-run-parts: $(basename $0)"
 
+# enable retroroot repo and disable arch repos (we dont want system updates)
+#rm /etc/pacman.conf.pacnew
+#mv /etc/pacman.d/mirrorlist.pacnew /etc/pacman.d/mirrorlist
+cp /overlays/${RR_PLATFORM}/etc/pacman.conf /etc/pacman.conf
+
+# install retroroot packages
+pacman --noconfirm -Syy
+# TODO
+
+# cleanup package cache
+rm -rf /var/cache/pacman/pkg
+
 # copy common overlay
 cp -r /overlays/common/. .
 
@@ -38,8 +50,8 @@ source /configs/common/services
 systemctl enable ${RR_SERVICES}
 
 # systemd-networkd resolv.conf handling
-rm /etc/resolv.conf
-ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+#rm /etc/resolv.conf
+#ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
 
 # install desktop bootloader (mbr for now)
 if [ "${RR_PLATFORM}" == "desktop" ]; then
@@ -47,4 +59,9 @@ if [ "${RR_PLATFORM}" == "desktop" ]; then
   # update initramfs including overlay
   mkinitcpio -p linux
 fi
+
+# final cleanup
+rm -rf /bootstrap
+rm -rf /configs
+rm -rf /overlays
 
