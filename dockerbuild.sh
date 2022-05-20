@@ -26,34 +26,42 @@ function cleanup {
 trap cleanup EXIT
 
 pack_sysroot() {
-  OUTPUT_SYS=${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_PLATFORM}-${RR_ARCH}.tgz
+  OUTPUT_SYS="${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_PLATFORM}-${RR_ARCH}/opt/pacbrew/retroroot/target/${RR_ARCH}"
+  OUTPUT_TARBALL="${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_PLATFORM}-${RR_ARCH}.tar.xz"
   
-  rm -rf /opt/pacbrew/retroroot/target/${RR_ARCH}
+  minfo "rr: generating sysroot taball: ${OUTPUT_TARBALL}"
+
+  rm -rf "${OUTPUT_TARBALL}"
+  rm -rf "${OUTPUT_SYS}"
 
   # create target directories
-  mkdir -p /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/bin
-  mkdir -p /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/share
+  mkdir -p ${OUTPUT_SYS}/usr/bin
+  mkdir -p ${OUTPUT_SYS}/usr/share
 
   # copy sysroot files
-  cp -r /media/cpasjuste/RR-ROOT/usr/lib /opt/pacbrew/retroroot/target/${RR_ARCH}/usr
-  cp -r /media/cpasjuste/RR-ROOT/usr/include /opt/pacbrew/retroroot/target/${RR_ARCH}/usr
-  cp -r /media/cpasjuste/RR-ROOT/usr/bin/*-config /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/bin/
-  cp -r /media/cpasjuste/RR-ROOT/usr/share/pkgconfig /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/share
-  cp -r /media/cpasjuste/RR-ROOT/usr/share/cmake /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/share
+  cp -r ${MOUNT_ROOT}/usr/lib ${OUTPUT_SYS}/usr
+  cp -r ${MOUNT_ROOT}/usr/include ${OUTPUT_SYS}/usr
+  cp -r ${MOUNT_ROOT}/usr/bin/*-config ${OUTPUT_SYS}/usr/bin/
+  cp -r ${MOUNT_ROOT}/usr/share/pkgconfig ${OUTPUT_SYS}/usr/share
+  cp -r ${MOUNT_ROOT}/usr/share/cmake ${OUTPUT_SYS}/usr/share
 
   # remove unwanted files
-  rm -f /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/bin/i686-pc-linux-gnu-pkg-config
-  rm -f /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/bin/x86_64-pc-linux-gnu-pkg-config
-  rm -f /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/bin/pkg-config
-  rm -f /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/bin/alsoft-config
+  rm -f ${OUTPUT_SYS}/usr/bin/i686-pc-linux-gnu-pkg-config
+  rm -f ${OUTPUT_SYS}/usr/bin/x86_64-pc-linux-gnu-pkg-config
+  rm -f ${OUTPUT_SYS}/usr/bin/pkg-config
+  rm -f ${OUTPUT_SYS}/usr/bin/alsoft-config
 
   # fix paths
-  sudo find /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/bin -type f -print0 | sudo xargs -0 sed -i \
+  find ${OUTPUT_SYS}/usr/bin -type f -print0 | xargs -0 sed -i \
     "s|/usr|/opt/pacbrew/retroroot/target/${RR_ARCH}/usr|g"
-  sudo find /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/lib/cmake -type f -print0 | sudo xargs -0 sed -i \
+  find ${OUTPUT_SYS}/usr/lib/cmake -type f -print0 | xargs -0 sed -i \
     "s|/usr|/opt/pacbrew/retroroot/target/${RR_ARCH}/usr|g"
-  sudo find /opt/pacbrew/retroroot/target/${RR_ARCH}/usr/share/cmake -type f -print0 | sudo xargs -0 sed -i \
+  find ${OUTPUT_SYS}/usr/share/cmake -type f -print0 | xargs -0 sed -i \
     "s|/usr|/opt/pacbrew/retroroot/target/${RR_ARCH}/usr|g"
+
+  # pack sysroot
+  tar cfJ "${OUTPUT_TARBALL}" --directory="${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_PLATFORM}-${RR_ARCH}" .
+  rm -rf "${OUTPUT_SYS}"
 }
 
 main() {

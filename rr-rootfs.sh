@@ -10,7 +10,7 @@ build() {
   fi
 
   # pull arch linux image
-  docker pull archlinux/archlinux:latest
+  docker pull archlinux/archlinux:base-20220519.0.57040
 
   # install desired packages on docker image so caching is used in pacstrap
   source configs/common/packages

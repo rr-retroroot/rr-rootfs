@@ -1,4 +1,4 @@
-FROM archlinux:latest
+FROM archlinux/archlinux:base-20220519.0.57040
 LABEL contributor="cpasjuste@gmail.com"
 
 # get desired packages arguments
