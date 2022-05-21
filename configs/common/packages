@@ -8,11 +8,12 @@ export RR_PACKAGES="\
   parted \
   e2fsprogs \
   dosfstools \
-  sudo \
   bash-completion \
+  sudo \
   nano \
   wget \
   openssh \
+  vsftpd \
   mesa \
   mesa-vdpau \
   libva-mesa-driver

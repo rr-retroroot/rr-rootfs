@@ -138,8 +138,8 @@ main() {
   # process retroroot installation and configuration
   arch-chroot ${MOUNT_ROOT} run-parts --exit-on-error -a ${RR_PLATFORM} -a ${RR_ARCH} /bootstrap/
   
-  # package toolchain
-  pack_sysroot
+  # package toolchain (disabled for now)
+  # pack_sysroot
 }
 
 main "$@"

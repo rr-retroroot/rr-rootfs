@@ -6,23 +6,14 @@ source /configs/common/vars
 
 echo "rr-run-parts: $(basename $0)"
 
-# enable retroroot repo and disable arch repos (we dont want system updates)
-#rm /etc/pacman.conf.pacnew
-#mv /etc/pacman.d/mirrorlist.pacnew /etc/pacman.d/mirrorlist
-cp /overlays/${RR_PLATFORM}/etc/pacman.conf /etc/pacman.conf
-
-# install retroroot packages
-pacman --noconfirm -Syy
-# TODO
-
-# cleanup package cache
-rm -rf /var/cache/pacman/pkg
-
 # copy common overlay
 cp -r /overlays/common/. .
 
 # copy platform overlay
 cp -r /overlays/${RR_PLATFORM}/. .
+
+# update retroroot packages
+pacman --noconfirm -Syy
 
 # root passwd
 echo "root:${RR_ROOT_PASSWORD}" | chpasswd
@@ -64,4 +55,6 @@ fi
 rm -rf /bootstrap
 rm -rf /configs
 rm -rf /overlays
+# cleanup package cache
+rm -rf /var/cache/pacman/pkg
 
