@@ -26,7 +26,7 @@ function cleanup {
 trap cleanup EXIT
 
 pack_sysroot() {
-  OUTPUT_SYS="${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_PLATFORM}-${RR_ARCH}/opt/pacbrew/retroroot/target/${RR_ARCH}"
+  OUTPUT_SYS="${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_PLATFORM}-${RR_ARCH}/opt/retroroot/target/${RR_ARCH}"
   OUTPUT_TARBALL="${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_PLATFORM}-${RR_ARCH}.tar.xz"
   
   minfo "rr: generating sysroot taball: ${OUTPUT_TARBALL}"
@@ -79,11 +79,11 @@ pack_sysroot() {
 
   # fix pkgconfig/cmake paths
   find ${OUTPUT_SYS}/usr/bin -type f -print0 | xargs -0 sed -i \
-    "s|/usr|/opt/pacbrew/retroroot/target/${RR_ARCH}/usr|g"
+    "s|/usr|/opt/retroroot/target/${RR_ARCH}/usr|g"
   find ${OUTPUT_SYS}/usr/lib/cmake -type f -print0 | xargs -0 sed -i \
-    "s|/usr|/opt/pacbrew/retroroot/target/${RR_ARCH}/usr|g"
+    "s|/usr|/opt/retroroot/target/${RR_ARCH}/usr|g"
   find ${OUTPUT_SYS}/usr/share/cmake -type f -print0 | xargs -0 sed -i \
-    "s|/usr|/opt/pacbrew/retroroot/target/${RR_ARCH}/usr|g"
+    "s|/usr|/opt/retroroot/target/${RR_ARCH}/usr|g"
 
   # pack sysroot
   tar cfJ "${OUTPUT_TARBALL}" --directory="${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_PLATFORM}-${RR_ARCH}" .
@@ -139,7 +139,7 @@ main() {
   arch-chroot ${MOUNT_ROOT} run-parts --exit-on-error -a ${RR_PLATFORM} -a ${RR_ARCH} /bootstrap/
   
   # package toolchain (disabled for now)
-  # pack_sysroot
+  pack_sysroot
 }
 
 main "$@"
