@@ -50,8 +50,10 @@ export RR_PACKAGES=${RR_PACKAGES}"\
   libass \
   libarchive \
   libconfig \
+  libevdev \
   libexif \
   libimagequant \
+  libinput \
   libjpeg-turbo \
   libmad \
   libmikmod \
