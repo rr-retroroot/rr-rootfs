@@ -38,6 +38,7 @@ export RR_PACKAGES=${RR_PACKAGES}"\
   fftw \
   gd \
   giflib \
+  glew \
   glm \
   harfbuzz \
   hidapi \
