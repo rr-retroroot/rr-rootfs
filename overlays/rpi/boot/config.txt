@@ -1,0 +1,16 @@
+[pi4]
+# Run as fast as firmware / board allows
+arm_boost=1
+
+[all]
+dtoverlay=vc4-kms-v3d
+initramfs initramfs-linux.img followkernel
+arm_64bit=1
+gpu_mem_256=128
+gpu_mem_512=192
+gpu_mem_1024=448
+disable_overscan=1
+include usercfg.txt
+
+# Uncomment to enable bluetooth
+#dtparam=krnbt=on

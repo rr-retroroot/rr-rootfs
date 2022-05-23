@@ -139,7 +139,7 @@ main() {
   arch-chroot ${MOUNT_ROOT} run-parts --exit-on-error -a ${RR_PLATFORM} -a ${RR_ARCH} /bootstrap/
   
   # package toolchain (disabled for now)
-  pack_sysroot
+  #pack_sysroot
 }
 
 main "$@"
