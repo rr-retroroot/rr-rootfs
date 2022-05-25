@@ -52,8 +52,8 @@ run() {
 show_usage() {
   echo "usage: $(basename "$0") [-b desktop|rpi] [-r desktop|rpi]"
   echo "examples:"
-  echo "       $(basename "$0") -b desktop: build desktop image"
-  echo "       $(basename "$0") -r desktop: run desktop image"
+  echo "       $(basename "$0") -b desktop      | build desktop image"
+  echo "       $(basename "$0") -r desktop      | run desktop image"
 }
 
 main() {

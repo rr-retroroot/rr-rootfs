@@ -12,6 +12,9 @@ cp -r /overlays/common/. .
 # copy platform overlay
 cp -r /overlays/${RR_PLATFORM}/. .
 
+# cleanup package cache and db (we don't want sys updates)
+rm -rf /var/cache/pacman/pkg
+rm -rf /var/lib/pacman/*
 # update retroroot packages
 pacman --noconfirm -Syy
 
@@ -55,6 +58,4 @@ fi
 rm -rf /bootstrap
 rm -rf /configs
 rm -rf /overlays
-# cleanup package cache
-rm -rf /var/cache/pacman/pkg
 

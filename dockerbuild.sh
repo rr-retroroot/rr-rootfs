@@ -26,9 +26,9 @@ function cleanup {
 trap cleanup EXIT
 
 pack_sysroot() {
-  OUTPUT_SYS="${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_PLATFORM}-${RR_ARCH}/opt/retroroot/target/${RR_ARCH}"
-  OUTPUT_TARBALL="${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_PLATFORM}-${RR_ARCH}.tar.xz"
-  
+  OUTPUT_SYS="${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_ARCH}/opt/retroroot/target/${RR_ARCH}"
+  OUTPUT_TARBALL="${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_ARCH}.tar.xz"
+
   minfo "rr: generating sysroot taball: ${OUTPUT_TARBALL}"
 
   rm -rf "${OUTPUT_TARBALL}"
@@ -50,6 +50,7 @@ pack_sysroot() {
   rm -f ${OUTPUT_SYS}/usr/bin/x86_64-pc-linux-gnu-pkg-config
   rm -f ${OUTPUT_SYS}/usr/bin/pkg-config
   rm -f ${OUTPUT_SYS}/usr/bin/alsoft-config
+  rm -f ${OUTPUT_SYS}/usr/lib/terminfo
   rm -rf ${OUTPUT_SYS}/usr/lib/awk
   rm -rf ${OUTPUT_SYS}/usr/lib/bash
   rm -rf ${OUTPUT_SYS}/usr/lib/binfmt.d
@@ -86,8 +87,8 @@ pack_sysroot() {
     "s|/usr|/opt/retroroot/target/${RR_ARCH}/usr|g"
 
   # pack sysroot
-  tar cfJ "${OUTPUT_TARBALL}" --directory="${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_PLATFORM}-${RR_ARCH}" .
-  rm -rf "${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_PLATFORM}-${RR_ARCH}"
+  tar cfJ "${OUTPUT_TARBALL}" --directory="${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_ARCH}" .
+  rm -rf "${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_ARCH}"
 }
 
 main() {
@@ -106,7 +107,8 @@ main() {
   parted ${OUTPUT_IMG} -- \
     mklabel msdos \
     mkpart primary fat32 1 256 \
-    mkpart primary ext2 256 -1s \
+    mkpart primary ext2 256 2304 \
+    mkpart primary ext2 2304 -1s \
     unit B
 
   # format partitions
@@ -114,8 +116,10 @@ main() {
   LOOP_DEV=$(losetup --partscan --show --find "${OUTPUT_IMG}")
   BOOT_DEV="$LOOP_DEV"p1
   ROOT_DEV="$LOOP_DEV"p2
+  DATA_DEV="$LOOP_DEV"p3
   mkfs.fat -F32 -n RR-BOOT "$BOOT_DEV"
   mkfs.ext4 -L RR-ROOT "$ROOT_DEV"
+  mkfs.ext4 -L RR-DATA "$DATA_DEV"
 
   # set mount paths
   MOUNT_ROOT=/tmp/rootfs

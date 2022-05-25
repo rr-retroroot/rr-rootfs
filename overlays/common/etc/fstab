@@ -1,4 +1,4 @@
-tmpfs           /tmp    tmpfs nodev,nosuid      0	0
-LABEL=RR-BOOT   /boot   vfat  defaults          0 2
-LABEL=RR-ROOT   /       ext4  defaults,noatime  0 1
+tmpfs           /tmp        tmpfs     nodev,nosuid          0	0
+LABEL=RR-BOOT   /boot       vfat      ro,defaults           0 2
+#LABEL=RR-ROOT   /           ext4      ro,defaults,noatime   0 1
 
