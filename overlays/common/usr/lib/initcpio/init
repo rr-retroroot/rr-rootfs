@@ -38,19 +38,40 @@ fi
 rootdev=$(resolve_device "$root") && root=$rootdev
 unset rootdev
 
+###############
+## RetroRoot ##
+###############
+
 #fsck_root
 
 # Mount root at /new_root
 #"$mount_handler" /new_root
 
-# retroroot rootfs overlay - TODO: use 'late hook'
-mkdir /overlay_root || launch_interactive_shell
-mount -L RR-DATA -o rw,defaults /overlay_root || launch_interactive_shell
-mkdir -p /overlay_root/lower /overlay_root/upper /overlay_root/work || launch_interactive_shell
-mount -L RR-ROOT -o ro,defaults /overlay_root/lower || launch_interactive_shell
-mount -t overlay overlay -o lowerdir=/overlay_root/lower,upperdir=/overlay_root/upper,workdir=/overlay_root/work /new_root || launch_interactive_shell
-#mkdir -p /new_root/overlay || launch_interactive_shell
-#mount --move /overlay_root /new_root/overlay || launch_interactive_shell
+# mount boot
+mkdir /boot_root
+mount -L RR-BOOT -o ro,defaults /boot_root || launch_interactive_shell
+
+# retroroot rootfs overlay - TODO: use 'late hook' ?
+mkdir /overlay_data || launch_interactive_shell
+# mount data partition
+mount -L RR-DATA -o rw,defaults /overlay_data || launch_interactive_shell
+# create directories
+mkdir -p /overlay_data/lower_root /overlay_data/upper_root /overlay_data/work_root \
+    /overlay_data/lower_home /overlay_data/upper_home /overlay_data/work_home \
+    || launch_interactive_shell
+# mount root overlay
+mount -t squashfs /boot_root/rootfs.sqsh /overlay_data/lower_root -o loop
+mount -t overlay overlay -o lowerdir=/overlay_data/lower_root,upperdir=/overlay_data/upper_root,workdir=/overlay_data/work_root /new_root || launch_interactive_shell
+# mount "rr" home overlay
+mount -t overlay overlay -o lowerdir=/overlay_data/lower_root/home/rr,upperdir=/overlay_data/upper_home,workdir=/overlay_data/work_home /new_root/home/rr || launch_interactive_shell
+
+# move boot in place
+mkdir -p /new_root/boot
+mount --move /boot_root /new_root/boot || launch_interactive_shell
+
+###############
+## RetroRoot ##
+###############
 
 run_hookfunctions 'run_latehook' 'late hook' $LATEHOOKS
 run_hookfunctions 'run_cleanuphook' 'cleanup hook' $CLEANUPHOOKS

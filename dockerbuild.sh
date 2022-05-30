@@ -103,22 +103,19 @@ main() {
   OUTPUT_IMG=${RR_OUTPUT_DIR}/retroroot-${RR_PLATFORM}-${RR_ARCH}.img
 
   # create image and partitions
-  dd if=/dev/zero of=${OUTPUT_IMG} bs=1M count=4096
+  dd if=/dev/zero of=${OUTPUT_IMG} bs=1M count=1152
   parted ${OUTPUT_IMG} -- \
     mklabel msdos \
-    mkpart primary fat32 1 256 \
-    mkpart primary ext2 256 2304 \
-    mkpart primary ext2 2304 -1s \
+    mkpart primary fat32 1 1024 \
+    mkpart primary ext2 1024 1152 \
     unit B
 
   # format partitions
   chmod 777 ${OUTPUT_IMG}
   LOOP_DEV=$(losetup --partscan --show --find "${OUTPUT_IMG}")
   BOOT_DEV="$LOOP_DEV"p1
-  ROOT_DEV="$LOOP_DEV"p2
-  DATA_DEV="$LOOP_DEV"p3
+  DATA_DEV="$LOOP_DEV"p2
   mkfs.fat -F32 -n RR-BOOT "$BOOT_DEV"
-  mkfs.ext4 -L RR-ROOT "$ROOT_DEV"
   mkfs.ext4 -L RR-DATA "$DATA_DEV"
 
   # set mount paths
@@ -128,7 +125,7 @@ main() {
 
   # mount partitions
   mkdir -p ${MOUNT_ROOT}
-  mount --make-private ${ROOT_DEV} ${MOUNT_ROOT}
+  #mount --make-private ${ROOT_DEV} ${MOUNT_ROOT}
   mkdir -p ${MOUNT_BOOT}
   mount --make-private ${BOOT_DEV} ${MOUNT_BOOT}
 
@@ -141,6 +138,9 @@ main() {
 
   # process retroroot installation and configuration
   arch-chroot ${MOUNT_ROOT} run-parts --exit-on-error -a ${RR_PLATFORM} -a ${RR_ARCH} /bootstrap/
+  
+  # generate squashfs
+  mksquashfs ${MOUNT_ROOT} ${MOUNT_BOOT}/rootfs.sqsh -noappend -e boot
   
   # package toolchain (disabled for now)
   #pack_sysroot

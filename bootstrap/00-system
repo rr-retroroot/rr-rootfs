@@ -43,15 +43,13 @@ locale-gen
 source /configs/common/services
 systemctl enable ${RR_SERVICES}
 
-# systemd-networkd resolv.conf handling
-#rm /etc/resolv.conf
-#ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
-
 # install desktop bootloader (mbr for now)
 if [ "${RR_PLATFORM}" == "desktop" ]; then
   syslinux-install_update -iam
-  # update initramfs including overlay
+  # update initramfs including init overlay
   mkinitcpio -p linux
+  # minor cleanup
+  rm -f /boot/initramfs-linux-fallback.img
 fi
 
 # final cleanup
