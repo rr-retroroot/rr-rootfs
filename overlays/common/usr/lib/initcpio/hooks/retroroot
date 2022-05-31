@@ -1,0 +1,58 @@
+#!/usr/bin/ash
+
+create_data_partition() {
+  DEVICE=$(blkid | grep RR-BOOT | cut -d ":" -f1) || launch_interactive_shell
+  DEVICE=${DEVICE::-1}
+  echo "Creating data partition on ${DEVICE}, please wait..."
+  parted ${DEVICE} -- \
+    mkpart primary ext2 1024 -1s \
+    unit B
+  partprobe
+  mke2fs -t ext4 -L "RR-DATA" ${DEVICE}2 || launch_interactive_shell
+}
+
+run_latehook() {
+  # umount "new_root"
+  umount /new_root || launch_interactive_shell
+  
+  # mount boot
+  mkdir /boot_root
+  mount -L RR-BOOT -o ro,defaults /boot_root || launch_interactive_shell
+
+  # check if data partition needs to be created
+  if [ "${recovery}" != "1" ]; then
+    blkid | grep "RR-DATA"
+    if [ $? -ne 0 ]; then
+      create_data_partition
+    fi
+  fi
+
+  # retroroot rootfs overlay
+  mkdir /overlay_data || launch_interactive_shell
+  
+  # mount data partition
+  if [ "${recovery}" = "1" ]; then
+    mount -t tmpfs -o size=128M tmpfs /overlay_data || launch_interactive_shell
+  else
+    mount -L "RR-DATA" -o rw,defaults /overlay_data || launch_interactive_shell
+  fi
+
+  # create directories
+  mkdir -p /overlay_data/lower_root /overlay_data/upper_root /overlay_data/work_root \
+      /overlay_data/lower_home /overlay_data/upper_home /overlay_data/work_home \
+      || launch_interactive_shell
+  
+  # mount root overlay
+  mount -t squashfs /boot_root/rootfs.sqsh /overlay_data/lower_root -o loop
+  mount -t overlay overlay -o lowerdir=/overlay_data/lower_root,upperdir=/overlay_data/upper_root,workdir=/overlay_data/work_root /new_root || launch_interactive_shell
+  
+  # mount "rr" home overlay
+  if [ "${recovery}" != "1" ]; then
+    mount -t overlay overlay -o lowerdir=/overlay_data/lower_root/home/rr,upperdir=/overlay_data/upper_home,workdir=/overlay_data/work_home /new_root/home/rr || launch_interactive_shell
+  fi
+  
+  # move boot in place
+  mkdir -p /new_root/boot
+  mount --move /boot_root /new_root/boot || launch_interactive_shell
+}
+

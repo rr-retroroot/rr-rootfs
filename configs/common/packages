@@ -19,7 +19,7 @@ export RR_PACKAGES="\
   mesa-vdpau \
   libva-mesa-driver
 "
-: '
+
 # "portlibs"
 export RR_PACKAGES=${RR_PACKAGES}"\
   asio \
@@ -118,4 +118,3 @@ export RR_PACKAGES=${RR_PACKAGES}"\
   zstd \
   zziplib
 "
-'

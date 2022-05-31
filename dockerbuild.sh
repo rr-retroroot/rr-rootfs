@@ -18,7 +18,6 @@ function cleanup {
   fi
   chmod -R 777 ${RR_OUTPUT_DIR}
   umount -lf ${MOUNT_BOOT} > /dev/null 2>&1 || :
-  umount -lf ${MOUNT_ROOT} > /dev/null 2>&1 || :
   losetup -d "$LOOP_DEV" > /dev/null 2>&1 || :
 }
 
@@ -78,13 +77,12 @@ pack_sysroot() {
   rm -f ${OUTPUT_SYS}/usr/lib/liblua5.4.so
   ln -s liblua.so.5.4.4 ${OUTPUT_SYS}/usr/lib/liblua5.4.so
 
-  # fix pkgconfig/cmake paths
+  # fix /usr/bin paths
   find ${OUTPUT_SYS}/usr/bin -type f -print0 | xargs -0 sed -i \
     "s|/usr|/opt/retroroot/target/${RR_ARCH}/usr|g"
-  find ${OUTPUT_SYS}/usr/lib/cmake -type f -print0 | xargs -0 sed -i \
-    "s|/usr|/opt/retroroot/target/${RR_ARCH}/usr|g"
-  find ${OUTPUT_SYS}/usr/share/cmake -type f -print0 | xargs -0 sed -i \
-    "s|/usr|/opt/retroroot/target/${RR_ARCH}/usr|g"
+  # fix /usr/lib paths
+  find ${OUTPUT_SYS}/usr/lib -type f \( -name "*.so" -o -name "*.a" \) -exec grep -Iq . {} \; -print0 | xargs -0 sed -i \
+    "s|/usr/lib|/opt/retroroot/target/${RR_ARCH}/usr/lib|g"
 
   # pack sysroot
   tar cfJ "${OUTPUT_TARBALL}" --directory="${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_ARCH}" .
@@ -103,20 +101,17 @@ main() {
   OUTPUT_IMG=${RR_OUTPUT_DIR}/retroroot-${RR_PLATFORM}-${RR_ARCH}.img
 
   # create image and partitions
-  dd if=/dev/zero of=${OUTPUT_IMG} bs=1M count=1152
+  dd if=/dev/zero of=${OUTPUT_IMG} bs=1M count=2048
   parted ${OUTPUT_IMG} -- \
     mklabel msdos \
     mkpart primary fat32 1 1024 \
-    mkpart primary ext2 1024 1152 \
     unit B
 
   # format partitions
   chmod 777 ${OUTPUT_IMG}
   LOOP_DEV=$(losetup --partscan --show --find "${OUTPUT_IMG}")
   BOOT_DEV="$LOOP_DEV"p1
-  DATA_DEV="$LOOP_DEV"p2
   mkfs.fat -F32 -n RR-BOOT "$BOOT_DEV"
-  mkfs.ext4 -L RR-DATA "$DATA_DEV"
 
   # set mount paths
   MOUNT_ROOT=/tmp/rootfs
@@ -124,8 +119,6 @@ main() {
   rm -rf ${MOUNT_BOOT}
 
   # mount partitions
-  mkdir -p ${MOUNT_ROOT}
-  #mount --make-private ${ROOT_DEV} ${MOUNT_ROOT}
   mkdir -p ${MOUNT_BOOT}
   mount --make-private ${BOOT_DEV} ${MOUNT_BOOT}
 
@@ -143,7 +136,7 @@ main() {
   mksquashfs ${MOUNT_ROOT} ${MOUNT_BOOT}/rootfs.sqsh -noappend -e boot
   
   # package toolchain (disabled for now)
-  #pack_sysroot
+  pack_sysroot
 }
 
 main "$@"

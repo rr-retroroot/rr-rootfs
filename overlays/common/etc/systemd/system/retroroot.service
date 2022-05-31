@@ -1,8 +1,0 @@
-[Unit]
-Description=RetroRoot data partition resizer
-
-[Service]
-Type=oneshot
-RemainAfterExit=yes
-ExecStart=/usr/bin/rr-resize
-

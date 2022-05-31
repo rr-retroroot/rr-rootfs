@@ -46,13 +46,15 @@ systemctl enable ${RR_SERVICES}
 # install desktop bootloader (mbr for now)
 if [ "${RR_PLATFORM}" == "desktop" ]; then
   syslinux-install_update -iam
-  # update initramfs including init overlay
-  mkinitcpio -p linux
   # minor cleanup
   rm -f /boot/initramfs-linux-fallback.img
 fi
 
+# update initramfs including "retroroot" mkinitcpio hook
+mkinitcpio -p linux
+
 # final cleanup
+sed -i 's/#CheckSpace/CheckSpace/g' /etc/pacman.conf
 rm -rf /bootstrap
 rm -rf /configs
 rm -rf /overlays

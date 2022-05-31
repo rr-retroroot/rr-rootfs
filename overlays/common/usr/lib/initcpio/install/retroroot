@@ -1,0 +1,15 @@
+#!/bin/bash
+
+build() {
+    add_binary parted
+    add_binary mke2fs
+
+    add_runscript
+}
+
+help() {
+    cat <<HELPEOF
+RetroRoot hook...
+HELPEOF
+}
+
