@@ -7,5 +7,5 @@ ALL_microcode=(/boot/*-ucode.img)
 PRESETS=('default')
 
 default_image="/boot/initramfs-linux.img"
-default_options="-S autodetect"
+default_options=""
 
