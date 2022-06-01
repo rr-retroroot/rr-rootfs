@@ -80,9 +80,6 @@ pack_sysroot() {
   # fix /usr/bin paths
   find ${OUTPUT_SYS}/usr/bin -type f -print0 | xargs -0 sed -i \
     "s|/usr|/opt/retroroot/target/${RR_ARCH}/usr|g"
-  # fix /usr/lib paths
-  find ${OUTPUT_SYS}/usr/lib -type f \( -name "*.so" -o -name "*.a" \) -exec grep -Iq . {} \; -print0 | xargs -0 sed -i \
-    "s|/usr/lib|/opt/retroroot/target/${RR_ARCH}/usr/lib|g"
   # fix cmake paths
   find ${OUTPUT_SYS}/usr/lib/cmake -type f -print0 | xargs -0 sed -i \
     "s|/usr|/opt/retroroot/target/${RR_ARCH}/usr|g"
