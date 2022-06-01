@@ -43,15 +43,17 @@ locale-gen
 source /configs/common/services
 systemctl enable ${RR_SERVICES}
 
-# install desktop bootloader (mbr for now)
+# install desktop bootloader (todo: uefi)
 if [ "${RR_PLATFORM}" == "desktop" ]; then
   syslinux-install_update -iam
+  # update initramfs including "retroroot" mkinitcpio hook
+  mkinitcpio -p linux
   # minor cleanup
   rm -f /boot/initramfs-linux-fallback.img
+else
+  # update initramfs including "retroroot" mkinitcpio hook
+  mkinitcpio -p linux-rpi
 fi
-
-# update initramfs including "retroroot" mkinitcpio hook
-mkinitcpio -p linux
 
 # final cleanup
 sed -i 's/#CheckSpace/CheckSpace/g' /etc/pacman.conf
