@@ -14,6 +14,7 @@ export RR_PACKAGES="\
   wget \
   openssh \
   vsftpd \
+  inetutils \
   mesa \
   mesa-vdpau \
   libva-mesa-driver

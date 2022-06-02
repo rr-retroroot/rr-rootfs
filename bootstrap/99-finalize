@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -xe
+
+source /configs/common/vars
+
+echo "rr-run-parts: $(basename $0)"
+
+# enable back pacman CheckSpace option
+sed -i 's/#CheckSpace/CheckSpace/g' /etc/pacman.conf
+
+# delete build directories
+rm -rf /bootstrap
+rm -rf /configs
+rm -rf /overlays
+

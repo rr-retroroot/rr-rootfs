@@ -21,7 +21,7 @@ pacman --noconfirm -Syy
 # root passwd
 echo "root:${RR_ROOT_PASSWORD}" | chpasswd
 
-# create user and groups
+# create local user and groups
 useradd -m ${RR_USERNAME}
 for GRP in autologin dialout cdrom spi i2c gpio netdev; do
 	groupadd -r --system $GRP
@@ -42,22 +42,4 @@ locale-gen
 # enable services
 source /configs/common/services
 systemctl enable ${RR_SERVICES}
-
-# install desktop bootloader (todo: uefi)
-if [ "${RR_PLATFORM}" == "desktop" ]; then
-  syslinux-install_update -iam
-  # update initramfs including "retroroot" mkinitcpio hook
-  mkinitcpio -p linux
-  # minor cleanup
-  rm -f /boot/initramfs-linux-fallback.img
-else
-  # update initramfs including "retroroot" mkinitcpio hook
-  mkinitcpio -p linux-rpi
-fi
-
-# final cleanup
-sed -i 's/#CheckSpace/CheckSpace/g' /etc/pacman.conf
-rm -rf /bootstrap
-rm -rf /configs
-rm -rf /overlays
 

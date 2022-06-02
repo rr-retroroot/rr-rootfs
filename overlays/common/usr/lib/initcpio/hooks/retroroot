@@ -49,6 +49,7 @@ run_latehook() {
   # mount "rr" home overlay
   if [ "${recovery}" != "1" ]; then
     mount -t overlay overlay -o lowerdir=/overlay_data/lower_root/home/rr,upperdir=/overlay_data/upper_home,workdir=/overlay_data/work_home /new_root/home/rr || launch_interactive_shell
+    chmod 777 /new_root/home/rr
   fi
   
   # move boot in place
