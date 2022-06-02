@@ -118,13 +118,13 @@ main() {
   # set mount paths
   MOUNT_ROOT=/tmp/rootfs
   MOUNT_BOOT=/tmp/rootfs/boot
-  rm -rf ${MOUNT_BOOT}
+  rm -rf ${MOUNT_ROOT}
 
   # mount partitions
   mkdir -p ${MOUNT_BOOT}
   mount --make-private ${BOOT_DEV} ${MOUNT_BOOT}
 
-  pacstrap -c ${MOUNT_ROOT} ${RR_PACKAGES}
+  pacstrap -C configs/pacstrap/pacman-${RR_ARCH}.conf -c ${MOUNT_ROOT} ${RR_PACKAGES}
 
   # copy platform config and bootstrap files
   cp -r bootstrap ${MOUNT_ROOT}
@@ -133,12 +133,12 @@ main() {
 
   # process retroroot installation and configuration
   arch-chroot ${MOUNT_ROOT} run-parts --exit-on-error -a ${RR_PLATFORM} -a ${RR_ARCH} /bootstrap/
-  
+
   # generate squashfs
   mksquashfs ${MOUNT_ROOT} ${MOUNT_BOOT}/rootfs.sqsh -noappend -e boot
-  
+
   # package toolchain (disabled for now)
-  pack_sysroot
+  #pack_sysroot
 }
 
 main "$@"

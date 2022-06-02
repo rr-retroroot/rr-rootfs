@@ -3,6 +3,7 @@
 export RR_SERVICES="\
   systemd-networkd
   systemd-resolved \
-  sshd
+  sshd \
+  vsftpd
 "
 

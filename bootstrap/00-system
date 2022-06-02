@@ -15,7 +15,7 @@ cp -r /overlays/${RR_PLATFORM}/. .
 # cleanup package cache and db (we don't want sys updates)
 rm -rf /var/cache/pacman/pkg
 rm -rf /var/lib/pacman/*
-# update retroroot packages
+# update retroroot database
 pacman --noconfirm -Syy
 
 # root passwd

@@ -7,10 +7,10 @@ build() {
   # set platform arch
   if [ "${PLATFORM}" == "desktop" ]; then
     ARCH=x86_64
-    RR_DOCKER_IMG="archlinux/archlinux:base-20220519.0.57040"
+    RR_DOCKER_IMG="archlinux/archlinux:base"
   else
     ARCH=aarch64
-    RR_DOCKER_IMG="stephank/archlinux:aarch64-latest"
+    RR_DOCKER_IMG="lopsided/archlinux-arm64v8:latest"
   fi
 
   docker pull ${RR_DOCKER_IMG}
@@ -22,12 +22,13 @@ build() {
   # build image with packages as argument
   docker build \
     --build-arg RR_DOCKER_IMG="${RR_DOCKER_IMG}" \
-    --build-arg RR_PACKAGES="${RR_PACKAGES}" \
     -t retroroot-${PLATFORM}-${ARCH} \
     .
 
   # let's go !
-  docker run --rm -v /dev:/dev:ro -v $(pwd)/output:/output --privileged=true \
+  docker run --rm --privileged=true \
+    -v /dev:/dev:ro \
+    -v $(pwd)/output:/output \
     -e RR_ARCH=${ARCH} \
     -e RR_PLATFORM=${PLATFORM} \
     -e RR_PACKAGES="${RR_PACKAGES}" \
