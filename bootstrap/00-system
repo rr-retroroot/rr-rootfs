@@ -12,11 +12,12 @@ cp -r /overlays/common/. .
 # copy platform overlay
 cp -r /overlays/${RR_PLATFORM}/. .
 
-# cleanup package cache and db (we don't want sys updates)
+# cleanup package cache
 rm -rf /var/cache/pacman/pkg
-rm -rf /var/lib/pacman/*
-# update retroroot database
+
+# update retroroot database and install retroroot stuff
 pacman --noconfirm -Syy
+pacman -S --noconfirm rr-recovery
 
 # root passwd
 echo "root:${RR_ROOT_PASSWORD}" | chpasswd

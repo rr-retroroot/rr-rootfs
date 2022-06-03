@@ -4,6 +4,7 @@ export RR_SERVICES="\
   systemd-networkd
   systemd-resolved \
   sshd \
-  vsftpd
+  vsftpd \
+  retroroot
 "
 

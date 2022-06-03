@@ -37,6 +37,7 @@ export RR_PACKAGES=${RR_PACKAGES}"\
   freetype2 \
   fribidi \
   fftw \
+  fuse2 \
   gd \
   giflib \
   glew \
