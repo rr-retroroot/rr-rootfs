@@ -80,11 +80,6 @@ pack_sysroot() {
   # fix /usr/bin paths
   find ${OUTPUT_SYS}/usr/bin -type f -print0 | xargs -0 sed -i \
     "s|/usr|/opt/retroroot/target/${RR_ARCH}/usr|g"
-  # fix cmake paths
-  find ${OUTPUT_SYS}/usr/lib/cmake -type f -print0 | xargs -0 sed -i \
-    "s|/usr|/opt/retroroot/target/${RR_ARCH}/usr|g"
-  find ${OUTPUT_SYS}/usr/share/cmake -type f -print0 | xargs -0 sed -i \
-    "s|/usr|/opt/retroroot/target/${RR_ARCH}/usr|g"
 
   # pack sysroot
   tar cfJ "${OUTPUT_TARBALL}" --directory="${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_ARCH}" .
@@ -138,7 +133,7 @@ main() {
   mksquashfs ${MOUNT_ROOT} ${MOUNT_BOOT}/rootfs.sqsh -noappend -e boot
 
   # package toolchain (disabled for now)
-  #pack_sysroot
+  pack_sysroot
 }
 
 main "$@"

@@ -17,7 +17,7 @@ rm -rf /var/cache/pacman/pkg
 
 # update retroroot database and install retroroot stuff
 pacman --noconfirm -Syy
-pacman -S --noconfirm rr-recovery
+pacman -S --noconfirm rr-recovery rr-splash
 
 # root passwd
 echo "root:${RR_ROOT_PASSWORD}" | chpasswd

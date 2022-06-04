@@ -1,14 +1,16 @@
 #!/bin/bash
 
 build() {
-    add_binary parted
-    add_binary mke2fs
+  add_binary parted
+  add_binary mke2fs
+  add_binary rr-splash
+  add_file /usr/share/retroroot/rr-splash/logo.png /logo.png
 
-    add_runscript
+  add_runscript
 }
 
 help() {
-    cat <<HELPEOF
+  cat <<HELPEOF
 RetroRoot hook...
 HELPEOF
 }
