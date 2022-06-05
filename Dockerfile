@@ -4,7 +4,7 @@ LABEL contributor="cpasjuste@gmail.com"
 
 # update and install build requirements
 RUN pacman -Syyu --noconfirm
-RUN pacman -S --needed --noconfirm arch-install-scripts \
+RUN pacman -S --needed --noconfirm base arch-install-scripts \
   parted e2fsprogs dosfstools squashfs-tools
 
 # add repo to build directory

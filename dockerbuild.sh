@@ -82,7 +82,7 @@ pack_sysroot() {
     "s|/usr|/opt/retroroot/target/${RR_ARCH}/usr|g"
 
   # pack sysroot
-  tar cfJ "${OUTPUT_TARBALL}" --directory="${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_ARCH}" .
+  tar -c -I 'xz -9 -T0' -f "${OUTPUT_TARBALL}" --directory="${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_ARCH}" .
   rm -rf "${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_ARCH}"
 }
 
@@ -133,7 +133,7 @@ main() {
   mksquashfs ${MOUNT_ROOT} ${MOUNT_BOOT}/rootfs.sqsh -noappend -e boot
 
   # package toolchain (disabled for now)
-  pack_sysroot
+  #pack_sysroot
 }
 
 main "$@"
