@@ -8,6 +8,10 @@ echo "rr-run-parts: $(basename $0)"
 
 # enable back pacman CheckSpace option
 sed -i 's/#CheckSpace/CheckSpace/g' /etc/pacman.conf
+# remove custom package cache directive
+sed -n '/CacheDir/!p' /etc/pacman.conf
+# cleanup pkg cache
+rm -rf /output/pacman_cache/${RR_ARCH}/
 
 # delete build directories
 rm -rf /bootstrap

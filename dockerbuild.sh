@@ -119,7 +119,7 @@ main() {
   mkdir -p ${MOUNT_BOOT}
   mount --make-private ${BOOT_DEV} ${MOUNT_BOOT}
 
-  pacstrap -C configs/pacstrap/pacman-${RR_ARCH}.conf -c ${MOUNT_ROOT} ${RR_PACKAGES}
+  pacstrap -C overlays/${RR_PLATFORM}/etc/pacman.conf -c ${MOUNT_ROOT} ${RR_PACKAGES}
 
   # copy platform config and bootstrap files
   cp -r bootstrap ${MOUNT_ROOT}
