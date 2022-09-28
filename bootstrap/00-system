@@ -16,8 +16,9 @@ cp -r /overlays/${RR_PLATFORM}/. .
 rm -rf /var/cache/pacman/pkg
 
 # update retroroot database and install retroroot stuff
+# todo: use custom "mkinitcpio" package
 pacman --noconfirm -Syy
-pacman -S --noconfirm rr-base rr-recovery rr-splash
+pacman -S --noconfirm --overwrite "/etc/mkinitcpio.conf" rr-base rr-recovery rr-splash
 
 # root passwd
 echo "root:${RR_ROOT_PASSWORD}" | chpasswd
