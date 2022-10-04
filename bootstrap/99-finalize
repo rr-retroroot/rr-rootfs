@@ -2,7 +2,7 @@
 
 set -xe
 
-source /configs/common/vars
+source /configs/platforms/common/vars
 
 echo "rr-run-parts: $(basename $0)"
 

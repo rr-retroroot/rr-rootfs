@@ -1,0 +1,10 @@
+# mkinitcpio preset file for the 'linux-rp2' package
+
+ALL_config="/etc/mkinitcpio.conf"
+ALL_kver="none"
+# 3.18.79-5-rp2
+
+PRESETS=('default')
+
+default_image="/boot/initramfs-linux.img"
+#default_options=""

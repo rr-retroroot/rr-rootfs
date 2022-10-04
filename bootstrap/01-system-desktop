@@ -2,7 +2,7 @@
 
 set -xe
 
-source /configs/common/vars
+source /configs/platforms/common/vars
 
 if [ "${RR_PLATFORM}" != "desktop" ]; then
   exit 0;

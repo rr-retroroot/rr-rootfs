@@ -4,12 +4,12 @@ set -xe
 
 source /configs/platforms/common/vars
 
-if [ "${RR_PLATFORM}" != "rpi" ]; then
+if [ "${RR_PLATFORM}" != "rp2" ]; then
   exit 0;
 fi
 
 echo "rr-run-parts: $(basename $0)"
 
 # update initramfs including "retroroot" mkinitcpio hook
-mkinitcpio -p linux-rpi
+mkinitcpio -p linux-rp2
 

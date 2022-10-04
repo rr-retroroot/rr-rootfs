@@ -1,23 +1,26 @@
 #!/bin/bash
 
 build() {
-  local ARCH=
-  local PLATFORM=$1
+  local ARCH=$1
+  local PLATFORM=$2
 
   # set platform arch
-  if [ "${PLATFORM}" == "desktop" ]; then
-    ARCH=x86_64
+  if [ "${ARCH}" == "x86_64" ]; then
     RR_DOCKER_IMG="archlinux/archlinux:base"
-  else
-    ARCH=aarch64
+  elif [ "$ARCH" == "aarch64" ]; then
     RR_DOCKER_IMG="lopsided/archlinux-arm64v8:latest"
+  else
+    RR_DOCKER_IMG="lopsided/archlinux-arm32v7:latest"
   fi
+
+  echo "[build] arch: $ARCH, platform: $PLATFORM, docker image: $RR_DOCKER_IMG"
 
   docker pull ${RR_DOCKER_IMG}
 
-  # install desired packages on docker image so caching is used in pacstrap
-  source configs/common/packages
-  source configs/${PLATFORM}/packages
+  # install target packages in docker image for pacstrap package caching
+  # this also populate RR_PACKAGES variable
+  source configs/platforms/common/packages
+  source configs/platforms/${PLATFORM}/packages
 
   # build image with packages as argument
   docker build \
@@ -51,24 +54,41 @@ run() {
 }
 
 show_usage() {
-  echo "usage: $(basename "$0") [-b desktop|rpi] [-r desktop|rpi]"
+  echo "usage: $(basename "$0") [-a x86_64|armv7h|aarch64] [-p desktop|rpi|rp2|none]"
+  echo ""
   echo "examples:"
-  echo "       $(basename "$0") -b desktop      | build desktop image"
-  echo "       $(basename "$0") -r desktop      | run desktop image"
+  echo "       $(basename "$0") -a x86_64 -p desktop  | build x86_64 arch for desktop platform"
+  echo "       $(basename "$0") -r desktop            | run desktop platform image"
 }
 
 main() {
   # parse args
   test $# -eq 0 && set -- "-h"
-  while getopts "b:r:h" ARG; do
+  while getopts "a:p:r:h" ARG; do
     case "$ARG" in
-      b) build $OPTARG; return 0;;
+      a) a=$OPTARG;;
+      p) b=$OPTARG;;
       r) run $OPTARG; return 0;;
       *) show_usage; return 1;;
     esac
   done
   shift $(($OPTIND-1))
-  test $# -eq 1 || { show_usage; return 1; }
+
+  if [ -z ${b+x} ]; then
+    b="none";
+  fi
+
+  if [ $a != "x86_64" ] && [ $a != "armv7h" ] && [ $a != "aarch64" ]; then
+    echo "error: supported arch: x86_64, armv7h, aarch64"
+    return 1;
+  fi
+
+  if [ $b != "desktop" ] && [ $b != "rpi" ] && [ $b != "rp2" ] && [ $b != "none" ]; then
+    echo "error: supported platform: desktop, rpi, rp2, none"
+    return 1;
+  fi
+
+  build $a $b
 }
 
 main "$@"

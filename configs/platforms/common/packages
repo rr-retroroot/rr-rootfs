@@ -13,6 +13,7 @@ export RR_PACKAGES="\
   nano \
   wget \
   openssh \
+  kexec-tools \
   vsftpd \
   inetutils \
   mesa \

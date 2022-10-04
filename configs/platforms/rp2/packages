@@ -1,0 +1,6 @@
+#!/bin/bash
+
+export RR_PACKAGES=${RR_PACKAGES}"\
+  linux-rp2 \
+"
+

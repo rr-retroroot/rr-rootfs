@@ -2,7 +2,7 @@
 
 set -xe
 
-source /configs/common/vars
+source /configs/platforms/common/vars
 
 echo "rr-run-parts: $(basename $0)"
 
@@ -10,7 +10,12 @@ echo "rr-run-parts: $(basename $0)"
 cp -r /overlays/common/. .
 
 # copy platform overlay
-cp -r /overlays/${RR_PLATFORM}/. .
+if [ -d "/overlays/${RR_PLATFORM}" ]; then
+  cp -r /overlays/${RR_PLATFORM}/. .
+fi
+
+# copy pacman config
+cp -f /configs/pacman-${RR_ARCH}.conf /etc/pacman.conf
 
 # cleanup package cache
 rm -rf /var/cache/pacman/pkg
@@ -42,6 +47,9 @@ ${RR_USERNAME} ALL=(ALL) ALL
 locale-gen
 
 # enable services
-source /configs/common/services
+source /configs/platforms/common/services
+if [ -f "/configs/platforms/${RR_PLATFORM}/services" ]; then
+  source /configs/platforms/${RR_PLATFORM}/services
+fi
 systemctl enable ${RR_SERVICES}
 
