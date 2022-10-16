@@ -55,7 +55,7 @@ run() {
 }
 
 show_usage() {
-  echo "usage: $(basename "$0") [-a x86_64|armv7h|aarch64] [-p desktop|rpi|none]"
+  echo "usage: $(basename "$0") [-a x86_64|armv7h|aarch64] [-p desktop|rpi|rg353|none]"
   echo ""
   echo "examples:"
   echo "       $(basename "$0") -a x86_64 -p desktop  | build x86_64 arch for desktop platform"
@@ -84,8 +84,8 @@ main() {
     return 1;
   fi
 
-  if [ $b != "desktop" ] && [ $b != "rpi" ] && [ $b != "none" ]; then
-    echo "error: supported platform: desktop, rpi, none"
+  if [ $b != "desktop" ] && [ $b != "rpi" ] && [ $b != "rg353" ] && [ $b != "none" ]; then
+    echo "error: supported platform: desktop, rpi, rg353, none"
     return 1;
   fi
 
