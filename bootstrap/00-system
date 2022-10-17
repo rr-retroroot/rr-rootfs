@@ -21,7 +21,7 @@ cp -f /configs/pacman-${RR_ARCH}.conf /etc/pacman.conf
 rm -rf /var/cache/pacman/pkg
 
 # update retroroot database and install retroroot stuff
-# todo: use custom "mkinitcpio" package
+# todo: use custom "mkinitcpio" package or PKGBUILD override?
 pacman --noconfirm -Syy
 pacman -S --noconfirm --overwrite "/etc/mkinitcpio.conf" rr-base rr-recovery rr-splash
 

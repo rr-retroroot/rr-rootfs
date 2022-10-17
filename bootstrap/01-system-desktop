@@ -13,9 +13,6 @@ echo "rr-run-parts: $(basename $0)"
 # install desktop bootloader (todo: uefi)
 syslinux-install_update -iam
 
-# update initramfs including "retroroot" mkinitcpio hook
-mkinitcpio -p linux
-
-# minor cleanup
+# cleanup
 rm -f /boot/initramfs-linux-fallback.img
 

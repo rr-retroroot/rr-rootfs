@@ -10,6 +10,5 @@ fi
 
 echo "rr-run-parts: $(basename $0)"
 
-# update initramfs including "retroroot" mkinitcpio hook
-mkinitcpio -p linux-rpi
+# nothing to do here for now...
 
