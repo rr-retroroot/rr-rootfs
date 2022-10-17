@@ -15,7 +15,8 @@ export RR_PACKAGES="\
   openssh \
   strace \
   vsftpd \
-  inetutils
+  inetutils \
+  iwd
 "
 
 # "portlibs"
