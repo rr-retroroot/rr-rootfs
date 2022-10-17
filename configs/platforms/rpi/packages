@@ -1,6 +1,9 @@
 #!/bin/bash
 
 export RR_PACKAGES=${RR_PACKAGES}"\
+  mesa \
+  mesa-vdpau \
+  libva-mesa-driver \
   linux-rpi \
   raspberrypi-bootloader \
   raspberrypi-firmware \

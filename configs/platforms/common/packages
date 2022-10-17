@@ -13,12 +13,9 @@ export RR_PACKAGES="\
   nano \
   wget \
   openssh \
-  kexec-tools \
+  strace \
   vsftpd \
-  inetutils \
-  mesa \
-  mesa-vdpau \
-  libva-mesa-driver
+  inetutils
 "
 
 # "portlibs"
