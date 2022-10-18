@@ -7,6 +7,7 @@ export RR_PACKAGES="\
   net-tools \
   parted \
   e2fsprogs \
+  exfatprogs \
   dosfstools \
   bash-completion \
   sudo \

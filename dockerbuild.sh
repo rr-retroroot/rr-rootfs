@@ -101,10 +101,9 @@ main() {
   dd if=/dev/zero of=${OUTPUT_IMG} bs=1M count=2048
 
   # create "RR-BOOT" partition
-  parted ${OUTPUT_IMG} -- \
+  parted -s -a optimal ${OUTPUT_IMG} -- \
     mklabel msdos \
-    mkpart primary fat32 1 1024 \
-    unit B
+    mkpart primary fat32 0% 1024MB
 
   # format "RR-BOOT" partition
   chmod 777 ${OUTPUT_IMG}
