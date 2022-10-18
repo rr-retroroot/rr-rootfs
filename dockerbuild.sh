@@ -97,14 +97,16 @@ main() {
   # set output image path
   OUTPUT_IMG=${RR_OUTPUT_DIR}/retroroot-${RR_PLATFORM}-${RR_ARCH}.img
 
-  # create image and partitions
+  # create output image
   dd if=/dev/zero of=${OUTPUT_IMG} bs=1M count=2048
+
+  # create "RR-BOOT" partition
   parted ${OUTPUT_IMG} -- \
     mklabel msdos \
     mkpart primary fat32 1 1024 \
     unit B
 
-  # format partitions
+  # format "RR-BOOT" partition
   chmod 777 ${OUTPUT_IMG}
   LOOP_DEV=$(losetup --partscan --show --find "${OUTPUT_IMG}")
   BOOT_DEV="$LOOP_DEV"p1
