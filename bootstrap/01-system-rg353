@@ -2,7 +2,7 @@
 
 set -xe
 
-source /configs/platforms/common/vars
+source /configs/vars
 
 if [ "${RR_PLATFORM}" != "rg353" ]; then
   exit 0;

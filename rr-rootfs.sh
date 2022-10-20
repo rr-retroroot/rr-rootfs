@@ -19,8 +19,8 @@ build() {
 
   # install target packages in docker image for pacstrap package caching
   # this also populate RR_PACKAGES variable
-  source configs/platforms/common/packages
-  source configs/platforms/${PLATFORM}/packages
+  source configs/packages
+  source configs/packages-${PLATFORM}
 
   # build image with packages as argument
   docker build \

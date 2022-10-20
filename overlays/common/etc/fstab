@@ -1,4 +1,0 @@
-tmpfs           /tmp        tmpfs     nodev,nosuid          0	0
-LABEL=RR-BOOT   /boot       vfat      ro,defaults           0 2
-LABEL=RR-DATA   /home/rr    exfat     defaults              0 2
-

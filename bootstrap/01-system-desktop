@@ -2,7 +2,7 @@
 
 set -xe
 
-source /configs/platforms/common/vars
+source /configs/vars
 
 if [ "${RR_PLATFORM}" != "desktop" ]; then
   exit 0;
@@ -13,6 +13,6 @@ echo "rr-run-parts: $(basename $0)"
 # install desktop bootloader (todo: uefi)
 syslinux-install_update -iam
 
-# cleanup
+# cleanup boot partition
 rm -f /boot/initramfs-linux-fallback.img
 

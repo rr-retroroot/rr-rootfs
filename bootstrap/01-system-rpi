@@ -2,7 +2,7 @@
 
 set -xe
 
-source /configs/platforms/common/vars
+source /configs/vars
 
 if [ "${RR_PLATFORM}" != "rpi" ]; then
   exit 0;

@@ -2,7 +2,7 @@
 
 set -xe
 
-source /configs/platforms/common/vars
+source /configs/vars
 
 echo "rr-run-parts: $(basename $0)"
 
@@ -12,9 +12,9 @@ sed -i 's/#CheckSpace/CheckSpace/g' /etc/pacman.conf
 sed -i '/CacheDir/d' /etc/pacman.conf
 # cleanup pkg cache
 rm -rf /output/pacman_cache/${RR_ARCH}/
+rm -rf /var/cache/pacman/pkg
 
 # delete build directories
 rm -rf /bootstrap
 rm -rf /configs
-rm -rf /overlays
 

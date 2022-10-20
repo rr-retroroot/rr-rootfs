@@ -125,15 +125,15 @@ main() {
   # copy config and bootstrap files
   cp -r bootstrap ${MOUNT_ROOT}
   cp -r configs ${MOUNT_ROOT}
-  cp -r overlays ${MOUNT_ROOT}
 
   # process retroroot installation and configuration
-  arch-chroot ${MOUNT_ROOT} run-parts --exit-on-error -a ${RR_PLATFORM} -a ${RR_ARCH} /bootstrap/
+  arch-chroot ${MOUNT_ROOT} run-parts --exit-on-error -a ${RR_PLATFORM} -a ${RR_ARCH} /bootstrap
 
   # generate squashfs
   mksquashfs ${MOUNT_ROOT} ${MOUNT_BOOT}/rootfs.sqsh -noappend -e boot
 
-  # package toolchain (disabled for now)
+  # TODO: add rr-rootfs.sh toolchain build argument
+  # package toolchain
   #pack_sysroot
 }
 

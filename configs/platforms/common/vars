@@ -1,7 +1,0 @@
-#!/bin/bash
-
-export RR_PLATFORM=$1
-export RR_ARCH=$2
-export RR_ROOT_PASSWORD=retroroot
-export RR_USERNAME=rr
-

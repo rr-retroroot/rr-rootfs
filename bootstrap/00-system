@@ -2,28 +2,16 @@
 
 set -xe
 
-source /configs/platforms/common/vars
+source /configs/vars
 
 echo "rr-run-parts: $(basename $0)"
 
-# copy common overlay
-cp -r /overlays/common/. .
-
-# copy platform overlay
-if [ -d "/overlays/${RR_PLATFORM}" ]; then
-  cp -r /overlays/${RR_PLATFORM}/. .
-fi
-
-# copy pacman config
+# copy target pacman config
 cp -f /configs/pacman-${RR_ARCH}.conf /etc/pacman.conf
 
-# cleanup package cache
-rm -rf /var/cache/pacman/pkg
-
 # update retroroot database and install retroroot stuff
-# todo: use custom "mkinitcpio" package or PKGBUILD override?
 pacman --noconfirm -Syy
-pacman -S --noconfirm --overwrite "/etc/mkinitcpio.conf" rr-base rr-recovery rr-splash
+pacman -S --needed --noconfirm --overwrite "*" rr-base-${RR_PLATFORM} rr-recovery rr-splash
 
 # root passwd
 echo "root:${RR_ROOT_PASSWORD}" | chpasswd
@@ -47,9 +35,6 @@ ${RR_USERNAME} ALL=(ALL) ALL
 locale-gen
 
 # enable services
-source /configs/platforms/common/services
-if [ -f "/configs/platforms/${RR_PLATFORM}/services" ]; then
-  source /configs/platforms/${RR_PLATFORM}/services
-fi
+source /configs/services
 systemctl enable ${RR_SERVICES}
 
