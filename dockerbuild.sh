@@ -101,14 +101,15 @@ main() {
   dd if=/dev/zero of=${OUTPUT_IMG} bs=1M count=2048
 
   # create "RR-BOOT" partition
-  parted -a optimal -s ${OUTPUT_IMG} \
-    mklabel msdos \
-    mkpart primary fat32 0% 1024MiB
+  parted -a optimal -s ${OUTPUT_IMG} mklabel gpt
+  parted -a optimal -s ${OUTPUT_IMG} unit s mkpart uboot 16384 24575
+  parted -a optimal -s ${OUTPUT_IMG} unit s mkpart resource 24576 32767
+  parted -a optimal -s ${OUTPUT_IMG} mkpart primary fat32 1% 1024MiB
 
   # format "RR-BOOT" partition
   chmod 777 ${OUTPUT_IMG}
   LOOP_DEV=$(losetup --partscan --show --find "${OUTPUT_IMG}")
-  BOOT_DEV="$LOOP_DEV"p1
+  BOOT_DEV="$LOOP_DEV"p3
   mkfs.fat -F32 -n RR-BOOT "$BOOT_DEV"
 
   # set mount paths

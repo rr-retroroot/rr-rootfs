@@ -9,4 +9,5 @@ export RR_PACKAGES=${RR_PACKAGES}"\
   amd-ucode \
   intel-ucode \
   syslinux \
+  gptfdisk
 "
