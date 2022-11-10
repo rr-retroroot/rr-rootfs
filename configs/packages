@@ -5,9 +5,6 @@ export RR_PACKAGES="\
   run-parts \
   squashfs-tools \
   net-tools \
-  parted \
-  e2fsprogs \
-  exfatprogs \
   dosfstools \
   bash-completion \
   sudo \
