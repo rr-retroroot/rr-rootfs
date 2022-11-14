@@ -15,3 +15,7 @@
     ```
     ./rr-rootfs.sh -a x86_64 -p desktop
     ```
+- Run x86_64 desktop image:
+    ```
+    ./rr-rootfs.sh -r desktop
+    ```
