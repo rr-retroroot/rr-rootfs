@@ -1,13 +1,13 @@
 #!/bin/bash
 
 export RR_PACKAGES=${RR_PACKAGES}"\
+  gptfdisk \
+  syslinux \
   mesa \
   mesa-vdpau \
   libva-mesa-driver \
   linux \
   linux-firmware \
   amd-ucode \
-  intel-ucode \
-  syslinux \
-  gptfdisk
+  intel-ucode
 "

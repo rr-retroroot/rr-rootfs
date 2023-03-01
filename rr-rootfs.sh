@@ -41,10 +41,11 @@ build() {
 run() {
   if [ "$1" == "desktop" ]; then
     qemu-img resize -f raw "output/retroroot-desktop-x86_64.img" 10G
-    qemu-system-x86_64 -m 2G \
+    qemu-system-x86_64 -m 2G -smp 4 \
       -serial stdio \
       -device virtio-vga-gl -display sdl,gl=on \
       -device e1000,netdev=net0 -netdev user,id=net0,hostfwd=tcp::5555-:22 \
+      -usbdevice mouse \
       -drive format=raw,file="output/retroroot-desktop-x86_64.img"
   else
     # TODO
