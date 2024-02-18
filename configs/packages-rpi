@@ -5,7 +5,7 @@ export RR_PACKAGES=${RR_PACKAGES}"\
   mesa-vdpau \
   libva-mesa-driver \
   linux-rpi \
-  raspberrypi-firmware \
-  raspberrypi-bootloader \
-  rpi-eeprom \
+  firmware-raspberrypi \
+  raspberrypi-bootloader
 "
+# rpi4-eeprom
