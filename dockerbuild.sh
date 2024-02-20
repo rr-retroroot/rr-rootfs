@@ -28,7 +28,7 @@ pack_sysroot() {
   OUTPUT_SYS="${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_ARCH}/opt/retroroot/target/${RR_ARCH}"
   OUTPUT_TARBALL="${RR_OUTPUT_DIR}/retroroot-sysroot-${RR_ARCH}.tar.xz"
 
-  minfo "rr: generating sysroot taball: ${OUTPUT_TARBALL}"
+  minfo "rr: generating sysroot tarball: ${OUTPUT_TARBALL}"
 
   rm -rf "${OUTPUT_TARBALL}"
   rm -rf "${OUTPUT_SYS}"
@@ -91,6 +91,12 @@ main() {
   minfo "rr: platform: ${RR_PLATFORM}"
   minfo "rr: arch: ${RR_ARCH}"
 
+  # update pacman db and install build deps
+  cp -f configs/pacman-${RR_ARCH}.conf /etc/pacman.conf
+  #pacman -Scc --noconfirm # cleanup cache
+  pacman -Syyu --noconfirm
+  pacman -S --needed --noconfirm base arch-install-scripts parted e2fsprogs dosfstools squashfs-tools
+
   # ...
   chmod -R 777 ${RR_OUTPUT_DIR}
 
@@ -128,14 +134,16 @@ main() {
   cp -r configs ${MOUNT_ROOT}
 
   # process retroroot installation and configuration
-  arch-chroot ${MOUNT_ROOT} run-parts --exit-on-error -a ${RR_PLATFORM} -a ${RR_ARCH} /bootstrap
+  arch-chroot ${MOUNT_ROOT} run-parts --exit-on-error -a ${RR_PLATFORM} -a ${RR_ARCH} -a ${RR_BUILD_TOOLCHAIN} /bootstrap
 
-  # generate squashfs
-  mksquashfs ${MOUNT_ROOT} ${MOUNT_BOOT}/rootfs.sqsh -noappend -e boot
-
-  # TODO: add rr-rootfs.sh toolchain build argument
-  # package toolchain
-  #pack_sysroot
+  if [ "$RR_BUILD_TOOLCHAIN" == "1" ]; then
+    # package toolchain
+    pack_sysroot
+    rm -f ${OUTPUT_IMG}
+  else
+    # generate squashfs
+    mksquashfs ${MOUNT_ROOT} ${MOUNT_BOOT}/rootfs.sqsh -noappend -e boot
+  fi
 }
 
 main "$@"

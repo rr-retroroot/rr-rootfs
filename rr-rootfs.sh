@@ -9,8 +9,10 @@ build() {
     RR_DOCKER_IMG="archlinux/archlinux:base"
   elif [ "$ARCH" == "aarch64" ]; then
     RR_DOCKER_IMG="lopsided/archlinux-arm64v8:latest"
-  else
+  elif [ "$ARCH" == "armv7h" ]; then
     RR_DOCKER_IMG="lopsided/archlinux-arm32v7:latest"
+  elif [ "$ARCH" == "armv6h" ]; then
+    RR_DOCKER_IMG="lopsided/archlinux-arm32v6:latest"
   fi
 
   echo "[build] arch: $ARCH, platform: $PLATFORM, docker image: $RR_DOCKER_IMG"
@@ -21,6 +23,11 @@ build() {
   # this also populate RR_PACKAGES variable
   source configs/packages
   source configs/packages-${PLATFORM}
+  
+  # TODO: use custom kernel package for rpi
+  if [ "$PLATFORM" == "rpi" ] && [ "$ARCH" == "armv6h" ]; then
+    RR_PACKAGES="${RR_PACKAGES//linux-rpi/linux-rpi-legacy}"
+  fi
 
   # build image with packages as argument
   docker build \
@@ -35,6 +42,7 @@ build() {
     -e RR_ARCH=${ARCH} \
     -e RR_PLATFORM=${PLATFORM} \
     -e RR_PACKAGES="${RR_PACKAGES}" \
+    -e RR_BUILD_TOOLCHAIN="${3}" \
     retroroot-${PLATFORM}-${ARCH}
 }
 
@@ -57,20 +65,22 @@ run() {
 }
 
 show_usage() {
-  echo "usage: $(basename "$0") [-a x86_64|armv7h|aarch64] [-p desktop|rpi|rg353|none]"
+  echo "usage: $(basename "$0") [-a x86_64|armv6h|armv7h|aarch64] [-p desktop|rpi|rg353|none] [-t 0|1]"
   echo ""
   echo "examples:"
-  echo "       $(basename "$0") -a x86_64 -p desktop  | build x86_64 arch for desktop platform"
-  echo "       $(basename "$0") -r desktop            | run desktop platform image"
+  echo "       $(basename "$0") -a x86_64 -p desktop      | build x86_64 arch for desktop platform"
+  echo "       $(basename "$0") -a x86_64 -p desktop -t   | build x86_64 desktop toolchain"
+  echo "       $(basename "$0") -r desktop                | run desktop platform image"
 }
 
 main() {
   # parse args
   test $# -eq 0 && set -- "-h"
-  while getopts "a:p:r:h" ARG; do
+  while getopts "a:p:t:r:h" ARG; do
     case "$ARG" in
       a) a=$OPTARG;;
-      p) b=$OPTARG;;
+      p) p=$OPTARG;;
+      t) t=$OPTARG;;
       r) run $OPTARG; return 0;;
       *) show_usage; return 1;;
     esac
@@ -81,17 +91,17 @@ main() {
     b="none";
   fi
 
-  if [ $a != "x86_64" ] && [ $a != "armv7h" ] && [ $a != "aarch64" ]; then
-    echo "error: supported arch: x86_64, armv7h, aarch64"
+  if [ $a != "x86_64" ] && [ $a != "armv6h" ] && [ $a != "armv7h" ] && [ $a != "aarch64" ]; then
+    echo "error: supported arch: x86_64, armv6h, armv7h, aarch64"
     return 1;
   fi
 
-  if [ $b != "desktop" ] && [ $b != "rpi" ] && [ $b != "rg353" ] && [ $b != "none" ]; then
+  if [ $p != "desktop" ] && [ $p != "rpi" ] && [ $p != "rg353" ] && [ $p != "none" ]; then
     echo "error: supported platform: desktop, rpi, rg353, none"
     return 1;
   fi
 
-  build $a $b
+  build $a $p $t
 }
 
 main "$@"

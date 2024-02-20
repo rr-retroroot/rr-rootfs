@@ -4,6 +4,11 @@ set -xe
 
 source /configs/vars
 
+# if toolchain build was requested just skip...
+if [ "$RR_BUILD_TOOLCHAIN" == "1" ]; then
+  exit 0;
+fi
+
 echo "rr-run-parts: $(basename $0)"
 
 # enable back pacman CheckSpace option
