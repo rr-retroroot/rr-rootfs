@@ -120,6 +120,9 @@ main() {
   # mount partitions
   mkdir -p ${MOUNT_BOOT}
   mount --make-private ${BOOT_DEV} ${MOUNT_BOOT}
+  
+  minfo "rr: running pacstrap with packages:"
+  minfo "${RR_PACKAGES}"
 
   pacstrap -C configs/pacman-${RR_ARCH}.conf -c ${MOUNT_ROOT} ${RR_PACKAGES}
 
