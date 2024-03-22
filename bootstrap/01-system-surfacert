@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -xe
+
+source /configs/vars
+
+if [ "${RR_PLATFORM}" != "surfacert" ]; then
+  exit 0;
+fi
+
+echo "rr-run-parts: $(basename $0)"
+
+# nothing to do here for now...
+
