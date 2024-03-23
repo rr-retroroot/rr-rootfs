@@ -4,6 +4,9 @@ export RR_PACKAGES=${RR_PACKAGES}"\
   mesa \
   mesa-vdpau \
   libglvnd \
-  linux-surfacert
+  linux-surfacert \
+  linux-firmware \
+  linux-firmware-marvell
 "
+# wpa_supplicant dhclient
 

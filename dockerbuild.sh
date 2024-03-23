@@ -138,7 +138,7 @@ main() {
 
   # TODO: add rr-rootfs.sh toolchain build argument
   # package toolchain
-  #pack_sysroot
+  # pack_sysroot
 }
 
 main "$@"

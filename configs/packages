@@ -10,11 +10,13 @@ export RR_PACKAGES="\
   sudo \
   nano \
   wget \
+  less \
   openssh \
   strace \
   vsftpd \
   inetutils \
-  iwd
+  iwd \
+  wireless-regdb
 "
 
 # "portlibs"
