@@ -4,7 +4,7 @@ export RR_PACKAGES=${RR_PACKAGES}"\
   mesa \
   mesa-vdpau \
   libglvnd \
-  linux-surfacert \
+  linux-surfacert-downstream \
   linux-firmware \
   linux-firmware-marvell
 "
