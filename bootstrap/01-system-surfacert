@@ -10,7 +10,8 @@ fi
 
 echo "rr-run-parts: $(basename $0)"
 
-mkinitcpio -p linux
+#ln -s /usr/lib/libidn.so /usr/lib/libidn.so.11
+#mkinitcpio -p linux
 
 # TODO: fixme
 # disable services

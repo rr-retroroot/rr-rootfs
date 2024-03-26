@@ -11,8 +11,8 @@ cp -f /configs/pacman-${RR_ARCH}.conf /etc/pacman.conf
 
 # update retroroot database and install retroroot stuff
 pacman --noconfirm -Syy
-pacman --noconfirm -S --needed --force rr-base-${RR_PLATFORM} rr-recovery
-# --overwrite "*"
+pacman --noconfirm -S --needed --overwrite "*" rr-base rr-base-${RR_PLATFORM} rr-recovery
+# --force
 
 # root passwd
 echo "root:${RR_ROOT_PASSWORD}" | chpasswd

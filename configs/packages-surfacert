@@ -1,11 +1,13 @@
 #!/bin/bash
 
-export RR_PACKAGES=${RR_PACKAGES}"\
+# downstream kernel (3.4.x) with tegra xorg hw acceleration doesn't work with latest systemd, use older version
+export RR_PACKAGES=${RR_PACKAGES}" \
+  filesystem=2023.01.01-1 systemd=230-7 systemd-sysvcompat=230-7 libsystemd=230-7 systemd-libs=230-7 \
   mesa \
   libglvnd \
   linux-surfacert-downstream \
   linux-firmware \
-  wpa_supplicant
+  wpa_supplicant dhclient
 "
 # mesa-vdpau linux-firmware-marvell
 # wpa_supplicant dhclient
