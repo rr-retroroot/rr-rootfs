@@ -10,8 +10,8 @@ fi
 
 echo "rr-run-parts: $(basename $0)"
 
-#ln -s /usr/lib/libidn.so /usr/lib/libidn.so.11
-#mkinitcpio -p linux
+# fix dbus-daemon-units for old systemd
+#pacman --noconfirm -S --overwrite "*" dbus-daemon-units
 
 # TODO: fixme
 # disable services
