@@ -2,11 +2,11 @@
 
 export RR_PACKAGES=${RR_PACKAGES}"\
   mesa \
-  mesa-vdpau \
   libglvnd \
   linux-surfacert-downstream \
   linux-firmware \
-  linux-firmware-marvell
+  wpa_supplicant
 "
+# mesa-vdpau linux-firmware-marvell
 # wpa_supplicant dhclient
 

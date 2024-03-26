@@ -17,6 +17,7 @@ function cleanup {
     merror 'something went wrong, exiting...'
   fi
   chmod -R 777 ${RR_OUTPUT_DIR}
+  umount -lf ${MOUNT_ROOT} > /dev/null 2>&1 || :
   umount -lf ${MOUNT_BOOT} > /dev/null 2>&1 || :
   losetup -d "$LOOP_DEV" > /dev/null 2>&1 || :
 }
@@ -98,19 +99,35 @@ main() {
   OUTPUT_IMG=${RR_OUTPUT_DIR}/retroroot-${RR_PLATFORM}-${RR_ARCH}.img
 
   # create output image
-  dd if=/dev/zero of=${OUTPUT_IMG} bs=1M count=2048
+  dd if=/dev/zero of=${OUTPUT_IMG} bs=1M count=3072
 
   # create "RR-BOOT" partition
   parted -a optimal -s ${OUTPUT_IMG} mklabel gpt
-  parted -a optimal -s ${OUTPUT_IMG} unit s mkpart uboot 16384 24575
-  parted -a optimal -s ${OUTPUT_IMG} unit s mkpart resource 24576 32767
-  parted -a optimal -s ${OUTPUT_IMG} mkpart primary fat32 1% 1024MiB
-
+  # TODO: revert this for rg353v ?
+  #parted -a optimal -s ${OUTPUT_IMG} unit s mkpart uboot 16384 24575
+  #parted -a optimal -s ${OUTPUT_IMG} unit s mkpart resource 24576 32767
+  parted -a optimal -s ${OUTPUT_IMG} mkpart primary fat32 0% 256MiB
+  
+  # create "RR-ROOT" partition
+  if [ "${RR_PLATFORM}" == "surfacert" ]; then
+    parted -a optimal -s ${OUTPUT_IMG} mkpart primary ext3 256MiB 100%
+  else
+    parted -a optimal -s ${OUTPUT_IMG} mkpart primary ext4 256MiB 100%
+  fi
+  
   # format "RR-BOOT" partition
   chmod 777 ${OUTPUT_IMG}
   LOOP_DEV=$(losetup --partscan --show --find "${OUTPUT_IMG}")
-  BOOT_DEV="$LOOP_DEV"p3
-  mkfs.fat -F32 -n RR-BOOT "$BOOT_DEV"
+  BOOT_DEV="$LOOP_DEV"p1
+  mkfs.fat -F32 -n RR-BOOT ${BOOT_DEV}
+  
+  # format "RR-ROOT" partition
+  ROOT_DEV="$LOOP_DEV"p2
+  if [ "${RR_PLATFORM}" == "surfacert" ]; then
+    mke2fs -t ext3 -L RR-ROOT ${ROOT_DEV}
+  else
+    mke2fs -t ext4 -L RR-ROOT ${ROOT_DEV}
+  fi
 
   # set mount paths
   MOUNT_ROOT=/tmp/rootfs
@@ -118,6 +135,8 @@ main() {
   rm -rf ${MOUNT_ROOT}
 
   # mount partitions
+  mkdir -p ${MOUNT_ROOT}
+  mount --make-private ${ROOT_DEV} ${MOUNT_ROOT}
   mkdir -p ${MOUNT_BOOT}
   mount --make-private ${BOOT_DEV} ${MOUNT_BOOT}
   
@@ -134,7 +153,7 @@ main() {
   arch-chroot ${MOUNT_ROOT} run-parts --exit-on-error -a ${RR_PLATFORM} -a ${RR_ARCH} /bootstrap
 
   # generate squashfs
-  mksquashfs ${MOUNT_ROOT} ${MOUNT_BOOT}/rootfs.sqsh -noappend -e boot
+  #mksquashfs ${MOUNT_ROOT} ${MOUNT_BOOT}/rootfs.sqsh -noappend -e boot
 
   # TODO: add rr-rootfs.sh toolchain build argument
   # package toolchain

@@ -1,9 +1,18 @@
 #!/bin/bash
 
-export RR_PACKAGES="\
-  base \
+# "base" package
+# https://gitlab.archlinux.org/archlinux/packaging/packages/base/-/blob/main/PKGBUILD?ref_type=heads
+export RR_PACKAGES=${RR_PACKAGES}" \
+  filesystem gcc-libs glibc bash \
+  coreutils file findutils gawk grep procps-ng sed tar \
+  gettext pciutils psmisc shadow util-linux bzip2 gzip xz \
+  licenses pacman archlinux-keyring systemd systemd-sysvcompat \
+  iputils iproute2
+"
+
+# extra utilites
+export RR_PACKAGES=${RR_PACKAGES}" \
   run-parts \
-  squashfs-tools \
   net-tools \
   dosfstools \
   bash-completion \
@@ -15,12 +24,12 @@ export RR_PACKAGES="\
   strace \
   vsftpd \
   inetutils \
-  iwd \
   wireless-regdb
 "
+# squashfs-tools iwd
 
 # "portlibs"
-export RR_PACKAGES=${RR_PACKAGES}"\
+export RR_PACKAGES_DISABLED_SURFACERT_TESTING=${RR_PACKAGES}" \
   asio \
   boost \
   box2d \

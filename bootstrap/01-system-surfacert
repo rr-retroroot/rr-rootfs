@@ -10,5 +10,10 @@ fi
 
 echo "rr-run-parts: $(basename $0)"
 
-# nothing to do here for now...
+mkinitcpio -p linux
+
+# TODO: fixme
+# disable services
+#source /configs/services
+#systemctl disable ${RR_SERVICES}
 
