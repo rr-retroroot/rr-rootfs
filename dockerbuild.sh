@@ -89,6 +89,7 @@ pack_sysroot() {
 
 main() {
   # let's go...
+  minfo "rr: docker: `uname -a`"
   minfo "rr: platform: ${RR_PLATFORM}"
   minfo "rr: arch: ${RR_ARCH}"
 
@@ -97,48 +98,62 @@ main() {
 
   # set output image path
   OUTPUT_IMG=${RR_OUTPUT_DIR}/retroroot-${RR_PLATFORM}-${RR_ARCH}.img
-
-  # create output image
-  dd if=/dev/zero of=${OUTPUT_IMG} bs=1M count=3072
-
-  # create "RR-BOOT" partition
-  parted -a optimal -s ${OUTPUT_IMG} mklabel gpt
-  # TODO: revert this for rg353v ?
-  #parted -a optimal -s ${OUTPUT_IMG} unit s mkpart uboot 16384 24575
-  #parted -a optimal -s ${OUTPUT_IMG} unit s mkpart resource 24576 32767
-  parted -a optimal -s ${OUTPUT_IMG} mkpart primary fat32 0% 256MiB
   
-  # create "RR-ROOT" partition
-  if [ "${RR_PLATFORM}" == "surfacert" ]; then
-    parted -a optimal -s ${OUTPUT_IMG} mkpart primary ext3 256MiB 100%
-  else
-    parted -a optimal -s ${OUTPUT_IMG} mkpart primary ext4 256MiB 100%
+  # create output image if not in chroot mode
+  if [ ! "${RR_CHROOT}" ]; then
+    dd if=/dev/zero of=${OUTPUT_IMG} bs=1M count=3072
+
+    # create "RR-BOOT" partition
+    parted -a optimal -s ${OUTPUT_IMG} mklabel gpt
+    # TODO: revert this for rg353v ?
+    #parted -a optimal -s ${OUTPUT_IMG} unit s mkpart uboot 16384 24575
+    #parted -a optimal -s ${OUTPUT_IMG} unit s mkpart resource 24576 32767
+    parted -a optimal -s ${OUTPUT_IMG} mkpart primary fat32 0% 256MiB
+  
+    # create "RR-ROOT" partition
+    if [ "${RR_PLATFORM}" == "surfacert" ]; then
+      parted -a optimal -s ${OUTPUT_IMG} mkpart primary ext3 256MiB 100%
+    else
+      parted -a optimal -s ${OUTPUT_IMG} mkpart primary ext4 256MiB 100%
+    fi
+    
+    chmod 777 ${OUTPUT_IMG}
   fi
   
-  # format "RR-BOOT" partition
-  chmod 777 ${OUTPUT_IMG}
+  # mount image
   LOOP_DEV=$(losetup --partscan --show --find "${OUTPUT_IMG}")
   BOOT_DEV="$LOOP_DEV"p1
-  mkfs.fat -F32 -n RR-BOOT ${BOOT_DEV}
-  
-  # format "RR-ROOT" partition
   ROOT_DEV="$LOOP_DEV"p2
-  if [ "${RR_PLATFORM}" == "surfacert" ]; then
-    mke2fs -t ext3 -L RR-ROOT ${ROOT_DEV}
-  else
-    mke2fs -t ext4 -L RR-ROOT ${ROOT_DEV}
+
+  # format paritions if not in chroot mode
+  if [ ! "${RR_CHROOT}" ]; then
+    # format "RR-BOOT" partition
+    mkfs.fat -F32 -n RR-BOOT ${BOOT_DEV}
+    # format "RR-ROOT" partition
+    if [ "${RR_PLATFORM}" == "surfacert" ]; then
+      mke2fs -t ext3 -L RR-ROOT ${ROOT_DEV}
+    else
+      mke2fs -t ext4 -L RR-ROOT ${ROOT_DEV}
+    fi
   fi
 
   # set mount paths
   MOUNT_ROOT=/tmp/rootfs
   MOUNT_BOOT=/tmp/rootfs/boot
-  rm -rf ${MOUNT_ROOT}
+  # rm -rf ${MOUNT_ROOT} # why ?
 
   # mount partitions
   mkdir -p ${MOUNT_ROOT}
   mount --make-private ${ROOT_DEV} ${MOUNT_ROOT}
   mkdir -p ${MOUNT_BOOT}
   mount --make-private ${BOOT_DEV} ${MOUNT_BOOT}
+
+  if [ "${RR_CHROOT}" ]; then
+    #systemd-nspawn -D ${MOUNT_ROOT}
+    #systemd-nspawn -b -D ${MOUNT_ROOT}
+    arch-chroot ${MOUNT_ROOT}
+    exit 0
+  fi
   
   minfo "rr: running pacstrap with packages:"
   minfo "${RR_PACKAGES}"

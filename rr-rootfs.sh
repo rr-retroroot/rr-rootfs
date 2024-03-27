@@ -3,6 +3,7 @@
 build() {
   local ARCH=$1
   local PLATFORM=$2
+  local CHROOT=$3
 
   # set platform arch
   if [ "${ARCH}" == "x86_64" ]; then
@@ -10,13 +11,13 @@ build() {
   elif [ "$ARCH" == "aarch64" ]; then
     RR_DOCKER_IMG="lopsided/archlinux-arm64v8:latest"
   else
-    RR_DOCKER_IMG="lopsided/archlinux-arm32v7:latest"
+    RR_DOCKER_IMG="lopsided/archlinux-arm32v7@sha256:11ff2089903a68c53ae792ece2a20e9902d71bfd40cde42c776fccca0011f1d0"
   fi
 
   echo "[build] arch: $ARCH, platform: $PLATFORM, docker image: $RR_DOCKER_IMG"
 
   docker pull ${RR_DOCKER_IMG}
-
+  
   # install target packages in docker image for pacstrap package caching
   # this also populate RR_PACKAGES variable
   source configs/packages
@@ -29,12 +30,13 @@ build() {
     .
 
   # let's go !
-  docker run --rm --privileged=true \
+  docker run -ti --rm --privileged=true \
     -v /dev:/dev:ro \
     -v $(pwd)/output:/output \
     -e RR_ARCH=${ARCH} \
     -e RR_PLATFORM=${PLATFORM} \
     -e RR_PACKAGES="${RR_PACKAGES}" \
+    -e RR_CHROOT="${CHROOT}" \
     retroroot-${PLATFORM}-${ARCH}
 }
 
@@ -60,38 +62,44 @@ show_usage() {
   echo "usage: $(basename "$0") [-a x86_64|armv7h|aarch64] [-p desktop|rpi|rg353|surfacert|none]"
   echo ""
   echo "examples:"
-  echo "       $(basename "$0") -a x86_64 -p desktop  | build x86_64 arch for desktop platform"
-  echo "       $(basename "$0") -r desktop            | run desktop platform image"
+  echo "       $(basename "$0") -a x86_64 -p desktop     | build x86_64 arch for desktop platform"
+  echo "       $(basename "$0") -a x86_64 -p desktop -c  | chroot desktop platform image"
+  echo "       $(basename "$0") -r desktop               | run desktop platform image (qemu)"
 }
 
 main() {
   # parse args
   test $# -eq 0 && set -- "-h"
-  while getopts "a:p:r:h" ARG; do
+  while getopts "a:p:r:ch" ARG; do
     case "$ARG" in
-      a) a=$OPTARG;;
-      p) b=$OPTARG;;
+      a) arch=$OPTARG;;
+      p) platform=$OPTARG;;
+      c) chroot=1;;
       r) run $OPTARG; return 0;;
       *) show_usage; return 1;;
     esac
   done
   shift $(($OPTIND-1))
 
-  if [ -z ${b+x} ]; then
-    b="none";
+  if [ -z ${platform+x} ]; then
+    platform="none";
   fi
 
-  if [ $a != "x86_64" ] && [ $a != "armv7h" ] && [ $a != "aarch64" ]; then
+  if [ $arch != "x86_64" ] && [ $arch != "armv7h" ] && [ $arch != "aarch64" ]; then
     echo "error: supported arch: x86_64, armv7h, aarch64"
     return 1;
   fi
 
-  if [ $b != "desktop" ] && [ $b != "rpi" ] && [ $b != "rg353" ] && [ $b != "surfacert" ] && [ $b != "none" ]; then
+  if [ $platform != "desktop" ] \
+    && [ $platform != "rpi" ] \
+    && [ $platform != "rg353" ] \
+    && [ $platform != "surfacert" ] \
+    && [ $platform != "none" ]; then
     echo "error: supported platform: desktop, rpi, rg353, surfacert, none"
     return 1;
   fi
 
-  build $a $b
+  build $arch $platform $chroot
 }
 
 main "$@"

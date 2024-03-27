@@ -2,9 +2,10 @@
 
 source /configs/vars
 
-export RR_SERVICES="\
-  systemd-networkd
+export RR_SERVICES=" \
+  systemd-networkd \
   systemd-resolved \
+  systemd-timesyncd \
   sshd
 "
 #  retroroot iwd \
