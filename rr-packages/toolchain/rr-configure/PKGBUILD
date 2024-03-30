@@ -1,0 +1,22 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=rr-configure
+pkgver=1
+pkgrel=1
+arch=(any)
+pkgdesc="retroroot configure wrapper"
+depends=('rr-environment' 'rr-pkg-config')
+license=("GPL")
+url="https://github.com/rr-retroroot/rr-packages"
+source=('rr-configure' 'rr-configure-lib')
+md5sums=('SKIP' 'SKIP')
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'toolchain')
+
+package() {
+  install -d "${pkgdir}"/opt/retroroot
+  install -m 755 rr-configure "${pkgdir}"/opt/retroroot
+  install -m 755 rr-configure-lib "${pkgdir}"/opt/retroroot
+}
+

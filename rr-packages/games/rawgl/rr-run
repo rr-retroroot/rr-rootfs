@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# rawgl
+rawgl --datapath=/home/rr/data/rawgl
+

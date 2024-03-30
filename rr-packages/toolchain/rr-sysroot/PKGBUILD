@@ -1,0 +1,29 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=rr-sysroot
+pkgver=0.0.8
+pkgrel=1
+pkgdesc="retroroot toolchain sysroot (x86_64, armv7h, aarch64)"
+arch=(any)
+url='https://github.com/rr-retroroot/rr-rootfs'
+license=('zlib')
+source=(
+  "${url}/releases/download/v${pkgver}/retroroot-sysroot-x86_64.tar.xz"
+  "${url}/releases/download/v${pkgver}/retroroot-sysroot-armv7h.tar.xz"
+  "${url}/releases/download/v${pkgver}/retroroot-sysroot-aarch64.tar.xz"
+)
+sha256sums=(
+  '0f5f78cdfd2d5938545fa96c37f2974492f2317ccde0f8378d861aae35cd9ade'
+  '48984d73925de7800491c25c6054054dfc2e8940b5d98c29f73d697947a5d2ec'
+  '64b1aa9fc05b769c6f4bf0be5aa428b61191c6bb601e21c9818ab35373b83a07'
+)
+options=(!strip !docs !libtool emptydirs)
+depends=('rr-configure')
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'toolchain')
+
+package() {
+  mv ${srcdir}/opt ${pkgdir}
+}
+

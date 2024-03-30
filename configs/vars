@@ -3,7 +3,6 @@
 export RR_ROOT_PASSWORD=retroroot
 export RR_USERNAME=rr
 
-if [ -f "/configs/vars-${RR_PLATFORM}" ]; then
-  source "/configs/vars-${RR_PLATFORM}"
+if [ -f "/retroroot/configs/vars-${RR_PLATFORM}" ]; then
+  source "/retroroot/configs/vars-${RR_PLATFORM}"
 fi
-

@@ -1,41 +1,58 @@
 #!/bin/sh
 
+# shellcheck disable=SC2039
+# shellcheck disable=SC1090
+
 set -xe
 
-source /configs/vars
+source /retroroot/configs/vars
 
-echo "rr-run-parts: $(basename $0)"
+echo "rr-run-parts: $(basename "$0")"
 
-# copy target pacman config
-cp -f /configs/pacman-${RR_ARCH}.conf /etc/pacman.conf
-
-# update retroroot database and install retroroot stuff
+# update retroroot database and install packages
+source /retroroot/configs/packages
+source /retroroot/configs/packages-"${RR_PLATFORM}"
+pacman-key --init && pacman-key --populate
 pacman --noconfirm -Syy
-pacman --noconfirm -S --needed --overwrite "*" rr-base rr-base-${RR_PLATFORM} rr-recovery
-# --force
+pacman --noconfirm -R netctl
+# shellcheck disable=SC2086
+pacman --noconfirm -S --needed --overwrite "*" ${RR_PACKAGES} rr-base rr-base-"${RR_PLATFORM}" rr-recovery
+#pacman --noconfirm -Su
 
 # root passwd
 echo "root:${RR_ROOT_PASSWORD}" | chpasswd
 
 # create local user and groups
-useradd -m ${RR_USERNAME}
+useradd -m "${RR_USERNAME}"
 for GRP in autologin dialout cdrom spi i2c gpio netdev; do
-	groupadd -r --system $GRP
+  groupadd -r --system $GRP
 done
 for GRP in adm dialout cdrom audio users video games input tty gpio spi i2c netdev; do
-  usermod -aG $GRP ${RR_USERNAME}
+  usermod -aG $GRP "${RR_USERNAME}"
 done
 echo "${RR_USERNAME}:${RR_USERNAME}" | chpasswd
 echo "
 root ALL=(ALL) ALL
 ${RR_USERNAME} ALL=(ALL) ALL
 #includedir /etc/sudoers.d
-" > /etc/sudoers
+" >/etc/sudoers
 
 # update locales
 locale-gen
 
 # enable services
-source /configs/services
+source /retroroot/configs/services
+# shellcheck disable=SC2086
 systemctl enable ${RR_SERVICES}
 
+# handle custom platform stuff
+if [ -f "/retroroot/bootstrap/01-system-${RR_PLATFORM}" ]; then
+  . /retroroot/bootstrap/01-system-"${RR_PLATFORM}"
+fi
+
+# enable back pacman CheckSpace option
+sed -i 's/#CheckSpace/CheckSpace/g' /etc/pacman.conf
+# remove custom package cache directive
+sed -i '/CacheDir/d' /etc/pacman.conf
+# cleanup pkg cache
+rm -rf /var/cache/pacman/pkg

@@ -1,0 +1,119 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=retroarch
+pkgver=1.18.0
+pkgrel=3
+pkgdesc='Reference frontend for the libretro API'
+arch=('x86_64' 'armv7h' 'aarch64')
+url='https://github.com/libretro/RetroArch'
+license=('GPL')
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'emulator')
+
+# a retroroot package should not depends on anything as required libraries
+# are in "retroroot-sysroot-*arch*" toolchain package. If not present in sysroot,
+# the package should build and link a static library here.
+#depends=()
+
+provides=('retroarch' 'retroarch-assets-glui' 'retroarch-assets-ozone' 'retroarch-assets-xmb' 'libretro-core-info')
+conflicts=('retroarch' 'retroarch-assets-glui' 'retroarch-assets-ozone' 'retroarch-assets-xmb' 'libretro-core-info')
+
+assets_commit=923b711dc6772a168d83dc8915e9260730fcf3a1
+core_info_commit=dab6fd87f661ce306bb867e9cd10f14dd40c10e9
+joypad_autoconfig_ver=1.17.0
+source=(
+  # retroarch
+  "$url/archive/refs/tags/v$pkgver.tar.gz"
+  "retroarch-config.patch"
+  # retroarch assets
+  "git+https://github.com/libretro/retroarch-assets.git#commit=${assets_commit}"
+  # retroarch core info
+  "git+https://github.com/libretro/libretro-core-info.git#commit=${core_info_commit}"
+  # retroarch-joypad-autoconfig
+  "https://github.com/libretro/retroarch-joypad-autoconfig/archive/refs/tags/v$joypad_autoconfig_ver.tar.gz"
+  # retroarch "retrogame_joypad" autoconfig (rg353)
+  'retrogame_joypad.cfg'
+  # icon: 128x128, preview: 512x512
+  'rr-run' 'rr-icon.png' 'rr-preview.png'
+)
+sha256sums=(
+  'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP'
+)
+
+prepare() {
+  cd RetroArch-$pkgver
+  patch -Np1 -i ../retroarch-config.patch
+}
+
+build() {
+  { echo; echo "Building $pkgname-$pkgver (${CARCH})"; echo; }
+
+  cd RetroArch-$pkgver
+  
+  source /opt/retroroot/rr-env ${CARCH}
+
+  case "$CARCH" in
+    aarch64)
+      ARCH_OPT="--disable-opengl --enable-opengles --enable-opengles3 --enable-opengles3_2"
+      ;;
+    armv7a)
+      ARCH_OPT="--disable-opengl --enable-opengles --enable-opengles3 --enable-opengles3_2"
+      ;;
+    x86_64)
+      ARCH_OPT="--enable-opengl"
+      ;;
+  esac
+
+  rr-configure ${CARCH} \
+    --sysconfdir=${RETROROOT_PREFIX}/etc \
+    --disable-x11 \
+    --disable-wayland \
+    --disable-videocore \
+    --disable-qt \
+    --disable-builtinflac \
+    --disable-builtinmbedtls \
+    --disable-builtinzlib \
+    --disable-builtinbearssl \
+    --disable-cg \
+    --enable-kms \
+    --enable-dbus \
+    ${ARCH_OPT}
+  make $MAKEFLAGS
+
+  # TODO
+  #make $MAKEFLAGS -C libretro-common/audio/dsp_filters
+  #make $MAKEFLAGS -C gfx/video_filters
+}
+
+package() {
+  # package retroarch
+  cd RetroArch-$pkgver
+  make DESTDIR="${pkgdir}" install
+
+  source /opt/retroroot/rr-env ${CARCH}
+
+  # package assets
+  cd "$srcdir"/retroarch-assets
+  install -dm 755 "${pkgdir}"${RETROROOT_PREFIX_SHARE}/retroarch/assets
+  cp -dr --no-preserve=ownership glui "${pkgdir}"${RETROROOT_PREFIX_SHARE}/retroarch/assets/
+  cp -dr --no-preserve=ownership ozone "${pkgdir}"${RETROROOT_PREFIX_SHARE}/retroarch/assets/
+  cp -dr --no-preserve=ownership xmb "${pkgdir}"${RETROROOT_PREFIX_SHARE}/retroarch/assets/
+
+  # package core info
+  cd $srcdir/libretro-core-info
+  make DESTDIR="$pkgdir" install
+
+  # retroarch-joypad-autoconfig
+  make -C "$srcdir"/retroarch-joypad-autoconfig-$joypad_autoconfig_ver DESTDIR="$pkgdir" install
+  # install "retrogame_joypad.cfg" autoconfig ((rg353)
+  install -dm 755 "$pkgdir"${RETROROOT_PREFIX_SHARE}/libretro/autoconfig/udev
+  install -m644 "$srcdir"/retrogame_joypad.cfg "$pkgdir"${RETROROOT_PREFIX_SHARE}/libretro/autoconfig/udev
+
+  # retroroot packages data needs to be installed in "/home/rr/apps/${pkgname}"
+  install -d "$pkgdir/home/rr/apps/$pkgname"
+  install -m755 $srcdir/rr-run "$pkgdir/home/rr/apps/$pkgname"
+  install -m644 $srcdir/rr-icon.png "$pkgdir/home/rr/apps/$pkgname"
+  install -m644 $srcdir/rr-preview.png "$pkgdir/home/rr/apps/$pkgname"
+}
+

@@ -8,7 +8,7 @@ export RR_PACKAGES=${RR_PACKAGES}" \
 
 # extra utilites
 export RR_PACKAGES=${RR_PACKAGES}" \
-  run-parts \
+  fakeroot \
   net-tools \
   dosfstools \
   bash-completion \

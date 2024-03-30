@@ -1,0 +1,33 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=rr-toolchain-armv7h
+pkgver=12.2.1
+pkgrel=1
+pkgdesc="retroroot arm toolchain (armv7h)"
+arch=(any)
+url='https://snapshots.linaro.org/gnu-toolchain'
+license=('zlib')
+source=(
+  "${url}/12.2-2022.09-1/arm-linux-gnueabihf/gcc-linaro-12.2.1-2022.09-x86_64_arm-linux-gnueabihf.tar.xz"
+)
+sha256sums=('SKIP')
+options=(!strip !docs !libtool emptydirs)
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'toolchain')
+
+package() {
+  install -d ${pkgdir}/opt/retroroot/host/armv7h
+  mv ${srcdir}/gcc-linaro-12.2.1-2022.09-x86_64_arm-linux-gnueabihf/* ${pkgdir}/opt/retroroot/host/armv7h
+  
+  # create symlinks for conveniance
+  # arm-linux-gnueabihf > armv7h-linux-gnu
+  cd ${pkgdir}/opt/retroroot/host/armv7h/bin
+  files="$(find . -type f)"
+  for i in $files; do
+    link="${i/arm/"armv7h"}"
+    link="${link/gnueabihf/"gnu"}"
+    ln -s "$i" "$link"
+  done
+}
+

@@ -1,0 +1,10 @@
+[Unit]
+Description=RetroRoot launcher service
+After=systemd-user-sessions.service
+
+[Service]
+ExecStart=/usr/bin/rr-service
+PIDFile=/run/retroroot.pid
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,23 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=rr-toolchain-aarch64
+pkgver=12.2.1
+pkgrel=1
+pkgdesc="retroroot toolchain tools (aarch64)"
+arch=(any)
+url='https://snapshots.linaro.org/gnu-toolchain'
+license=('zlib')
+source=(
+  "${url}/12.2-2022.09-1/aarch64-linux-gnu/gcc-linaro-12.2.1-2022.09-x86_64_aarch64-linux-gnu.tar.xz"
+)
+sha256sums=('SKIP')
+options=(!strip !docs !libtool emptydirs)
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'toolchain')
+
+package() {
+  install -d ${pkgdir}/opt/retroroot/host/aarch64
+  mv ${srcdir}/gcc-linaro-12.2.1-2022.09-x86_64_aarch64-linux-gnu/* ${pkgdir}/opt/retroroot/host/aarch64
+}
+

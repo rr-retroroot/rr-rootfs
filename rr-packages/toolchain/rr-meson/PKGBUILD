@@ -1,0 +1,22 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=rr-meson
+pkgver=1
+pkgrel=1
+pkgdesc='retroroot meson wrapper'
+arch=('any')
+url='https://github.com/rr-retroroot/rr-packages'
+license=('custom')
+source=(
+'rr-meson' 'rr-meson-toolchain'
+)
+md5sums=('SKIP' 'SKIP')
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'toolchain')
+
+package() {
+  install -d ${pkgdir}/opt/retroroot
+  install -Dm755 rr-meson rr-meson-toolchain ${pkgdir}/opt/retroroot
+}
+

@@ -1,0 +1,58 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=powermanga
+pkgver=0.93.1
+pkgrel=2
+pkgdesc='Powermanga is a shoot-em-up game. You will have to fight more than 60 different types of
+       enemies. You start with a ship, and enemies show up throwing bombs at  you.  Shoot  them,  and  get
+       better weapons for your ship (otherwise, you wont go too far!).
+       To  get  better  weapons,  you  will have to catch green and red gems. Whenever you pick a
+       green gem, the highlighted option at the right side of the screen goes up one unit...'
+arch=('x86_64' 'armv7h' 'aarch64')
+url="http://linux.tlk.fr/games/Powermanga"
+license=('GPL3')
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'game')
+
+# a retroroot package should not depends on anything as required libraries
+# are in "retroroot-sysroot-*arch*" toolchain package. If not present in sysroot,
+# the package should build and link a static library here.
+#depends=()
+
+source=(
+  "$url/download/powermanga-$pkgver.tgz"
+)
+sha256sums=('SKIP')
+
+build() {
+  { echo; echo "Building $pkgname-$pkgver (${CARCH})"; echo; }
+
+  cd powermanga-$pkgver
+
+  # TODO: proper patch...
+  sed -i 's|scoredir = /var/games/powermanga|scoredir = $(prefix)/var/games/powermanga|g' src/Makefile.am
+  
+  source /opt/retroroot/rr-env ${CARCH}
+  
+  autoreconf -fi
+  rr-configure-lib ${CARCH} \
+    --program-prefix="" \
+    --with-sdl-prefix=${RETROROOT_SYSROOT}/usr \
+    --without-x
+
+  make $MAKEFLAGS
+}
+
+package() {
+  cd powermanga-$pkgver
+
+  make DESTDIR="$pkgdir" install
+
+  # retroroot packages data needs to be installed in "/home/rr/apps/${pkgname}"
+  #install -d "$pkgdir/home/rr/apps/$pkgname"
+  #install -m777 rr-run "$pkgdir/home/rr/apps/$pkgname"
+  #install -m777 rr-icon.png "$pkgdir/home/rr/apps/$pkgname"
+  #install -m777 rr-preview.png "$pkgdir/home/rr/apps/$pkgname"
+}
+

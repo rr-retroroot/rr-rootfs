@@ -1,0 +1,23 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=rr-overlay-surfacert
+pkgver=1
+pkgrel=8
+pkgdesc="RetroRoot rootfs overlay (surfacert)"
+arch=('armv7h')
+license=('GPL')
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'system' 'surfacert')
+
+# a retroroot package should not depends on anything as required libraries
+# are in "retroroot-sysroot-*arch*" toolchain package. If not present in sysroot,
+# the package should build and link a static library here.
+# "system" packages are specials...
+depends=('rr-overlay')
+
+package() {
+  # copy surfacert rootfs overlays
+  cp -r "$startdir"/overlay/. "${pkgdir}"
+}
+

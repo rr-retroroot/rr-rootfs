@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /configs/vars
+source /retroroot/configs/vars
 
 export RR_SERVICES=" \
   systemd-networkd \
@@ -10,7 +10,6 @@ export RR_SERVICES=" \
 "
 #  retroroot iwd \
 
-if [ -f "/configs/services-${RR_PLATFORM}" ]; then
-  source "/configs/services-${RR_PLATFORM}"
+if [ -f "/retroroot/configs/services-${RR_PLATFORM}" ]; then
+  source "/retroroot/configs/services-${RR_PLATFORM}"
 fi
-

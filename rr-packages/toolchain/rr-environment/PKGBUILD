@@ -1,0 +1,20 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=rr-environment
+pkgver=1
+pkgrel=2
+pkgdesc='retroroot script providing common environment variables and functions.'
+arch=('any')
+url='https://github.com/rr-retroroot/rr-packages'
+license=('MIT')
+source=('rr-env')
+md5sums=('SKIP')
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'toolchain')
+
+package() {
+  install -d ${pkgdir}/opt/retroroot
+  install -m755 rr-env ${pkgdir}/opt/retroroot
+}
+

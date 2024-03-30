@@ -1,0 +1,46 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=opentyrian
+pkgver=2.1.20220318
+pkgrel=2
+pkgdesc='OpenTyrian is an open-source port of the DOS game Tyrian.
+  Tyrian is an arcade-style vertical scrolling shooter.  The story is set
+  in 20,031 where you play as Trent Hawkins, a skilled fighter-pilot employed
+  to fight MicroSol and save the galaxy.
+  Tyrian features a story mode, one- and two-player arcade modes, and networked
+  multiplayer.'
+url='https://github.com/opentyrian/opentyrian'
+arch=('x86_64' 'armv7h' 'aarch64')
+license=('GPL2')
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'game')
+
+# a retroroot package should not depends on anything as required libraries
+# are in "retroroot-sysroot-*arch*" toolchain package. If not present in sysroot,
+# the package should build and link a static library here.
+#depends=('sdl2' 'sdl2_net')
+
+source=("${url}/archive/refs/tags/v${pkgver}.tar.gz"
+        'http://camanis.net/tyrian/tyrian21.zip')
+sha256sums=('e0c6afbb5d395c919f9202f4c9b3b4da7bd6e993e9da6152f995012577e1ccbd'
+            '7790d09a2a3addcd33c66ef063d5900eb81cc9c342f4807eb8356364dd1d9277')
+
+build() {
+  source /opt/retroroot/rr-env ${CARCH}
+	make $MAKEFLAGS prefix=${RETROROOT_PREFIX} all -C "$srcdir/opentyrian-${pkgver}"
+}
+
+package() {
+	cd "$srcdir/opentyrian-${pkgver}"
+	
+	source /opt/retroroot/rr-env ${CARCH}
+	make DESTDIR="$pkgdir" prefix=${RETROROOT_PREFIX} install
+
+	cd "$srcdir/tyrian21"
+	install -Dt "$pkgdir/usr/share/games/tyrian" -m644 *.dat *.lvl *.shp *.snd \
+		demo.* music.mus tyrend.anm tyrian.{cdt,hdt,pic} tshp2.pcx
+
+  # every retroroot package needs an icon, a preview image, and a path to the executable
+  # TODO
+}

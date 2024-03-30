@@ -2,13 +2,12 @@
 
 set -xe
 
-source /configs/vars
+source /retroroot/configs/vars
 
 if [ "${RR_PLATFORM}" != "rg353" ]; then
   exit 0;
 fi
 
-echo "rr-run-parts: $(basename $0)"
+echo "rr-run-parts: $(basename "$0")"
 
 # nothing to do here for now...
-

@@ -1,0 +1,9 @@
+[Unit]
+Description=surfacert mlan0 connection (wifi)
+
+[Service]
+ExecStart=/usr/bin/srtwconnect
+
+[Install]
+WantedBy=multi-user.target
+

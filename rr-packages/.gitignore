@@ -1,0 +1,15 @@
+rr-repo*
+sources
+*.tar.xz.part
+*.tar.xz
+src
+pkg
+*.pkg.tar.xz*
+*.tar.gz
+*.tar.bz2
+*.tar.zst
+*.tar.gz.asc
+*.tgz
+*.zip
+*~
+

@@ -1,0 +1,48 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=wesnoth
+pkgver=1.16.3
+pkgrel=2
+pkgdesc="A turn-based strategy game on a fantasy world"
+arch=('x86_64' 'armv7h' 'aarch64')
+license=('GPL')
+url="http://www.wesnoth.org/"
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'game')
+
+# a retroroot package should not depends on anything as required libraries
+# are in "retroroot-sysroot-*arch*" toolchain package. If not present in sysroot,
+# the package should build and link a static library here.
+#depends=('sdl2_mixer' 'sdl2_image' 'boost-libs' 'pango' 'dbus')
+
+options=(!emptydirs)
+source=("https://github.com/wesnoth/wesnoth/archive/refs/tags/${pkgver}.zip")
+sha512sums=('SKIP')
+
+build() {
+  cd "wesnoth-$pkgver"
+
+  source /opt/retroroot/rr-env ${CARCH}
+
+  retroroot-cmake \
+    -Wno-dev \
+    -Bbuild \
+    -DCMAKE_INSTALL_PREFIX=${RETROROOT_PREFIX} \
+    -DENABLE_DISPLAY_REVISION=OFF \
+    -DENABLE_CAMPAIGN_SERVER=OFF \
+    -DENABLE_SERVER=OFF \
+    -DENABLE_TESTS=OFF
+
+  cd build
+  make $MAKEFLAGS
+}
+
+package() {
+  cd "wesnoth-$pkgver"
+
+  DESTDIR="$pkgdir" make -C build install
+
+  # See http://forums.wesnoth.org/viewtopic.php?t=51038
+  echo "Linux repository" > "$pkgdir"/usr/share/wesnoth/data/dist
+}

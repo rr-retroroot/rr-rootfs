@@ -1,0 +1,46 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=libmali-rg353
+pkgver=1.9.0
+pkgrel=2
+pkgdesc="Userspace interface to kernel DRM services (rg353)"
+arch=('aarch64')
+license=('custom')
+url="https://github.com/JustEnoughLinuxOS/libmali"
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'system' 'rg353')
+
+depends=('libdrm')
+makedepends=('rr-environment' 'rr-toolchain-aarch64')
+#provides=('mesa' 'libglvnd' 'libgl' 'libegl')
+conflicts=('mesa' 'libglvnd' 'libgl' 'libegl')
+
+commit="db646740a751082b31d4b53cc69ae311aab7e20f"
+source=("https://github.com/JustEnoughLinuxOS/libmali/archive/$commit.zip")
+sha512sums=('SKIP')
+
+build() {
+  source /opt/retroroot/rr-env ${CARCH}
+  
+  #-DMALI_ARCH=aarch64-linux-gnu"
+
+  /opt/retroroot/rr-meson ${CARCH} crossfile.txt libmali-${commit} build \
+    -Darch=aarch64 \
+    -Dgpu=bifrost-g52 \
+    -Dversion=g2p0 \
+    -Dplatform=gbm \
+    -Dkhr-header=true
+
+  meson compile -C build
+}
+
+package() {
+  meson install -C build --destdir "$pkgdir"
+  for lib in libEGL.so.1 libgbm.so.1 libGLESv1_CM.so.1 libGLESv2.so.2 libMaliOpenCL.so.1
+  do
+    rm -f ${pkgdir}/usr/lib/${lib}
+    ln -s libmali.so.${pkgver} ${pkgdir}/usr/lib/${lib}
+  done
+}
+

@@ -1,0 +1,21 @@
+pkgname=systemd-libs
+pkgver=230
+pkgrel=8
+arch=('armv7h')
+license=('LGPL-2.1-or-later')
+pkgdesc='systemd client libraries'
+provides=('systemd-libs' 'hwids') #'libsystemd.so' 'libudev.so'
+# fix dbus.socket / dbus.service
+depends=('dbus-daemon-units')
+
+package() {
+  # copy common rootfs overlays
+  mkdir -p $pkgdir/usr/lib
+  
+  # fix dbus.socket / dbus.service
+  ln -sf /usr/lib/libidn.so $pkgdir/usr/lib/libidn.so.11
+  
+  # fix systemd-networkd
+  ln -s /usr/lib/libip4tc.so $pkgdir/usr/lib/libip4tc.so.0
+}
+

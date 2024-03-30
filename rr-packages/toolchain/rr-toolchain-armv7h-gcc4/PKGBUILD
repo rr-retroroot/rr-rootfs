@@ -1,0 +1,35 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=rr-toolchain-armv7h-gcc4
+pkgver=5.5.0
+pkgrel=1
+pkgdesc="retroroot arm toolchain (gcc4) (armv7h)"
+arch=(any)
+url='https://releases.linaro.org/components/toolchain/binaries'
+license=('zlib')
+source=(
+  "https://releases.linaro.org/components/toolchain/binaries/4.9-2017.01/arm-linux-gnueabihf/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf.tar.xz"
+)
+sha256sums=('SKIP')
+options=(!strip !docs !libtool emptydirs)
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'toolchain')
+
+package() {
+  install -d ${pkgdir}/opt/retroroot/host/armv7h-gcc4
+  mv ${srcdir}/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf/* ${pkgdir}/opt/retroroot/host/armv7h-gcc4
+  
+  # create symlinks for conveniance
+  # arm-linux-gnueabihf > armv7h-linux-gnu
+  cd ${pkgdir}/opt/retroroot/host/armv7h-gcc4/bin
+  files="$(find . -type f)"
+  for i in $files; do
+    link="${i/arm/"armv7h"}"
+    link="${link/gnueabihf/"gnu"}"
+    if [ ! -f "$link" ]; then
+      ln -s "$i" "$link"
+    fi
+  done
+}
+

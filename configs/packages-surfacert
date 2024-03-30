@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# xorg 14: 
+# xorg 14:
 #xorgproto pixman libx11 mesa mesa-libgl xtrans \
 #  libxkbfile libxfont2 libpciaccess libxv libxcvt \
 #  libxmu libxrender libxi libxaw libxtst libxres \
@@ -20,17 +20,16 @@
 # hw/xfree86/common/compiler.h > //#include <sys/io.h> + #define NO_INLINE
 
 # render/picture.c
-# - pPicture->pSourcePict = (SourcePictPtr) malloc(sizeof(PictSolidFill));            
+# - pPicture->pSourcePict = (SourcePictPtr) malloc(sizeof(PictSolidFill));
 # + pPicture->pSourcePict = (SourcePictPtr) malloc(sizeof(SourcePict));
-# (x4)              
+# (x4)
 
 # downstream kernel (3.4.x) with tegra xorg hw acceleration doesn't work with latest systemd, use older version
 export RR_PACKAGES=${RR_PACKAGES}" \
   filesystem=2023.01.01-1 systemd=230-7 systemd-sysvcompat=230-7 libsystemd=230-7 systemd-libs=230-8 \
-  mesa \
-  libglvnd \
+  xorg-server=1.14.5 \
   linux-surfacert-downstream \
   linux-firmware \
   wpa_supplicant dhclient
 "
-
+#mesa libglvnd
