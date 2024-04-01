@@ -47,14 +47,14 @@ sha512sums=('7b737631fb9a7a6e305c2281b854cde0e1cc62ba546adf008582e2e8a54089df519
             'de5e2cb3c6825e6cf1f07ca0d52423e17f34d70ec7935e9dd24be5fb9883bf1e03b50ff584931bd3b41095c510ab2aa44d2573fd5feaebdcb59363b65607ff22'
             '3a05d7f0aa3c0010004de9851c6af5a6351b14550a05238d9e26ce39cce66fbfc47f0d082f66fe13697051205c553e085d3c505d999817f3433ebdf6eeba62ea')
 
-__prepare() {
+prepare() {
   cd ${pkgbase}-$pkgver
   
   # patch for arch linux upstream support
   patch -Np1 -i ../001-arch-upsteam.patch
 }
 
-__build() {
+build() {
 	cd "${pkgbase}-${pkgver}"
   autoreconf -fi
   ./configure --prefix=/usr \
