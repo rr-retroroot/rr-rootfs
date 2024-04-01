@@ -1,35 +1,12 @@
 #!/bin/bash
 
-# xorg 14:
-#xorgproto pixman libx11 mesa mesa-libgl xtrans \
-#  libxkbfile libxfont2 libpciaccess libxv libxcvt \
-#  libxmu libxrender libxi libxaw libxtst libxres \
-#  xorg-xkbcomp xorg-util-macros xorg-font-util xorg-xfontsel libepoxy \
-#  xcb-util xcb-util-image xcb-util-renderutil xcb-util-wm xcb-util-keysyms \
-#  libxshmfence libunwind
-
-# http://tardis.tiny-vps.com/aarm/packages/w/wayland/wayland-1.14.0-1-armv7h.pkg.tar.xz
-# http://tardis.tiny-vps.com/aarm/packages/l/libtxc_dxtn/libtxc_dxtn-1.0.1-6-armv7h.pkg.tar.xz
-# http://tardis.tiny-vps.com/aarm/packages/m/mesa/mesa-12.0.3-3.1-armv7h.pkg.tar.xz
-# http://tardis.tiny-vps.com/aarm/packages/m/mesa-libgl/mesa-libgl-12.0.3-3.1-armv7h.pkg.tar.xz
-# http://tardis.tiny-vps.com/aarm/packages/d/dmxproto/dmxproto-2.3.1-3-any.pkg.tar.xz
-# http://tardis.tiny-vps.com/aarm/packages/l/libxfont/libxfont-1.5.3-1-armv7h.pkg.tar.xz
-# http://tardis.tiny-vps.com/aarm/packages/x/xproto/xproto-7.0.31-1-any.pkg.tar.xz
-# http://tardis.tiny-vps.com/aarm/packages/f/fontsproto/fontsproto-2.1.3-2-any.pkg.tar.xz
-
-# hw/xfree86/common/compiler.h > //#include <sys/io.h> + #define NO_INLINE
-
-# render/picture.c
-# - pPicture->pSourcePict = (SourcePictPtr) malloc(sizeof(PictSolidFill));
-# + pPicture->pSourcePict = (SourcePictPtr) malloc(sizeof(SourcePict));
-# (x4)
-
 # downstream kernel (3.4.x) with tegra xorg hw acceleration doesn't work with latest systemd, use older version
+# downstream kernel (3.4.x) needs xorg-server ABI 14
 export RR_PACKAGES=${RR_PACKAGES}" \
   filesystem=2023.01.01-1 systemd=230-7 systemd-sysvcompat=230-7 libsystemd=230-7 systemd-libs=230-8 \
-  xorg-server=1.14.5 \
+  xorg-server-surfacert xf86-video-tegra \
   linux-surfacert-downstream \
   linux-firmware \
   wpa_supplicant dhclient
 "
-#mesa libglvnd
+

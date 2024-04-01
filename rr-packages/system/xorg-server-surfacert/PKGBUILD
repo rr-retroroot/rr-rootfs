@@ -3,8 +3,8 @@
 # Contributor: cpasjuste <cpasjuste@gmail.com>
 
 pkgbase=xorg-server
-pkgname=('xorg-server' 'xorg-server-common' 'xorg-server-devel'
-					'xorg-server-xnest' 'xorg-server-xephyr' 'xorg-server-xvfb')
+pkgname=('xorg-server-surfacert' 'xorg-server-common-surfacert' 'xorg-server-devel-surfacert'
+					'xorg-server-xnest-surfacert' 'xorg-server-xephyr-surfacert' 'xorg-server-xvfb-surfacert')
 pkgver=1.14.5
 pkgrel=1
 arch=('armv7h')
@@ -47,14 +47,14 @@ sha512sums=('7b737631fb9a7a6e305c2281b854cde0e1cc62ba546adf008582e2e8a54089df519
             'de5e2cb3c6825e6cf1f07ca0d52423e17f34d70ec7935e9dd24be5fb9883bf1e03b50ff584931bd3b41095c510ab2aa44d2573fd5feaebdcb59363b65607ff22'
             '3a05d7f0aa3c0010004de9851c6af5a6351b14550a05238d9e26ce39cce66fbfc47f0d082f66fe13697051205c553e085d3c505d999817f3433ebdf6eeba62ea')
 
-prepare() {
+__prepare() {
   cd ${pkgbase}-$pkgver
   
   # patch for arch linux upstream support
   patch -Np1 -i ../001-arch-upsteam.patch
 }
 
-build() {
+__build() {
 	cd "${pkgbase}-${pkgver}"
   autoreconf -fi
   ./configure --prefix=/usr \
@@ -108,9 +108,11 @@ _install() {
   done
 }
 
-package_xorg-server-common() {
+package_xorg-server-common-surfacert() {
   pkgdesc="Xorg server common files"
   depends=(xkeyboard-config xorg-xkbcomp xorg-setxkbmap)
+  provides=('xorg-server-common=21.1.11')
+  conflicts=('xorg-server-common')
   
   # xorg 1.14.5
   cd "${pkgbase}-${pkgver}"
@@ -132,7 +134,7 @@ package_xorg-server-common() {
   #install -m644 -Dt "${pkgdir}/usr/share/licenses/${pkgname}" "${pkgbase}-${pkgver}"/COPYING
 }
 
-package_xorg-server() {
+package_xorg-server-surfacert() {
   pkgdesc="Xorg X server"
   depends=(libepoxy libxfont2 pixman xorg-server-common libunwind
            dbus libgl xf86-input-libinput nettle
@@ -140,9 +142,9 @@ package_xorg-server() {
            libpciaccess libdrm libxshmfence libxcvt) # FS#52949
   # see xorg-server-*/hw/xfree86/common/xf86Module.h for ABI versions - we provide major numbers that drivers can depend on
   # and /usr/lib/pkgconfig/xorg-server.pc in xorg-server-devel pkg
-  #provides=('X-ABI-VIDEODRV_VERSION=25.2' 'X-ABI-XINPUT_VERSION=24.4' 'X-ABI-EXTENSION_VERSION=10.0' 'x-server')
-  provides=('X-ABI-VIDEODRV_VERSION=14' 'X-ABI-XINPUT_VERSION=19' 'X-ABI-EXTENSION_VERSION=7.0' 'x-server')
-  conflicts=('nvidia-utils<=331.20' 'glamor-egl' 'xf86-video-modesetting' 'xf86-video-opentegra')
+  provides=('X-ABI-VIDEODRV_VERSION=25.2' 'X-ABI-XINPUT_VERSION=24.4' 'X-ABI-EXTENSION_VERSION=10.0' 'x-server' 'xorg-server=21.1.11')
+  #provides=('X-ABI-VIDEODRV_VERSION=14' 'X-ABI-XINPUT_VERSION=19' 'X-ABI-EXTENSION_VERSION=7.0' 'x-server' 'xorg-server=1.20.0')
+  conflicts=('xorg-server' 'nvidia-utils<=331.20' 'glamor-egl' 'xf86-video-modesetting' 'xf86-video-opentegra')
   replaces=('glamor-egl' 'xf86-video-modesetting')
   install=xorg-server.install
 
@@ -171,6 +173,10 @@ package_xorg-server() {
   rm -rf "${pkgdir}/usr/lib/pkgconfig"
   rm -rf "${pkgdir}/usr/include"
   rm -rf "${pkgdir}/usr/share/aclocal"
+  
+  rm -rf "${pkgdir}/usr/bin/cvt"
+  rm -rf "${pkgdir}/usr/share/man/man1/cvt.1"
+  rm -rf "${pkgdir}/usr/share/man/man1/cvt.man"
 	
 	# xorg 21.1.11
   #_install fakeinstall/usr/bin/{X,Xorg,gtf}
@@ -186,12 +192,14 @@ package_xorg-server() {
   #install -m644 -Dt "${pkgdir}/usr/share/licenses/${pkgname}" "${pkgbase}-${pkgver}"/COPYING
 }
 
-package_xorg-server-xephyr() {
+package_xorg-server-xephyr-surfacert() {
   pkgdesc="A nested X server that runs as an X application"
   depends=(libxfont2 libgl libepoxy libunwind systemd-libs pixman xorg-server-common
            xcb-util-image xcb-util-renderutil xcb-util-wm xcb-util-keysyms
            nettle libtirpc
            xcb-util libxdmcp libx11 libxau libxshmfence glibc)
+	provides=('xorg-server-xephyr=21.1.11')
+	conflicts=('xorg-server-xephyr')
 
 	# xorg 1.14.5
 	#cd "${pkgbase}-${pkgver}/hw/kdrive"
@@ -207,13 +215,15 @@ package_xorg-server-xephyr() {
   #install -m644 -Dt "${pkgdir}/usr/share/licenses/${pkgname}" "${pkgbase}-${pkgver}"/COPYING
 }
 
-package_xorg-server-xvfb() {
+package_xorg-server-xvfb-surfacert() {
   pkgdesc="Virtual framebuffer X server"
   # xvfb-run is GPLv2, rest is MIT
   license=('MIT' 'GPL-2.0-only')
   depends=(libxfont2 libunwind pixman xorg-server-common xorg-xauth 
            libgl nettle libtirpc systemd-libs
            libxdmcp sh glibc libxau)
+	provides=('xorg-server-xvfb=21.1.11')
+	conflicts=('xorg-server-xvfb')
 
 	# xorg 1.14.5
 	cd "${pkgbase}-${pkgver}/hw/vfb"
@@ -234,11 +244,13 @@ package_xorg-server-xvfb() {
   #install -m644 -Dt "${pkgdir}/usr/share/licenses/${pkgname}" "${pkgbase}-${pkgver}"/COPYING
 }
 
-package_xorg-server-xnest() {
+package_xorg-server-xnest-surfacert() {
   pkgdesc="A nested X server that runs as an X application"
   depends=(libxfont2 libunwind libxext pixman xorg-server-common nettle
            libtirpc systemd-libs
            libxdmcp glibc libx11 libxau)
+	provides=('xorg-server-xnest=21.1.11')
+	conflicts=('xorg-server-xnest')
 
 	# xorg 1.14.5
 	cd "${pkgbase}-${pkgver}/hw/xnest"
@@ -254,12 +266,14 @@ package_xorg-server-xnest() {
   #install -m644 -Dt "${pkgdir}/usr/share/licenses/${pkgname}" "${pkgbase}-${pkgver}"/COPYING
 }
 
-package_xorg-server-devel() {
+package_xorg-server-devel-surfacert() {
   pkgdesc="Development files for the X.Org X server"
   depends=('xorgproto' 'mesa' 'libpciaccess' 'pixman'
            # not technically required but almost every Xorg pkg needs it to build
            'xorg-util-macros')
-
+	provides=('xorg-server-devel=21.1.11')
+	conflicts=('xorg-server-devel')
+	
 	# xorg 1.14.5
 	cd "${pkgbase}-${pkgver}"
   make DESTDIR="${pkgdir}" install
