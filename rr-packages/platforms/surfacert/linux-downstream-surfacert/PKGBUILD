@@ -1,0 +1,103 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=linux-downstream-surfacert
+pkgver=3.4.113
+pkgrel=1
+pkgdesc="RetroRoot surfacert kernel"
+arch=('armv7h')
+license=('GPL')
+commit="6d33401a6d36e954593b6bc07c29f1eedeaf240f"
+url="https://github.com/Open-Surface-RT/android_kernel_nvidia_tegra3/archive/${commit}.tar.gz"
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'system' 'surfacert')
+
+depends=('coreutils' 'mkinitcpio>=0.7')
+makedepends=('base-devel')
+options=(!debug !strip)
+
+source=(
+  "$url"
+  "config-surfacert"
+  "sd8797_uapsta.bin"
+  "001-overlayfs.patch"
+  "002-sd8xxx.patch"
+  "https://releases.linaro.org/components/toolchain/binaries/4.9-2017.01/arm-linux-gnueabihf/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf.tar.xz"
+)
+sha512sums=(
+  'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP'
+)
+
+prepare() {
+	# unpack gcc 4.9 cross compiler
+	cd "$srcdir"
+	tar xJf gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf.tar.xz
+
+  _builddir="$srcdir/android_kernel_nvidia_tegra3-${commit}"
+  cd "$_builddir"
+  
+  # copy custom config
+  cp "$srcdir/config-surfacert" .config
+  
+  # overlayfs patch
+  #echo "overlayfs: patching..."
+  #patch -Np1 < "../001-overlayfs.patch"
+  
+  # sd8xxx patch
+  echo "sd8xxx: patching..."
+  patch -Np1 < "../002-sd8xxx.patch"
+
+  # use gcc4
+  export RETROROOT_HOST="$srcdir"/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf
+  export RETROROOT_CROSS_PREFIX=arm-linux-gnueabihf-
+  export CFLAGS="-march=armv7-a -mfloat-abi=hard -mfpu=neon -O2"
+  export CPPFLAGS="-march=armv7-a -mfloat-abi=hard -mfpu=neon -O2"
+  export CXXFLAGS="-march=armv7-a -mfloat-abi=hard -mfpu=neon -O2"
+  export LDFLAGS=""
+	export PATH="${RETROROOT_HOST}/bin:$PATH"
+
+  make ARCH="arm" CROSS_COMPILE=${RETROROOT_CROSS_PREFIX} oldconfig
+  
+  # copy firmware
+  cp "$srcdir/sd8797_uapsta.bin" "$srcdir/android_kernel_nvidia_tegra3-${commit}/firmware/"
+}
+
+build() {
+  cd "$srcdir"/android_kernel_nvidia_tegra3-${commit}
+  
+  # use gcc4
+  export RETROROOT_HOST="$srcdir"/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf
+  export RETROROOT_CROSS_PREFIX=arm-linux-gnueabihf-
+  export CFLAGS="-march=armv7-a -mfloat-abi=hard -mfpu=neon -O2"
+  export CPPFLAGS="-march=armv7-a -mfloat-abi=hard -mfpu=neon -O2"
+  export CXXFLAGS="-march=armv7-a -mfloat-abi=hard -mfpu=neon -O2"
+  export LDFLAGS=""
+	export PATH="${RETROROOT_HOST}/bin:$PATH"
+
+  make ARCH="arm" CROSS_COMPILE=${RETROROOT_CROSS_PREFIX} \
+    KBUILD_BUILD_VERSION="$((pkgrel + 0))-retroroot"
+}
+
+package() {
+  cd "$srcdir"/android_kernel_nvidia_tegra3-${commit}
+  
+  # use gcc4
+  #export RETROROOT_HOST=/opt/retroroot/host/armv7h-gcc4
+  #source /opt/retroroot/rr-env ${CARCH}
+  
+  # install kernel image and dtb
+  install -d "$pkgdir"/boot
+  cp arch/arm/boot/zImage "$pkgdir"/boot/zImage
+  
+  # install kernel modules
+  make ARCH="arm" INSTALL_MOD_PATH="$pkgdir"/usr modules_install
+  # remove build and source links
+  rm -rf "$pkgdir"/usr/lib/modules/${pkgver}/{source,build}
+  
+  # TODO: install kernel headers
+  #make INSTALL_HDR_PATH="$pkgdir"/usr header_install
+  
+  # copy surfacert rootfs overlays
+  cp -r "$startdir"/overlay/. "${pkgdir}"
+}
+
