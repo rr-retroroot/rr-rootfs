@@ -1,9 +1,0 @@
-# Static information about the filesystems.
-# See fstab(5) for details.
-
-# <file system> <dir> <type> <options> <dump> <pass>
-
-LABEL=RR-ROOT   /           ext4    defaults    0 1
-LABEL=RR-BOOT   /boot       vfat    rw,defaults 0 0
-#LABEL=RR-DATA   /home/rr  exfat  defaults 0 2
-

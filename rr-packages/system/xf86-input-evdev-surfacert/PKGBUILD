@@ -1,0 +1,32 @@
+# Maintainer : cpasjuste 
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=xf86-input-evdev-surfacert
+pkgver=2.8.2
+pkgrel=1
+pkgdesc="X.org evdev input driver"
+arch=(armv7h)
+url="http://xorg.freedesktop.org/"
+license=('custom')
+#depends=('glibc' 'systemd-tools' 'mtdev')
+#makedepends=('xorg-server-devel' 'resourceproto' 'scrnsaverproto')
+makedepends=('xorg-server-devel-surfacert')
+#conflicts=('xorg-server<1.14.0' 'X-ABI-XINPUT_VERSION<19' 'X-ABI-XINPUT_VERSION>=20')
+options=('!makeflags')
+groups=('xorg-drivers' 'xorg')
+source=(${url}/releases/individual/driver/xf86-input-evdev-${pkgver}.tar.bz2)
+sha256sums=('750461749a83bdee7771592aa5c0db5e267b18d847078a4b8622f55b04797eb3')
+
+build() {
+  cd "${srcdir}/xf86-input-evdev-${pkgver}"
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "${srcdir}/xf86-input-evdev-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/"
+}
+

@@ -9,3 +9,7 @@ if [ "${RR_PLATFORM}" != "surfacert" ]; then
 fi
 
 echo "rr-run-parts: $(basename "$0")"
+
+# fix for systemd 230 (which use dbus-daemon-units)
+pacman --noconfirm -Rdd dbus-broker-units
+

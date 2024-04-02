@@ -2,8 +2,9 @@
 
 # downstream kernel (3.4.x) with tegra xorg hw acceleration doesn't work with latest systemd, use older version
 # downstream kernel (3.4.x) needs xorg-server ABI 14
-export RR_PACKAGES=${RR_PACKAGES}" \
-  filesystem=2023.01.01-1 systemd=230-7 systemd-sysvcompat=230-7 libsystemd=230-7 systemd-libs=230-8 \
+# filesystem=2023.01.01-1
+export RR_PACKAGES=" \
+  systemd=230-7 systemd-sysvcompat=230-7 libsystemd=230-7 systemd-libs=230-8 \
   xorg-server-surfacert xf86-video-tegra \
   linux-surfacert-downstream \
   linux-firmware \

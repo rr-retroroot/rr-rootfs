@@ -91,18 +91,26 @@ function build_image() {
   mount --make-private --bind "${RR_ROOT_PATH}" "${MOUNT_RR}"
 
   # extract rootfs
+  #if [ ! "${RR_DO_CHROOT}" ]; then
+  #  if [ ! -f "${RR_ROOT_PATH}"/output/archlinux-bootstrap-"${RR_ARCH}".tar.gz ]; then
+  #    minfo "rr: downloading arch bootstrap tarball..."
+  #    wget http://retroroot.mydedibox.fr/misc/archlinux-bootstrap-"${RR_ARCH}".tar.gz \
+  #      -O "${RR_ROOT_PATH}"/output/archlinux-bootstrap-"${RR_ARCH}".tar.gz
+  #  fi
+  #  minfo "rr: extracting arch bootstrap tarball..."
+  #  tar zxf "${RR_ROOT_PATH}"/output/archlinux-bootstrap-"${RR_ARCH}".tar.gz --numeric-owner -C "${MOUNT_ROOT}" >/dev/null 2>&1 || :
+  #  # copy custom config
+  #  cp -f "${RR_ROOT_PATH}"/configs/pacman-"${RR_ARCH}".conf "${MOUNT_ROOT}"/etc/pacman.conf
+  #  rm -f "${MOUNT_ROOT}"/etc/resolv.conf
+  #  cp -f /etc/resolv.conf "${MOUNT_ROOT}"/etc/resolv.conf
+  #fi
+  
   if [ ! "${RR_DO_CHROOT}" ]; then
-    if [ ! -f "${RR_ROOT_PATH}"/output/archlinux-bootstrap-"${RR_ARCH}".tar.gz ]; then
-      minfo "rr: downloading arch bootstrap tarball..."
-      wget http://retroroot.mydedibox.fr/misc/archlinux-bootstrap-"${RR_ARCH}".tar.gz \
-        -O "${RR_ROOT_PATH}"/output/archlinux-bootstrap-"${RR_ARCH}".tar.gz
-    fi
-    minfo "rr: extracting arch bootstrap tarball..."
-    tar zxf "${RR_ROOT_PATH}"/output/archlinux-bootstrap-"${RR_ARCH}".tar.gz --numeric-owner -C "${MOUNT_ROOT}" >/dev/null 2>&1 || :
-    # copy custom config
-    cp -f "${RR_ROOT_PATH}"/configs/pacman-"${RR_ARCH}".conf "${MOUNT_ROOT}"/etc/pacman.conf
-    rm -f "${MOUNT_ROOT}"/etc/resolv.conf
-    cp -f /etc/resolv.conf "${MOUNT_ROOT}"/etc/resolv.conf
+		minfo "rr: running pacstrap with packages:"
+		minfo "${RR_PACKAGES}"
+		source "${RR_ROOT_PATH}"/configs/packages
+		pacstrap -c -K -M -C "${RR_ROOT_PATH}"/configs/pacman-"${RR_ARCH}".conf ${MOUNT_ROOT} ${RR_PACKAGES}
+		cp -f "${RR_ROOT_PATH}"/configs/pacman-"${RR_ARCH}".conf "${MOUNT_ROOT}"/etc/pacman.conf
   fi
 
   minfo "rr: running container with packages:"

@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -xe
+
+source /retroroot/configs/vars
+
+if [ "${RR_PLATFORM}" != "surfacert" ]; then
+  exit 0;
+fi
+
+echo "rr-run-parts: $(basename "$0")"
+
+# v4l-utils: latest versions seems to use BPF decoder from "/usr/lib/systemd/system/systemd-udevd.service.d/50-rc_keymap.conf" which is not compatible with our kernel (TODO: proper fix...)
+pacman --noconfirm -S --overwrite "*" v4l-utils
+rm /usr/lib/systemd/system/systemd-udevd.service.d/50-rc_keymap.conf
+
+# prevent upgrade of surfacert specific packages
+sed -i 's/#IgnorePkg =/IgnorePkg = filesystem systemd systemd-sysvcompat libsystemd systemd-libs/g' /etc/pacman.conf
+

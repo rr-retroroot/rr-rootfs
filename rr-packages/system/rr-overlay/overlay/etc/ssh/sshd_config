@@ -1,6 +1,0 @@
-AuthorizedKeysFile .ssh/authorized_keys
-UsePAM yes
-PermitRootLogin yes
-PrintMotd no
-Subsystem	sftp	/usr/lib/ssh/sftp-server
-
