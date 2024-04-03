@@ -1,5 +1,6 @@
 # Maintainer: cpasjuste <cpasjuste@gmail.com>
 
+# TODO: fixme:
 # sudo ln -s /usr/lib/libmpfr.so /usr/lib/libmpfr.so.4
 # CONFIG_ARM_UNWIND is not set
 # ar: /usr/lib/libstdc++.so.6: version `GLIBCXX_3.4.30' not found (required by /usr/bin/../bin/../lib/bfd-plugins/LLVMgold.so)
@@ -55,8 +56,8 @@ prepare() {
   patch -Np1 < "../002-sd8xxx.patch"
   
 	# gcc12 noreturn patch
-  #echo "gcc12: patching..."
-  #patch -Np1 < "../003-fix-gcc12-noreturn.patch"
+  echo "gcc12: patching..."
+  patch -Np1 < "../003-fix-gcc12-noreturn.patch"
 
 	# gcc12 patch
   echo "gcc12: patching..."
@@ -83,11 +84,17 @@ build() {
   export CXXFLAGS="-march=armv7-a -mfloat-abi=hard -mfpu=neon -O2 -Wno-error=attributes"
   export LDFLAGS=""
   
-  # gcc12 fix
+  # gcc12 "fix"
   cp include/linux/compiler-gcc5.h include/linux/compiler-gcc12.h
+  export CFLAGS_KERNEL="-Wno-attributes -Wno-tautological-compare -Wno-misleading-indentation \
+    -Wno-maybe-uninitialized -Wno-unused-const-variable -Wno-error"
+  export CFLAGS_MODULE="${CFLAGS_KERNEL}"
+  #export KBUILD_CFLAGS_KERNEL="${CFLAGS_KERNEL}"
+  #export KBUILD_CFLAGS_MODULE="${CFLAGS_KERNEL}"
+  # gcc12 "tegra" fix...
+  find . -type f -exec sed -i 's/= -Werror/= -Wno-error/g' {} +
   
-  make ARCH="arm" EXTRA_CFLAGS="-Wno-attributes -Wno-tautological-compare -Wno-misleading-indentation -Wno-maybe-uninitialized -Wno-unused-const-variable -Wno-error" \
-  	KBUILD_BUILD_VERSION="$((pkgrel + 0))-retroroot"
+  make ARCH="arm" KBUILD_BUILD_VERSION="$((pkgrel + 0))-retroroot"
 }
 
 package() {
