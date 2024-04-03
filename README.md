@@ -13,7 +13,7 @@
   sudo cp /usr/lib/binfmt.d/qemu-aarch64-static.conf /etc/binfmt.d/
   sudo sed -i 's/:FP/:FPC/g' /etc/binfmt.d/qemu-arm-static.conf
   sudo sed -i 's/:FP/:FPC/g' /etc/binfmt.d/qemu-aarch64-static.conf
-   sudo systemctl restart systemd-binfmt.service
+  sudo systemctl restart systemd-binfmt.service
   ```
 
 ## OLD
