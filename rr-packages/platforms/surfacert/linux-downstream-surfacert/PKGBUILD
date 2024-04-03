@@ -89,8 +89,6 @@ build() {
   export CFLAGS_KERNEL="-Wno-attributes -Wno-tautological-compare -Wno-misleading-indentation \
     -Wno-maybe-uninitialized -Wno-unused-const-variable -Wno-error"
   export CFLAGS_MODULE="${CFLAGS_KERNEL}"
-  #export KBUILD_CFLAGS_KERNEL="${CFLAGS_KERNEL}"
-  #export KBUILD_CFLAGS_MODULE="${CFLAGS_KERNEL}"
   # gcc12 "tegra" fix...
   find . -type f -exec sed -i 's/= -Werror/= -Wno-error/g' {} +
   
