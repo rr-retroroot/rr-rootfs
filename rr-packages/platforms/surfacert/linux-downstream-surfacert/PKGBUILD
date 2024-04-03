@@ -62,15 +62,11 @@ prepare() {
   echo "gcc12: patching..."
   patch -Np1 < "../004-fix-gcc12.patch"
   
-  # use gcc4
-  #export RETROROOT_HOST="$srcdir"/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf
-  #export RETROROOT_CROSS_PREFIX=arm-linux-gnueabihf-
+  # armv7h
   export CFLAGS="-march=armv7-a -mfloat-abi=hard -mfpu=neon -O2"
   export CPPFLAGS="-march=armv7-a -mfloat-abi=hard -mfpu=neon -O2"
   export CXXFLAGS="-march=armv7-a -mfloat-abi=hard -mfpu=neon -O2"
   export LDFLAGS=""
-	#export PATH="${RETROROOT_HOST}/bin:$PATH"
-  #make ARCH="arm" CROSS_COMPILE=${RETROROOT_CROSS_PREFIX} oldconfig
   
   make ARCH="arm" oldconfig
   
@@ -81,17 +77,13 @@ prepare() {
 build() {
   cd "$srcdir"/android_kernel_nvidia_tegra3-${commit}
   
-  # use gcc4
-  #export RETROROOT_HOST="$srcdir"/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf
-  #export RETROROOT_CROSS_PREFIX=arm-linux-gnueabihf-
+  # armv7h
   export CFLAGS="-march=armv7-a -mfloat-abi=hard -mfpu=neon -O2 -Wno-error=attributes"
   export CPPFLAGS="-march=armv7-a -mfloat-abi=hard -mfpu=neon -O2 -Wno-error=attributes"
   export CXXFLAGS="-march=armv7-a -mfloat-abi=hard -mfpu=neon -O2 -Wno-error=attributes"
   export LDFLAGS=""
-	#export PATH="${RETROROOT_HOST}/bin:$PATH"
-  #make ARCH="arm" CROSS_COMPILE=${RETROROOT_CROSS_PREFIX} \
-  #  KBUILD_BUILD_VERSION="$((pkgrel + 0))-retroroot"
   
+  # gcc12 fix
   cp include/linux/compiler-gcc5.h include/linux/compiler-gcc12.h
   
   make ARCH="arm" EXTRA_CFLAGS="-Wno-attributes -Wno-tautological-compare -Wno-misleading-indentation -Wno-maybe-uninitialized -Wno-unused-const-variable -Wno-error" \
