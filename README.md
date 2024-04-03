@@ -4,7 +4,7 @@
 
 - Install build dependencies:
   ```
-  sudo pacman -S --needed dosfstools e2fsprogs qemu-user-static qemu-user-static-binfmt
+  sudo pacman -S --needed git base-devel arch-install-scripts parted dosfstools e2fsprogs qemu-user-static qemu-user-static-binfmt
   ```
 
 - Fix sudo permissions for systemd-nspawn (optional, if chroot needed)

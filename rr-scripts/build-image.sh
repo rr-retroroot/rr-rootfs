@@ -35,6 +35,7 @@ function build_image() {
 
   # ...
   #chmod -R 777 ${ROOT_DIR}
+  mkdir -p "${RR_ROOT_PATH}"/output
 
   # set output image path
   OUTPUT_IMG="${RR_ROOT_PATH}"/output/retroroot-${RR_PLATFORM}-${RR_ARCH}.img

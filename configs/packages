@@ -8,6 +8,7 @@ export RR_PACKAGES=${RR_PACKAGES}" \
 
 # extra utilites
 export RR_PACKAGES=${RR_PACKAGES}" \
+  mkinitcpio \
   fakeroot \
   net-tools \
   dosfstools \

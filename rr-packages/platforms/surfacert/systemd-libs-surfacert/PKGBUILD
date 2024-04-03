@@ -5,6 +5,7 @@ arch=('armv7h')
 license=('LGPL-2.1-or-later')
 pkgdesc='systemd client libraries'
 provides=('systemd-libs' 'hwids') #'libsystemd.so' 'libudev.so'
+replace=('systemd-libs')
 # fix dbus.socket / dbus.service
 depends=('dbus-daemon-units')
 
