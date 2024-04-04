@@ -27,7 +27,7 @@ export RR_PACKAGES=${RR_PACKAGES}" \
 # squashfs-tools
 
 # "portlibs" (wip, disabled)
-export RR_PACKAGES__TODO__=${RR_PACKAGES}" \
+export RR_PACKAGES_DISABLED__=${RR_PACKAGES}" \
   asio \
   boost \
   box2d \

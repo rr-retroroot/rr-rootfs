@@ -1,13 +1,10 @@
 # Maintainer: cpasjuste <cpasjuste@gmail.com>
 
-# TODO: fixme:
-# sudo ln -s /usr/lib/libmpfr.so /usr/lib/libmpfr.so.4
-# CONFIG_ARM_UNWIND is not set
-# ar: /usr/lib/libstdc++.so.6: version `GLIBCXX_3.4.30' not found (required by /usr/bin/../bin/../lib/bfd-plugins/LLVMgold.so)
+# TODO: fixme: CONFIG_ARM_UNWIND is not set
 
 pkgname=linux-downstream-surfacert
 pkgver=3.4.113
-pkgrel=1
+pkgrel=2
 pkgdesc="RetroRoot surfacert kernel"
 arch=('armv7h')
 license=('GPL')
@@ -28,24 +25,16 @@ source=(
   "001-overlayfs.patch"
   "002-sd8xxx.patch"
   "003-fix-gcc12-noreturn.patch"
-  "004-fix-gcc12.patch"
-  #"https://releases.linaro.org/components/toolchain/binaries/4.9-2017.01/arm-linux-gnueabihf/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf.tar.xz"
+  "004-fix-gcc12-asm.patch"
+  "005-fix-gcc12-return_address.patch"
 )
 sha512sums=(
-  'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP'
-  #'SKIP'
+  'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP'
 )
 
 prepare() {
-	# unpack gcc 4.9 cross compiler
-	#cd "$srcdir"
-	#tar xJf gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf.tar.xz
-
   _builddir="$srcdir/android_kernel_nvidia_tegra3-${commit}"
   cd "$_builddir"
-  
-  # copy custom config
-  cp "$srcdir/config-surfacert" .config
   
   # overlayfs patch
   #echo "overlayfs: patching..."
@@ -56,51 +45,46 @@ prepare() {
   patch -Np1 < "../002-sd8xxx.patch"
   
 	# gcc12 noreturn patch
-  echo "gcc12: patching..."
+  echo "gcc12: patching... (noreturn)"
   patch -Np1 < "../003-fix-gcc12-noreturn.patch"
 
 	# gcc12 patch
-  echo "gcc12: patching..."
-  patch -Np1 < "../004-fix-gcc12.patch"
+  echo "gcc12: patching... (asm)"
+  patch -Np1 < "../004-fix-gcc12-asm.patch"
   
-  # armv7h
-  export CFLAGS="-march=armv7-a -mfloat-abi=hard -mfpu=neon -O2"
-  export CPPFLAGS="-march=armv7-a -mfloat-abi=hard -mfpu=neon -O2"
-  export CXXFLAGS="-march=armv7-a -mfloat-abi=hard -mfpu=neon -O2"
-  export LDFLAGS=""
+  # gcc12 return_address patch
+  echo "gcc12: patching (return_address)..."
+  patch -Np1 < "../005-fix-gcc12-return_address.patch"
   
-  make ARCH="arm" oldconfig
+  # gcc12 "fix"
+  cp include/linux/compiler-gcc5.h include/linux/compiler-gcc12.h
+  
+  # gcc12 "tegra crap" fix...
+  find ./drivers -type f -exec sed -i 's/EXTRA_CFLAGS +=/EXTRA_CFLAGS += -fno-pie /g' {} +
+  find ./drivers -type f -exec sed -i 's/= -Werror/= -Wno-error/g' {} +
+  find ./sound -type f -exec sed -i 's/= -Werror/= -Wno-error/g' {} +
   
   # copy firmware
   cp "$srcdir/sd8797_uapsta.bin" "$srcdir/android_kernel_nvidia_tegra3-${commit}/firmware/"
+  
+  # restore our custom config
+  cp "$srcdir/config-surfacert" .config
+  make ARCH="arm" oldconfig
 }
 
 build() {
   cd "$srcdir"/android_kernel_nvidia_tegra3-${commit}
   
-  # armv7h
-  export CFLAGS="-march=armv7-a -mfloat-abi=hard -mfpu=neon -O2 -Wno-error=attributes"
-  export CPPFLAGS="-march=armv7-a -mfloat-abi=hard -mfpu=neon -O2 -Wno-error=attributes"
-  export CXXFLAGS="-march=armv7-a -mfloat-abi=hard -mfpu=neon -O2 -Wno-error=attributes"
-  export LDFLAGS=""
-  
   # gcc12 "fix"
-  cp include/linux/compiler-gcc5.h include/linux/compiler-gcc12.h
-  export CFLAGS_KERNEL="-Wno-attributes -Wno-tautological-compare -Wno-misleading-indentation \
-    -Wno-maybe-uninitialized -Wno-unused-const-variable -Wno-error"
-  export CFLAGS_MODULE="${CFLAGS_KERNEL}"
-  # gcc12 "tegra" fix...
-  find . -type f -exec sed -i 's/= -Werror/= -Wno-error/g' {} +
-  
-  make ARCH="arm" KBUILD_BUILD_VERSION="$((pkgrel + 0))-retroroot"
+  unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS
+  EXTRA_CFLAGS="-Wno-error -fno-pie" \
+    CFLAGS_KERNEL="-Wno-error -fno-pie" \
+    CFLAGS_MODULE="-Wno-error -fno-pie" \
+    make ARCH="arm" KBUILD_BUILD_VERSION="$((pkgrel + 0))-retroroot"
 }
 
 package() {
   cd "$srcdir"/android_kernel_nvidia_tegra3-${commit}
-  
-  # use gcc4
-  #export RETROROOT_HOST=/opt/retroroot/host/armv7h-gcc4
-  #source /opt/retroroot/rr-env ${CARCH}
   
   # install kernel image and dtb
   install -d "$pkgdir"/boot
