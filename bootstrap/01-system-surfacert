@@ -10,9 +10,12 @@ fi
 
 echo "rr-run-parts: $(basename "$0")"
 
-# fix for systemd 230 (systemd-libs conflicts with libsystemd 230)
-pacman --noconfirm -Rdd systemd-libs
+if [ "${RR_SURFACERT_MAINLINE}" ]; then
+  echo "surfacert: using mainline archlinux, hacking in..."
+  # fix for systemd 230 (systemd-libs conflicts with libsystemd 230)
+  pacman --noconfirm -Rdd systemd-libs
 
-# fix for systemd 230 (which use dbus-daemon-units)
-pacman --noconfirm -Rdd dbus-broker-units
+  # fix for systemd 230 (which use dbus-daemon-units)
+  pacman --noconfirm -Rdd dbus-broker-units
+fi
 

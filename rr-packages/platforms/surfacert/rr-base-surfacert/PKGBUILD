@@ -2,7 +2,7 @@
 
 pkgname=rr-base-surfacert
 pkgver=1
-pkgrel=1
+pkgrel=3
 pkgdesc="RetroRoot base system (surfacert)"
 arch=('armv7h')
 license=('GPL')

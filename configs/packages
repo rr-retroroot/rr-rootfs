@@ -3,7 +3,11 @@
 # "base" package
 # https://gitlab.archlinux.org/archlinux/packaging/packages/base/-/blob/main/PKGBUILD?ref_type=heads
 export RR_PACKAGES=${RR_PACKAGES}" \
-  base
+  filesystem gcc-libs glibc bash \
+  coreutils file findutils gawk grep procps-ng sed tar \
+  gettext pciutils psmisc shadow util-linux bzip2 gzip xz \
+  licenses pacman archlinux-keyring systemd systemd-sysvcompat \
+  iputils iproute2
 "
 
 # extra utilites
@@ -19,12 +23,10 @@ export RR_PACKAGES=${RR_PACKAGES}" \
   less \
   openssh \
   strace \
-  vsftpd \
   inetutils \
-  iwd \
   wireless-regdb
 "
-# squashfs-tools
+# iwd
 
 # "portlibs" (wip, disabled)
 export RR_PACKAGES_DISABLED__=${RR_PACKAGES}" \

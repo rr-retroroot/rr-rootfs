@@ -2,5 +2,5 @@
 pkill dhclient
 pkill wpa_supplicant
 wpa_supplicant -B -i mlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf
-dhclient &
+dhclient mlan0 &
 

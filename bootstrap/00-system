@@ -17,7 +17,12 @@ fi
 # install platform specific and retroroot packages
 source /retroroot/configs/packages-"${RR_PLATFORM}"
 # shellcheck disable=SC2086
-pacman --noconfirm -S --needed --overwrite "*" ${RR_PACKAGES} rr-base-"${RR_PLATFORM}"
+
+if [ "${RR_PLATFORM}" == "surfacert" ]; then
+  pacman --noconfirm -S --needed --force ${RR_PACKAGES} rr-base-"${RR_PLATFORM}"
+else
+  pacman --noconfirm -S --needed --overwrite "*" ${RR_PACKAGES} rr-base-"${RR_PLATFORM}"
+fi
 # rr-recovery
 
 # root passwd
