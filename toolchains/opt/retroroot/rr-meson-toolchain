@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+SCRIPTDIR="${BASH_SOURCE%/*}"
+
+make_flag_list()
+{
+	while (( "$#" )); do
+		echo -n "'$1'";
+		if [ $# -gt 1 ]; then
+			echo -n ",";
+		fi
+		shift
+	done
+}
+
+if [ -z "$1" ]; then
+	echo "No platform specified." 1>&2
+	exit 1
+fi
+
+case "$1" in
+"aarch64")
+	PLAT_SYSTEM="linux"
+	PLAT_CPU_FAMILY="aarch64"
+	PLAT_CPU="cortex-a35"
+	PLAT_ENDIAN="little"
+	source ${SCRIPTDIR}/rr-env
+	;;
+"armv7a")
+	PLAT_SYSTEM="linux"
+	PLAT_CPU_FAMILY="armv7-a"
+	PLAT_CPU="cortex-a8"
+	PLAT_ENDIAN="little"
+	source ${SCRIPTDIR}/rr-env
+	;;
+*)
+	echo "Unsupported arch." 1>&2
+	exit 1
+	;;
+esac
+
+echo "[binaries]"
+echo "c = '${RETROROOT_CC}'"
+echo "cpp = '${RETROROOT_CXX}'"
+echo "ar = '${RETROROOT_AR}'"
+echo "strip = '${RETROROOT_STRIP}'"
+echo "pkgconfig = '${RETROROOT_PKGCONFIG}'"
+echo ""
+echo "[built-in options]"
+echo "c_args = [` make_flag_list $CPPFLAGS $CFLAGS --sysroot=${RETROROOT_SYSROOT}`]"
+echo "c_link_args = [` make_flag_list $LDFLAGS $LIBS --sysroot=${RETROROOT_SYSROOT}`]"
+echo "cpp_args = [` make_flag_list $CPPFLAGS $CXXFLAGS --sysroot=${RETROROOT_SYSROOT}`]"
+echo "cpp_link_args = [` make_flag_list $LDFLAGS $LIBS --sysroot=${RETROROOT_SYSROOT}`]"
+echo ""
+echo "[host_machine]"
+echo "system = '${PLAT_SYSTEM}'"
+echo "cpu_family = '${PLAT_CPU_FAMILY}'"
+echo "cpu = '${PLAT_CPU}'"
+echo "endian = '${PLAT_ENDIAN}'"
+echo ""
+echo "[target_machine]"
+echo "system = '${PLAT_SYSTEM}'"
+echo "cpu_family = '${PLAT_CPU_FAMILY}'"
+echo "cpu = '${PLAT_CPU}'"
+echo "endian = '${PLAT_ENDIAN}'"

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -e
+
+source /opt/retroroot/rr-env x86_64
+
+exec cmake -DCMAKE_TOOLCHAIN_FILE=${RETROROOT_SYSROOT}/usr/lib/cmake/rr-toolchain.cmake "$@"
+

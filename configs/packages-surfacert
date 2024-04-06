@@ -5,6 +5,7 @@
 export RR_PACKAGES=" \
   systemd=230-7 systemd-sysvcompat=230-7 libsystemd=230-7 systemd-libs-surfacert \
   xorg-server-surfacert xf86-video-tegra-surfacert xf86-input-evdev-surfacert \
+  mkinitcpio=37.3-1 cryptsetup=2.7.0-1 \
   linux-downstream-surfacert \
   linux-firmware \
   wpa_supplicant dhclient
