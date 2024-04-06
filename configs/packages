@@ -22,7 +22,8 @@ export RR_PACKAGES=${RR_PACKAGES}" \
   vsftpd \
   inetutils \
   iwd \
-  wireless-regdb
+  wireless-regdb \
+  alsa-utils
 "
 # squashfs-tools
 
