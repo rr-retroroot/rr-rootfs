@@ -3,7 +3,8 @@
 # get root privileges
 [ "$UID" -eq 0 ] || exec sudo bash "$0" "$@"
 
-source rr-scripts/build-image.sh
+source scripts/utility.sh
+source scripts/build-image.sh
 
 run() {
   if [ "$1" == "desktop" ]; then

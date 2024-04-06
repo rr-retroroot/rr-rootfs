@@ -1,0 +1,55 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=uboot-rg353
+pkgver=2017.09
+pkgrel=1
+pkgdesc="Rockchip U-Boot is a bootloader for embedded systems (retroroot rg353)"
+arch=('aarch64')
+license=('GPL')
+commit=3efa78841582814a4085580ebbaafeb614ca8201
+url="https://github.com/rr-retroroot/rk356x-uboot/archive/$commit.zip"
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'system' 'rg353')
+
+depends=('coreutils')
+makedepends=('rr-environment' 'rr-toolchain-aarch64')
+
+install=$pkgname.install
+
+# TODO: build idbloader from sources...
+# https://github.com/JustEnoughLinuxOS/distribution/blob/dev/projects/Rockchip/packages/linux/package.mk
+source=("$url" 
+  "https://github.com/JustEnoughLinuxOS/rkbin/archive/7d631e0d5b2d373b54d4533580d08fb9bd2eaad4.zip"
+  "001-yylloc-gcc12.patch" "002-remove-oled-bits.patch"
+  "idbloader.img"
+)
+sha512sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+
+prepare() {
+  _builddir="$srcdir/rk356x-uboot-$commit"
+  cd "$_builddir"
+  
+  patch -p1 < $srcdir/001-yylloc-gcc12.patch
+  patch -p1 < $srcdir/002-remove-oled-bits.patch
+}
+
+build() {
+  _builddir="$srcdir/rk356x-uboot-$commit"
+  cd "$_builddir"
+
+  source /opt/retroroot/rr-env ${CARCH}
+
+  sed -i "s|TOOLCHAIN_ARM64=.*|TOOLCHAIN_ARM64=${RETROROOT_HOST}/bin|" make.sh
+  sed -i "s|../rkbin|"${srcdir}/rkbin-7d631e0d5b2d373b54d4533580d08fb9bd2eaad4"|" make.sh
+  ./make.sh rk3566
+}
+
+package() {
+  _builddir="$srcdir/rk356x-uboot-$commit"
+  cd $_builddir
+  
+  mkdir -p "$pkgdir"/boot/
+  cp uboot.img "$pkgdir"/boot/
+  cp $srcdir/idbloader.img "$pkgdir"/boot/
+}

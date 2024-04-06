@@ -1,0 +1,34 @@
+#!/bin/bash
+
+need_recovery() {
+  # first check for recovery flag in kernel cmdline
+  cat /proc/cmdline | grep recovery &>/dev/null
+  if [ $? -eq 0 ]; then
+    return 0;
+  fi
+  
+  # if we are not in recovery mode but data partition doesn't exist, enter recovery
+  blkid | grep "RR-DATA" &>/dev/null
+  if [ $? -ne 0 ]; then
+    return 0;
+  fi
+  
+  return 1;
+}
+
+kill_splah() {
+  PID=$(pidof rr-splash)
+  kill -INT $PID &>/dev/null
+}
+
+# stop splash
+kill_splah
+
+# run recovery if needed, else rr-launcher
+if need_recovery; then
+  /usr/bin/rr-recovery
+else
+  # TODO
+  echo TODO
+fi
+

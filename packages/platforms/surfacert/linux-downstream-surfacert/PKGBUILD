@@ -1,0 +1,104 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+# TODO: fixme: CONFIG_ARM_UNWIND is not set
+
+pkgname=linux-downstream-surfacert
+pkgver=3.4.113
+pkgrel=2
+pkgdesc="RetroRoot surfacert kernel"
+arch=('armv7h')
+license=('GPL')
+commit="6d33401a6d36e954593b6bc07c29f1eedeaf240f"
+url="https://github.com/Open-Surface-RT/android_kernel_nvidia_tegra3/archive/${commit}.tar.gz"
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'system' 'surfacert')
+
+depends=('coreutils' 'mkinitcpio>=0.7')
+makedepends=('base-devel')
+options=(!debug !strip)
+
+source=(
+  "$url"
+  "config-surfacert"
+  "sd8797_uapsta.bin"
+  "001-overlayfs.patch"
+  "002-sd8xxx.patch"
+  "003-fix-gcc12-noreturn.patch"
+  "004-fix-gcc12-asm.patch"
+  "005-fix-gcc12-return_address.patch"
+)
+sha512sums=(
+  'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP'
+)
+
+prepare() {
+  _builddir="$srcdir/android_kernel_nvidia_tegra3-${commit}"
+  cd "$_builddir"
+  
+  # overlayfs patch
+  #echo "overlayfs: patching..."
+  #patch -Np1 < "../001-overlayfs.patch"
+  
+  # sd8xxx patch
+  echo "sd8xxx: patching..."
+  patch -Np1 < "../002-sd8xxx.patch"
+  
+	# gcc12 noreturn patch
+  echo "gcc12: patching... (noreturn)"
+  patch -Np1 < "../003-fix-gcc12-noreturn.patch"
+
+	# gcc12 patch
+  echo "gcc12: patching... (asm)"
+  patch -Np1 < "../004-fix-gcc12-asm.patch"
+  
+  # gcc12 return_address patch
+  echo "gcc12: patching (return_address)..."
+  patch -Np1 < "../005-fix-gcc12-return_address.patch"
+  
+  # gcc12 "fix"
+  cp include/linux/compiler-gcc5.h include/linux/compiler-gcc12.h
+  
+  # gcc12 "tegra crap" fix...
+  find ./drivers -type f -exec sed -i 's/EXTRA_CFLAGS +=/EXTRA_CFLAGS += -fno-pie /g' {} +
+  find ./drivers -type f -exec sed -i 's/= -Werror/= -Wno-error/g' {} +
+  find ./sound -type f -exec sed -i 's/= -Werror/= -Wno-error/g' {} +
+  
+  # copy firmware
+  cp "$srcdir/sd8797_uapsta.bin" "$srcdir/android_kernel_nvidia_tegra3-${commit}/firmware/"
+  
+  # restore our custom config
+  cp "$srcdir/config-surfacert" .config
+  make ARCH="arm" oldconfig
+}
+
+build() {
+  cd "$srcdir"/android_kernel_nvidia_tegra3-${commit}
+  
+  # gcc12 "fix"
+  unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS
+  EXTRA_CFLAGS="-Wno-error -fno-pie" \
+    CFLAGS_KERNEL="-Wno-error -fno-pie" \
+    CFLAGS_MODULE="-Wno-error -fno-pie" \
+    make ARCH="arm" KBUILD_BUILD_VERSION="$((pkgrel + 0))-retroroot"
+}
+
+package() {
+  cd "$srcdir"/android_kernel_nvidia_tegra3-${commit}
+  
+  # install kernel image and dtb
+  install -d "$pkgdir"/boot
+  cp arch/arm/boot/zImage "$pkgdir"/boot/zImage
+  
+  # install kernel modules
+  make ARCH="arm" INSTALL_MOD_PATH="$pkgdir"/usr modules_install
+  # remove build and source links
+  rm -rf "$pkgdir"/usr/lib/modules/${pkgver}/{source,build}
+  
+  # TODO: install kernel headers
+  #make INSTALL_HDR_PATH="$pkgdir"/usr header_install
+  
+  # copy surfacert rootfs overlays
+  cp -r "$startdir"/overlay/. "${pkgdir}"
+}
+
