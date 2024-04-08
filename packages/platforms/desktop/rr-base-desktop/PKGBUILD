@@ -2,17 +2,29 @@
 
 pkgname=rr-base-desktop
 pkgver=1
-pkgrel=1
+pkgrel=5
 pkgdesc="RetroRoot base system (desktop)"
 arch=('x86_64')
 license=('GPL')
+options=(!debug !strip)
 
 # every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
-groups=('retroroot' 'system')
+groups=('retroroot' 'system' 'desktop')
 
 # a retroroot package should not depends on anything as required libraries
 # are in "retroroot-sysroot-*arch*" toolchain package. If not present in sysroot,
 # the package should build and link a static library here.
 # "system" packages are specials...
-depends=('rr-base' 'rr-overlay-desktop')
+depends=(
+  'rr-base'
+  'syslinux' 'gptfdisk' 'mtools'
+  'linux' 'linux-firmware' 'amd-ucode' 'intel-ucode'
+  'mesa' 'mesa-vdpau' 'libva-mesa-driver'
+  'iwd'
+)
+
+package() {
+  # copy desktop rootfs overlays
+  cp -r "$startdir"/overlay/. "${pkgdir}"
+}
 

@@ -1,0 +1,36 @@
+#!/bin/sh
+
+set -xe
+
+source /retroroot/configs/vars "$@"
+
+echo "rr-run-parts: $(basename "$0")"
+
+# install retroroot and platform specific packages
+pacman --noconfirm -S --needed --overwrite "*" rr-base-"${RR_PLATFORM}"
+
+# set root passwd
+echo "root:${RR_ROOT_PASSWORD}" | chpasswd
+
+# create local user and groups
+useradd -m "${RR_USERNAME}"
+for GRP in autologin dialout cdrom spi i2c gpio netdev; do
+  groupadd -r --system $GRP
+done
+for GRP in adm dialout cdrom audio users video games input tty gpio spi i2c netdev; do
+  usermod -aG $GRP "${RR_USERNAME}"
+done
+echo "${RR_USERNAME}:${RR_USERNAME}" | chpasswd
+echo "
+root ALL=(ALL) ALL
+${RR_USERNAME} ALL=(ALL) ALL
+#includedir /etc/sudoers.d
+" >/etc/sudoers
+
+# update locales
+locale-gen
+
+# enable services
+source /retroroot/configs/services
+systemctl enable ${RR_SERVICES}
+

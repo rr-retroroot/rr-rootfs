@@ -2,7 +2,7 @@
 
 set -xe
 
-source /retroroot/configs/vars
+source /retroroot/configs/vars "$@"
 
 if [ "${RR_PLATFORM}" != "surfacert" ]; then
   exit 0;

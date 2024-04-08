@@ -9,7 +9,7 @@ run_latehook() {
     # umount "new_root"
     umount /new_root || launch_interactive_shell
     mount -L RR-ROOT -o rw,defaults /new_root || launch_interactive_shell
-    mount -L RR-BOOT -o ro,defaults /new_root/boot || launch_interactive_shell
+    mount -L RR-BOOT -o rw,defaults /new_root/boot || launch_interactive_shell
  fi
 }
 

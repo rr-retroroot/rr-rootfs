@@ -67,21 +67,6 @@ function build_image() {
   # mount retroroot build stuff
   mkdir -p "${MOUNT_RR}"
   mount --make-private --bind "${RR_ROOT_PATH}" "${MOUNT_RR}"
-
-  # extract rootfs
-  #if [ ! "${RR_DO_CHROOT}" ]; then
-  #  if [ ! -f "${RR_ROOT_PATH}"/output/archlinux-bootstrap-"${RR_ARCH}".tar.gz ]; then
-  #    minfo "rr: downloading arch bootstrap tarball..."
-  #    wget http://retroroot.mydedibox.fr/misc/archlinux-bootstrap-"${RR_ARCH}".tar.gz \
-  #      -O "${RR_ROOT_PATH}"/output/archlinux-bootstrap-"${RR_ARCH}".tar.gz
-  #  fi
-  #  minfo "rr: extracting arch bootstrap tarball..."
-  #  tar zxf "${RR_ROOT_PATH}"/output/archlinux-bootstrap-"${RR_ARCH}".tar.gz --numeric-owner -C "${MOUNT_ROOT}" >/dev/null 2>&1 || :
-  #  # copy custom config
-  #  cp -f "${RR_ROOT_PATH}"/configs/pacman-"${RR_ARCH}".conf "${MOUNT_ROOT}"/etc/pacman.conf
-  #  rm -f "${MOUNT_ROOT}"/etc/resolv.conf
-  #  cp -f /etc/resolv.conf "${MOUNT_ROOT}"/etc/resolv.conf
-  #fi
   
   if [ ! "${RR_DO_CHROOT}" ]; then
 		minfo "rr: running pacstrap with packages:"
@@ -94,27 +79,29 @@ function build_image() {
   minfo "rr: running container with packages:"
   minfo "${RR_PACKAGES}"
 
+  # chroot requested, proceed
   if [ "${RR_DO_CHROOT}" ]; then
     if [ "${RR_ARCH}" == "armv7h" ]; then
-      systemd-nspawn --bind "$(which qemu-arm-static)" -b -D "${MOUNT_ROOT}"
+      systemd-nspawn --bind "$(which qemu-arm-static)" \
+        --bind="${LOOP_DEV}" --bind="${BOOT_DEV}" --bind="${ROOT_DEV}" \
+        -b -D "${MOUNT_ROOT}"
     elif [ "${RR_ARCH}" == "aarch64" ]; then
-      systemd-nspawn --bind "$(which qemu-aarch64-static)" -b -D "${MOUNT_ROOT}"
+      systemd-nspawn --bind "$(which qemu-aarch64-static)" \
+        --bind="${LOOP_DEV}" --bind="${BOOT_DEV}" --bind="${ROOT_DEV}" \
+        -b -D "${MOUNT_ROOT}"
     else
-      systemd-nspawn -b -D "${MOUNT_ROOT}"
+      systemd-nspawn --bind="${LOOP_DEV}" --bind="${BOOT_DEV}" --bind="${ROOT_DEV}" \
+        -b -D "${MOUNT_ROOT}"
     fi
   else
     if [ "${RR_ARCH}" == "armv7h" ]; then
-      systemd-nspawn --bind "$(which qemu-arm-static)" -D "${MOUNT_ROOT}" \
-        -E RR_PLATFORM="${RR_PLATFORM}" -E RR_ARCH="${RR_ARCH}" \
-        /bin/bash -c /retroroot/bootstrap/00-system
+      cp -f "$(which qemu-arm-static)" ${MOUNT_ROOT}/usr/bin/
     elif [ "${RR_ARCH}" == "aarch64" ]; then
-      systemd-nspawn --bind "$(which qemu-aarch64-static)" -D "${MOUNT_ROOT}" \
-        -E RR_PLATFORM="${RR_PLATFORM}" -E RR_ARCH="${RR_ARCH}" \
-        /bin/bash -c /retroroot/bootstrap/00-system
-    else
-      systemd-nspawn -D "${MOUNT_ROOT}" \
-        -E RR_PLATFORM="${RR_PLATFORM}" -E RR_ARCH="${RR_ARCH}" \
-        /bin/bash -c /retroroot/bootstrap/00-system
+      cp -f "$(which qemu-aarch64-static)" ${MOUNT_ROOT}/usr/bin/
     fi
+    arch-chroot ${MOUNT_ROOT} run-parts --exit-on-error -a "${RR_PLATFORM}" -a "${RR_ARCH}" /retroroot/bootstrap
+    rm -f ${MOUNT_ROOT}/usr/bin/qemu-arm-static
+    rm -f ${MOUNT_ROOT}/usr/bin/qemu-aarch64-static
   fi
 }
+

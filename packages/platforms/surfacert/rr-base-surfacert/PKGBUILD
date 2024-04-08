@@ -2,20 +2,30 @@
 
 pkgname=rr-base-surfacert
 pkgver=1
-pkgrel=1
+pkgrel=2
 pkgdesc="RetroRoot base system (surfacert)"
 arch=('armv7h')
 license=('GPL')
 options=(!debug !strip)
 
 # every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
-groups=('retroroot' 'system')
+groups=('retroroot' 'system' 'surfacert')
 
 # a retroroot package should not depends on anything as required libraries
 # are in "retroroot-sysroot-*arch*" toolchain package. If not present in sysroot,
 # the package should build and link a static library here.
 # "system" packages are specials...
-depends=('rr-base')
+
+# downstream kernel (3.4.x) with tegra xorg hw acceleration doesn't work with latest systemd, use older version
+# downstream kernel (3.4.x) needs xorg-server ABI 14
+depends=(
+  'rr-base'
+  'systemd=230-7' 'systemd-sysvcompat=230-7' 'libsystemd=230-7' 'systemd-libs-surfacert'
+  'xorg-server-surfacert' 'xf86-video-tegra-surfacert' 'xf86-input-evdev-surfacert'
+  'mkinitcpio=37.3-1' 'cryptsetup=2.7.0-1'
+  'linux-downstream-surfacert' 'linux-firmware'
+  'wpa_supplicant' 'dhclient'
+)
 
 package() {
   # copy surfacert rootfs overlays

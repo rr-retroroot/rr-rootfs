@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
 set -xe
 
-source /retroroot/configs/vars
+source /retroroot/configs/vars "$@"
 
 if [ "${RR_PLATFORM}" != "desktop" ]; then
   exit 0;
@@ -15,3 +15,4 @@ syslinux-install_update -iam
 
 # cleanup boot partition
 rm -f /boot/initramfs-linux-fallback.img
+

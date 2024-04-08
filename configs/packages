@@ -8,6 +8,7 @@ export RR_PACKAGES=${RR_PACKAGES}" \
 
 # extra utilites
 export RR_PACKAGES=${RR_PACKAGES}" \
+  run-parts \
   mkinitcpio \
   fakeroot \
   net-tools \
@@ -21,7 +22,6 @@ export RR_PACKAGES=${RR_PACKAGES}" \
   strace \
   vsftpd \
   inetutils \
-  iwd \
   wireless-regdb \
   alsa-utils
 "
@@ -33,7 +33,6 @@ export RR_PACKAGES=${RR_PACKAGES}" \
   retroarch-assets-glui \
   retroarch-assets-ozone \
   retroarch-assets-xmb \
-  libretro-shaders-glsl \
   libretro-snes9x \
   libretro-flycast
 "
