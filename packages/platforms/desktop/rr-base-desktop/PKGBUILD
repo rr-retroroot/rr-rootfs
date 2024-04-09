@@ -2,7 +2,7 @@
 
 pkgname=rr-base-desktop
 pkgver=1
-pkgrel=5
+pkgrel=6
 pkgdesc="RetroRoot base system (desktop)"
 arch=('x86_64')
 license=('GPL')
@@ -19,7 +19,6 @@ depends=(
   'rr-base'
   'syslinux' 'gptfdisk' 'mtools'
   'linux' 'linux-firmware' 'amd-ucode' 'intel-ucode'
-  'mesa' 'mesa-vdpau' 'libva-mesa-driver'
   'iwd'
 )
 

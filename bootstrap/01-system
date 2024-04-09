@@ -6,6 +6,21 @@ source /retroroot/configs/vars "$@"
 
 echo "rr-run-parts: $(basename "$0")"
 
+# update fstab
+echo "LABEL=RR-ROOT   /           ext4    defaults  0 1" >> /etc/fstab
+echo "LABEL=RR-BOOT   /boot       vfat    defaults  0 0" >> /etc/fstab
+
+# set hostname
+echo "retroroot" > /etc/hostname
+
+# set hosts
+echo "127.0.0.1 retroroot retroroot.localdomain" > /etc/hosts
+
+# update locale
+echo "LANG=en_US.UTF-8" > /etc/locale.conf
+echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
+locale-gen
+
 # install retroroot and platform specific packages
 pacman --noconfirm -S --needed --overwrite "*" rr-base-"${RR_PLATFORM}"
 
@@ -13,22 +28,18 @@ pacman --noconfirm -S --needed --overwrite "*" rr-base-"${RR_PLATFORM}"
 echo "root:${RR_ROOT_PASSWORD}" | chpasswd
 
 # create local user and groups
-useradd -m "${RR_USERNAME}"
+useradd -m "${RR_USERNAME}" -p "${RR_USERNAME}"
 for GRP in autologin dialout cdrom spi i2c gpio netdev; do
   groupadd -r --system $GRP
 done
 for GRP in adm dialout cdrom audio users video games input tty gpio spi i2c netdev; do
   usermod -aG $GRP "${RR_USERNAME}"
 done
-echo "${RR_USERNAME}:${RR_USERNAME}" | chpasswd
 echo "
 root ALL=(ALL) ALL
 ${RR_USERNAME} ALL=(ALL) ALL
 #includedir /etc/sudoers.d
 " >/etc/sudoers
-
-# update locales
-locale-gen
 
 # enable services
 source /retroroot/configs/services

@@ -2,9 +2,9 @@
 
 pkgname=rr-base
 pkgver=1
-pkgrel=2
+pkgrel=4
 pkgdesc="RetroRoot base system"
-arch=('x86_64' 'armv7h' 'aarch64')
+arch=('x86_64' 'aarch64' 'armv7h')
 license=('GPL')
 options=(!debug !strip)
 
@@ -21,6 +21,6 @@ package() {
   cd "$srcdir"
   
 	# copy common rootfs overlays
-  cp -r "$startdir"/overlay/etc "${pkgdir}"
+  cp -r "$startdir"/overlay/. "${pkgdir}"
 }
 

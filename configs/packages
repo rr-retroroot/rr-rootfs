@@ -26,13 +26,15 @@ export RR_PACKAGES=${RR_PACKAGES}" \
   alsa-utils
 "
 
-# emulators
+# emulation stuff
 export RR_PACKAGES=${RR_PACKAGES}" \
-  libglvnd \
+  mesa mesa-vdpau libva-mesa-driver libglvnd \
   retroarch \
   retroarch-assets-glui \
   retroarch-assets-ozone \
   retroarch-assets-xmb \
+  libretro-overlays \
+  libretro-shaders \
   libretro-snes9x \
   libretro-flycast
 "

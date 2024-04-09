@@ -15,5 +15,5 @@ pacman --noconfirm -S --overwrite "*" v4l-utils
 rm /usr/lib/systemd/system/systemd-udevd.service.d/50-rc_keymap.conf
 
 # prevent upgrade of surfacert specific packages
-sed -i 's/#IgnorePkg =/IgnorePkg = filesystem systemd systemd-sysvcompat libsystemd systemd-libs mkinitcpio/g' /etc/pacman.conf
+sed -i 's/#IgnorePkg =/IgnorePkg = filesystem systemd systemd-sysvcompat libsystemd systemd-libs mkinitcpio cryptsetup/g' /etc/pacman.conf
 

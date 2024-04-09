@@ -1,0 +1,33 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=rr-base-sysroot
+pkgver=1
+pkgrel=2
+pkgdesc="RetroRoot base system (sysroot)"
+arch=('x86_64' 'aarch64' 'armv7h')
+license=('GPL')
+options=(!debug !strip)
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'system' 'sysroot')
+
+# a retroroot package should not depends on anything as required libraries
+# are in "retroroot-sysroot-*arch*" toolchain package. If not present in sysroot,
+# the package should build and link a static library here.
+# "system" packages are specials...
+depends=('rr-base')
+if test "$CARCH" == x86_64; then
+  depends=("${depends[@]}" linux)
+elif test "$CARCH" == armv7h; then
+  depends=("${depends[@]}" linux-armv7)
+else
+  depends=("${depends[@]}" linux-aarch64)
+fi
+
+package() {
+  cd "$srcdir"
+  
+	# copy sysroot rootfs overlays
+  cp -r "$startdir"/overlay/. "${pkgdir}"
+}
+
