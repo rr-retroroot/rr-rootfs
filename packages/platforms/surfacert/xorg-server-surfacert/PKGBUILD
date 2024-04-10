@@ -26,38 +26,45 @@ license=('LicenseRef-Adobe-Display-PostScript'
 )
 groups=('xorg')
 url="https://xorg.freedesktop.org"
-makedepends=('base-devel' 'git' 
-							'xorgproto' 'pixman' 'libx11' 'mesa' 'mesa-libgl' 'xtrans'
+makedepends=('xorgproto' 'pixman' 'libx11' 'mesa' 'mesa-libgl' 'xtrans'
 							'libxkbfile' 'libxfont2' 'libpciaccess' 'libxv' 'libxcvt'
 							'libxmu' 'libxrender' 'libxi' 'libxaw' 'libxtst' 'libxres'
 							'xorg-xkbcomp' 'xorg-util-macros' 'xorg-font-util' 'libepoxy'
 							'xcb-util' 'xcb-util-image' 'xcb-util-renderutil' 'xcb-util-wm' 'xcb-util-keysyms'
 							'libxshmfence' 'libunwind' 'systemd')
-source=(https://xorg.freedesktop.org/releases/individual/xserver/${pkgbase}-${pkgver}.tar.bz2
-        xvfb-run # with updates from FC master
-        xvfb-run.1
-        001-arch-upsteam.patch
+source=(
+  https://xorg.freedesktop.org/releases/individual/xserver/${pkgbase}-${pkgver}.tar.bz2
+  xvfb-run # with updates from FC master
+  xvfb-run.1
+  001-arch-upsteam.patch
+  config.sub # fix configure for armv7h target
 )
 validpgpkeys=('SKIP'  # Peter Hutterer (Who-T) <office@who-t.net>
               '67DC86F2623FC5FD4BB5225D14706DBE1E4B4540'  # Olivier Fourdan <fourdan@xfce.org>
               'FD0004A26EADFE43A4C3F249C6F7AE200374452D'  # Povilas Kanapickas <povilas@radix.lt>
-              'SKIP')
+              'SKIP' 'SKIP')
 sha512sums=('7b737631fb9a7a6e305c2281b854cde0e1cc62ba546adf008582e2e8a54089df519ad4b79705d0f08f40255e4c607b726299ee4e50e2281efaa871c071e7771b'
             '672375cb5028ba9cda286e317d17bd8c9a9039483e7f79c21f223fd08ba07655729e9f59a082f4b8f5d8de45a77a9e9affce1002fb8c6657e26ef1a490654e49'
             'de5e2cb3c6825e6cf1f07ca0d52423e17f34d70ec7935e9dd24be5fb9883bf1e03b50ff584931bd3b41095c510ab2aa44d2573fd5feaebdcb59363b65607ff22'
-            '3a05d7f0aa3c0010004de9851c6af5a6351b14550a05238d9e26ce39cce66fbfc47f0d082f66fe13697051205c553e085d3c505d999817f3433ebdf6eeba62ea')
+            'SKIP'
+            'SKIP')
 
 prepare() {
   cd ${pkgbase}-$pkgver
   
   # patch for arch linux upstream support
   patch -Np1 -i ../001-arch-upsteam.patch
+  
+  cp ../config.sub .
 }
 
 build() {
 	cd "${pkgbase}-${pkgver}"
-  autoreconf -fi
-  ./configure --prefix=/usr \
+	
+	source ${RETROROOT_HOME}/bin/rr-env ${CARCH}
+  
+  rr-configure ${CARCH} \
+      --prefix=/usr \
   		--enable-xorg \
   		--enable-composite \
       --enable-ipv6 \
@@ -86,6 +93,7 @@ build() {
       --with-xkb-path=/usr/share/X11/xkb \
       --with-xkb-output=/var/lib/xkb \
       --with-fontrootdir=/usr/share/fonts
+
   make
 
   # Disable subdirs for make install rule to make splitting easier

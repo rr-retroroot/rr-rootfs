@@ -13,6 +13,21 @@
  LIBXTST="xtst >= 1.0.99.2"
  LIBPCIACCESS="pciaccess >= 0.12.901"
 
+--- xorg-server-1.14.5/configure	2013-12-13 04:42:49.000000000 +0100
++++ xorg-server-1.14.5-archupstream/configure	2024-04-10 11:27:27.291473428 +0200
+@@ -23857,9 +23857,9 @@ LIBAPPLEWM="applewm >= 1.4"
+ LIBDMX="dmx >= 1.0.99.1"
+ LIBDRI="dri >= 7.8.0"
+ LIBDRM="libdrm >= 2.3.0"
+-LIBGL="gl >= 7.1.0"
++LIBGL="gl >= 1.2"
+ LIBXEXT="xext >= 1.0.99.4"
+-LIBXFONT="xfont >= 1.4.2"
++LIBXFONT="xfont2 >= 1.4.2"
+ LIBXI="xi >= 1.2.99.1"
+ LIBXTST="xtst >= 1.0.99.2"
+ LIBPCIACCESS="pciaccess >= 0.12.901"
+
 --- xorg-server-1.14.5/dix/main.c	2013-07-26 07:19:03.000000000 +0200
 +++ xorg-server-1.14.5-archupstream/dix/main.c	2024-03-29 17:02:04.358502703 +0100
 @@ -81,6 +81,8 @@ Equipment Corporation.

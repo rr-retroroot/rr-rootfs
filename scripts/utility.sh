@@ -12,17 +12,17 @@ function minfo() {
 }
 
 # cleanup on exit
-function cleanup {
+function image_cleanup {
   if [ $? -ne 0 ]; then
     merror 'something went wrong...'
   fi
-  umount -lfR "${MOUNT_ROOT}" >/dev/null 2>&1 || :
-  losetup -d "${LOOP_DEV}" >/dev/null 2>&1 || :
+  sudo umount -lfR "${MOUNT_ROOT}" >/dev/null 2>&1 || :
+  sudo losetup -d "${LOOP_DEV}" >/dev/null 2>&1 || :
   rm -d "${MOUNT_ROOT}" >/dev/null 2>&1 || :
 }
 
 # set exit trap
-trap cleanup EXIT
+trap image_cleanup EXIT
 
 # mount_image
 function mount_image() {
@@ -33,7 +33,7 @@ function mount_image() {
     exit 1;
   fi
   
-  LOOP_DEV=$(losetup --partscan --show --find "${RR_OUTPUT_IMG}")
+  LOOP_DEV=$(sudo losetup --partscan --show --find "${RR_OUTPUT_IMG}")
   BOOT_DEV="$LOOP_DEV"p1
   ROOT_DEV="$LOOP_DEV"p2
   
@@ -44,18 +44,18 @@ function mount_image() {
 
   # mount partitions
   mkdir -p "${MOUNT_ROOT}"
-  mount --make-private "${ROOT_DEV}" "${MOUNT_ROOT}"
-  mkdir -p "${MOUNT_BOOT}"
-  mount --make-private "${BOOT_DEV}" "${MOUNT_BOOT}"
+  sudo mount --make-private "${ROOT_DEV}" "${MOUNT_ROOT}"
+  sudo mkdir -p "${MOUNT_BOOT}"
+  sudo mount --make-private "${BOOT_DEV}" "${MOUNT_BOOT}"
   # mount retroroot build stuff
-  mkdir -p "${MOUNT_RR}"
-  mount --make-private --bind "${RR_ROOT_PATH}" "${MOUNT_RR}"
+  sudo mkdir -p "${MOUNT_RR}"
+  sudo mount --make-private --bind "${RR_ROOT_PATH}" "${MOUNT_RR}"
 }
 
 function umount_image() {
   minfo "umount_image: ${RR_OUTPUT_IMG} (mounted on ${LOOP_DEV})"
-  umount -lfR "${MOUNT_ROOT}" >/dev/null 2>&1 || :
-  losetup -d "${LOOP_DEV}" >/dev/null 2>&1 || :
+  sudo umount -lfR "${MOUNT_ROOT}" >/dev/null 2>&1 || :
+  sudo losetup -d "${LOOP_DEV}" >/dev/null 2>&1 || :
 }
 
 # create_image
@@ -63,11 +63,12 @@ function create_image() {
   minfo "create_image: ${RR_OUTPUT_IMG}"
 
   if [ ! -f "${RR_OUTPUT_IMG}" ]; then
-    if [ "${PLATFORM}" == "sysroot" ]; then
+    minfo "create_image: creating image with dd (${RR_OUTPUT_IMG})"
+    if [ "${RR_PLATFORM}" == "sysroot" ]; then
       # "sysroot" platform is used for cross compilation of packages, use a bigger image
-      dd if=/dev/zero of="${RR_OUTPUT_IMG}" bs=1M count=4096
+      dd if=/dev/zero of="${RR_OUTPUT_IMG}" bs=1M count=4096 >/dev/null 2>&1 || :
     else
-      dd if=/dev/zero of="${RR_OUTPUT_IMG}" bs=1M count=3072
+      dd if=/dev/zero of="${RR_OUTPUT_IMG}" bs=1M count=3072 >/dev/null 2>&1 || :
     fi
   fi
   
@@ -79,7 +80,7 @@ function create_image() {
   parted -a optimal -s "${RR_OUTPUT_IMG}" mkpart primary fat32 0% 256MiB
   
   # create "RR-ROOT" partition
-  if [ "${PLATFORM}" == "surfacert" ]; then
+  if [ "${RR_PLATFORM}" == "surfacert" ]; then
     # TODO: fix ext4 on surfacert
     parted -a optimal -s "${RR_OUTPUT_IMG}" mkpart primary ext3 256MiB 100%
   else
@@ -87,28 +88,43 @@ function create_image() {
   fi
   
   # mount image
-  LOOP_DEV=$(losetup --partscan --show --find "${RR_OUTPUT_IMG}")
+  LOOP_DEV=$(sudo losetup --partscan --show --find "${RR_OUTPUT_IMG}")
   BOOT_DEV="$LOOP_DEV"p1
   ROOT_DEV="$LOOP_DEV"p2
 
   # format "RR-BOOT" partition
-  mkfs.fat -F32 -n RR-BOOT "${BOOT_DEV}"
+  minfo "create_image: formating boot partiton (${BOOT_DEV})"
+  sudo mkfs.fat -F32 -n RR-BOOT "${BOOT_DEV}" >/dev/null 2>&1 || :
 
   # format "RR-ROOT" partition
+  minfo "create_image: formating root partiton (${ROOT_DEV})"
   if [ "${RR_PLATFORM}" == "surfacert" ]; then
-    mke2fs -t ext3 -L RR-ROOT -F "${ROOT_DEV}"
+    sudo mke2fs -t ext3 -L RR-ROOT -F "${ROOT_DEV}" >/dev/null 2>&1 || :
   else
-    mke2fs -t ext4 -L RR-ROOT -F "${ROOT_DEV}"
+    sudo mke2fs -t ext4 -L RR-ROOT -F "${ROOT_DEV}" >/dev/null 2>&1 || :
   fi
   
   # umount
-  losetup -d "${LOOP_DEV}" >/dev/null 2>&1 || :
+  sudo losetup -d "${LOOP_DEV}" >/dev/null 2>&1 || :
+}
+
+function create_rootfs() {
+  # create minimal rootfs with pacstrap and specifed packages
+  source "${RR_ROOT_PATH}"/configs/packages
+  minfo "create_rootfs: creating rootfs with specified packages: ${RR_PACKAGES}"
+  sudo pacstrap -c -K -M -C "${RR_ROOT_PATH}"/configs/pacman-"${RR_ARCH}".conf ${MOUNT_ROOT} ${RR_PACKAGES}
+  
+  # boostrap rootfs for custom platform packages and retroroot setup
+  minfo "create_rootfs: running bootstrap scripts..."
+  sudo cp -f "${RR_ROOT_PATH}"/configs/pacman-"${RR_ARCH}".conf "${MOUNT_ROOT}"/etc/pacman.conf
+  sudo arch-chroot ${MOUNT_ROOT} run-parts --exit-on-error -a "${RR_PLATFORM}" -a "${RR_ARCH}" /retroroot/bootstrap
 }
 
 function install_package() {
-  minfo "installing packages to $(basename -- ${RR_OUTPUT_IMG}): ${RR_PACKAGES}"
+  minfo "install_package: installing packages to $(basename -- ${RR_OUTPUT_IMG}): ${RR_PACKAGES}"
   mount_image
-  arch-chroot ${MOUNT_ROOT} pacman -S --noconfirm --needed $1
+  minfo "install_package: chroot..."
+  sudo arch-chroot ${MOUNT_ROOT} pacman -S --noconfirm --needed $1
   umount_image
 }
 

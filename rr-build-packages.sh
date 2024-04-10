@@ -3,10 +3,10 @@
 set -e
 
 # base stuff
-RR_ROOT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 RR_SSH_HOST="mydedibox.fr"
 RR_SSH_HOST_MIRROR="mydedibox.fr"
-RR_TEMP_DB="${RR_ROOT_DIR}/retrodb"
+RR_TEMP_DB="${RR_ROOT_PATH}/retroroot_db"
+RR_ROOT_PATH=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 # toolchains
 RR_TOOLCHAIN_LINK_ARMV7H="https://snapshots.linaro.org/gnu-toolchain/12.3-2023.06-1/arm-linux-gnueabihf/gcc-linaro-12.3.1-2023.06-x86_64_arm-linux-gnueabihf.tar.xz"
@@ -17,12 +17,16 @@ COL_G='\033[0;32m'
 COL_Y='\033[0;33m'
 COL_N='\033[0m'
 
+# source build scripts
+source scripts/utility.sh
+
 # cleanup on exit
 function cleanup_repo {
   if [ $? -ne 0 ]; then
     echo "${COL_R}something went wrong...\n${COL_N}"
   fi
-  rm -rf "${RR_TEMP_DB}"
+  image_cleanup
+  sudo rm -rf "${RR_TEMP_DB}"
 }
 
 # set exit trap
@@ -35,7 +39,9 @@ function die() {
 
 function pacman_sync() {
   echo -e "${COL_G}pacman_sync:${COL_N} synching repositories..."
-  pacman --dbpath ${RR_TEMP_DB} -Syy &> /dev/null || die "pacman_sync: repo sync failed"
+  sudo pacman --config "${RR_ROOT_PATH}/packages/pacman.conf" --dbpath ${RR_TEMP_DB} -Syy || die "pacman_sync: repo sync failed"
+  # get remote package list
+  RR_REMOTE_PACKAGES=$(pacman --config "${RR_ROOT_PATH}/packages/pacman.conf" --dbpath "${RR_TEMP_DB}" -Sl)
   echo -e "${COL_G}pacman_sync:${COL_N} ok"
 }
 
@@ -54,17 +60,30 @@ function upload_pkg() {
     || die "upload_pkg: repo-add failed"
 }
 
-# get_local_pkg_arch PKGBUILD
-function get_local_pkg_arch() {
-  local arch=`cat "$1" | grep "arch=" | sed -n "s/^.*(\(.*\)).*$/\1/ p"`
-  echo "$arch"
+# get_local_srcinfo PKGPATH
+function get_local_srcinfo() {
+  pushd "$1" &> /dev/null || die "build_package: pushd $1 failed"
+  echo "$(makepkg --printsrcinfo)"
+  popd &> /dev/null || die "build_package: popd failed"
 }
 
-# get_local_pkg_version PKGBUILD
+# get_local_pkg_name SRCINFO
+function get_local_pkg_name() {
+  echo "$1" | grep pkgbase | cut -d' ' -f 3
+}
+
+# get_local_pkg_version SRCINFO
 function get_local_pkg_ver() {
-  local local_pkgver=`cat "$1" | grep "pkgver=" | sed 's/pkgver=//g'`
-  local local_pkgrel=`cat "$1" | grep "pkgrel=" | sed 's/pkgrel=//g'`
-  echo "$local_pkgver-$local_pkgrel"
+  local v=$(echo "$1" | grep pkgver | cut -d' ' -f 3)
+  local r=$(echo "$1" | grep pkgrel | cut -d' ' -f 3)
+  echo "$v-$r"
+}
+
+# get_local_pkg_arch SRCINFO
+function get_local_pkg_arch() {
+  # TODO: use SRCINFO
+  local arch=`cat "$1" | grep "arch=" | sed -n "s/^.*(\(.*\)).*$/\1/ p"`
+  echo "$arch"
 }
 
 # get_remote_pkg_version ARCH PKGNAME
@@ -79,11 +98,44 @@ function get_remote_pkg_ver() {
 
 # build_package PKGPATH ARCH INSTALL
 function build_package() {
-  # build package
   pushd "$1" &> /dev/null || die "build_package: pushd $1 failed"
   rm -rf *-$2.pkg.tar.* &> /dev/null
-  # -d: we don't want to install deps ("cross-compilation")
-  RETROROOT_HOME="${RR_ROOT_DIR}/toolchain" CARCH=$2 makepkg -Cfd || die "build_package: makepkg failed"
+  
+  RR_ARCH="$2"
+  RR_PLATFORM="sysroot"
+  RR_OUTPUT_IMG="${RR_ROOT_PATH}"/output/retroroot-${RR_ARCH}-${RR_PLATFORM}.img
+  if [ ! -f "${RR_OUTPUT_IMG}" ]; then
+    die "build_package: sysroot image doesn't exist... (${RR_OUTPUT_IMG})"
+  fi
+  
+  # -d: we don't want to install deps ("cross-compilation") - TODO: use "rr-build-image.sh" install_packages
+  # get package build depds
+  local deps=""
+  local makedepends=$(echo "${SRCINFO}" | grep makedepends)
+  for dep in "${makedepends}"; do
+    deps="$deps $(echo "$dep" | cut -d' ' -f 3)"
+  done
+  
+  # install build dependencies to  sysroot image if needed
+  if [ ! -z "${deps}" ]; then
+    install_package "${deps}" || die "build_package: package deps installation failed"
+  fi
+  
+  # mount sysroot image
+  mount_image || die "build_package: mount_image failed"
+
+  # setup toolchain variables
+  export RETROROOT_HOME="${RR_ROOT_PATH}/toolchain"
+  export RETROROOT_SYSROOT="${RR_ROOT_PATH}/output/rootfs"
+  export RETROROOT_HOST="${RR_ROOT_PATH}/output/toolchains/${ARCH}"
+  export CARCH=${RR_ARCH}
+  
+  # let's go...
+  makepkg -Cfd || die "build_package: makepkg failed"
+  
+  # umount sysroot image
+  umount_image || die "build_package: umount_image failed"
+  
   #if [ $3 ]; then
   #  echo -e "${COL_G}build_package:${COL_N} installing ${COL_G}$pkgname${COL_N} ($local_pkgver)..."
   #  sudo pacman --noconfirm -U *-$2.pkg.tar.* || die "build_package: pkg installation failed"
@@ -96,16 +148,16 @@ function check_install_toolchain() {
   local ARCH="$1"
   local URL="$2"
 
-  if [ ! -f "${RR_ROOT_DIR}/output/toolchains/${ARCH}/bin/${ARCH}-linux-gnu-gcc" ]; then
+  if [ ! -f "${RR_ROOT_PATH}/output/toolchains/${ARCH}/bin/${ARCH}-linux-gnu-gcc" ]; then
     echo -e "${COL_G}rr_build${COL_N}: ${ARCH} toolchain not found, installing..."
-    mkdir -p "${RR_ROOT_DIR}/output/toolchains/${ARCH}"
-    if [ ! -f "${RR_ROOT_DIR}/output/toolchains/gcc-linaro-${ARCH}.tar.xz" ]; then
-      wget "${URL}" -O "${RR_ROOT_DIR}/output/toolchains/gcc-linaro-${ARCH}.tar.xz"
+    mkdir -p "${RR_ROOT_PATH}/output/toolchains/${ARCH}"
+    if [ ! -f "${RR_ROOT_PATH}/output/toolchains/gcc-linaro-${ARCH}.tar.xz" ]; then
+      wget "${URL}" -O "${RR_ROOT_PATH}/output/toolchains/gcc-linaro-${ARCH}.tar.xz"
     fi
-    tar xJf "${RR_ROOT_DIR}/output/toolchains/gcc-linaro-${ARCH}.tar.xz" --strip-components=1 -C "${RR_ROOT_DIR}/output/toolchains/${ARCH}"
+    tar xJf "${RR_ROOT_PATH}/output/toolchains/gcc-linaro-${ARCH}.tar.xz" --strip-components=1 -C "${RR_ROOT_PATH}/output/toolchains/${ARCH}"
     # create symlinks for conveniance (arm-linux-gnueabihf > armv7h-linux-gnu)
-    if [ ! -f "${RR_ROOT_DIR}/output/toolchains/${ARCH}/bin/${ARCH}-linux-gnu-gcc" ]; then
-      pushd "${RR_ROOT_DIR}/output/toolchains/${ARCH}/bin" &> /dev/null
+    if [ ! -f "${RR_ROOT_PATH}/output/toolchains/${ARCH}/bin/${ARCH}-linux-gnu-gcc" ]; then
+      pushd "${RR_ROOT_PATH}/output/toolchains/${ARCH}/bin" &> /dev/null
       files="$(find . -type f)"
       for i in $files; do
         link="${i/arm/"${ARCH}"}"
@@ -114,6 +166,8 @@ function check_install_toolchain() {
       done
       popd &> /dev/null
     fi
+    # copy custom tools to mounted image
+    #sudo cp -rf "${RR_ROOT_PATH}/toolchain/overlay_${ARCH}/." "${RETROROOT_HOST}/"
   else
     echo -e "${COL_G}rr_build${COL_N}: ${ARCH} toolchain already installed..."
   fi
@@ -121,10 +175,10 @@ function check_install_toolchain() {
 
 function build_packages() {
   # create temp repo
-  mkdir "${RR_TEMP_DB}"
+  sudo mkdir -p "${RR_TEMP_DB}"
   
   # set packages path
-  RR_PACKAGES_PATH="${RR_ROOT_DIR}/packages"
+  RR_PACKAGES_PATH="${RR_ROOT_PATH}/packages"
 
   # parse args
   while test $# -gt 0
@@ -157,23 +211,24 @@ function build_packages() {
   # check for toolchains installation
   check_install_toolchain armv7h ${RR_TOOLCHAIN_LINK_ARMV7H}
   check_install_toolchain aarch64 ${RR_TOOLCHAIN_LINK_AARCH64}
-  exit 0
   
   # sync pacman packages
   pacman_sync
-  
-  # get remote package list
-  RR_REMOTE_PACKAGES=$(pacman --dbpath "${RR_TEMP_DB}" -Sl)
 
   # loop through packages, ignore "pkg" and "src"
   pkgs=$(find "${RR_PACKAGES_PATH}" \( -path "*/pkg" -o -path "*/src" \) -prune -o -name PKGBUILD -print)
   for pkg in $pkgs; do
     # get pkgbuild basename
     local pkgpath=$(dirname "$pkg")
+    
+    # get pkg "srcinfo"
+    echo -e "${COL_G}rr_build:${COL_N} getting ${COL_G}$pkgpath${COL_N} information..."
+    SRCINFO=$(get_local_srcinfo "$pkgpath")
+    
     # get local package name and version
-    local pkgname=$(cat "$pkg" | grep "pkgname=" | sed 's/pkgname=//g')
-    local local_pkgver=$(get_local_pkg_ver "$pkg")
-    #echo "pkg: $pkg, path: $pkgpath"
+    local pkgname=$(get_local_pkg_name "$SRCINFO")
+    local local_pkgver=$(get_local_pkg_ver "$SRCINFO")
+    #echo "pkg: $pkg, path: $pkgpath, name: $pkgname, ver: $local_pkgver"
 
     # build a "target" package
     if [ -z ${RR_BUILD_ARCH+x} ]; then

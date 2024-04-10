@@ -40,11 +40,11 @@ export AR="${RETROROOT_AR}"
 export NM="${RETROROOT_NM}"
 export RANLIB="${RETROROOT_RANLIB}"
 export STRIP="${RETROROOT_STRIP}"
-export CFLAGS="-I${RETROROOT_SYSROOT}/usr/include -O2 -pipe -fno-plt -D__RETROROOT__ ${CFLAGS}"
+export CFLAGS="-I${RETROROOT_SYSROOT}/usr/include -O2 -pipe -fno-plt -D__RETROROOT__"
 export CPPFLAGS="${CFLAGS} ${CPPFLAGS} -fexceptions"
 export CXXFLAGS="${CFLAGS} ${CXXFLAGS} -fexceptions"
-export LDFLAGS="-L${RETROROOT_SYSROOT}/usr/lib ${LDFLAGS}"
-# -Wl,-O1,--sort-common,--as-needed
+export LDFLAGS="-L${RETROROOT_SYSROOT}/usr/lib ${LDFLAGS}" # -Wl,-O1,--sort-common,--as-needed
+
 # arch specific
 if [ ${_arch} == "x86_64" ]; then
   export CFLAGS="${CFLAGS}"
@@ -74,5 +74,5 @@ export RETROROOT_PREFIX_LIB=${RETROROOT_PREFIX}/lib
 export RETROROOT_PREFIX_ETC=${RETROROOT_PREFIX}/etc
 export RETROROOT_PREFIX_SHARE=${RETROROOT_PREFIX}/share
 
-export PATH="${RETROROOT_HOME}:${RETROROOT_SYSROOT}/usr/bin:${RETROROOT_HOST}/bin:$PATH"
+export PATH="${RETROROOT_HOME}/bin:${RETROROOT_HOST}/bin:$PATH"
 

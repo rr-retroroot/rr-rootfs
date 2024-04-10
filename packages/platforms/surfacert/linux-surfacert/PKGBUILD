@@ -22,13 +22,14 @@ prepare() {
   _builddir="$srcdir/linux-v${pkgver}-lts"
   cd "$_builddir"
   cp "$srcdir/config-surfacert" .config
+  source ${RETROROOT_HOME}/bin/rr-env ${CARCH}
   make ARCH="arm" olddefconfig
 }
 
 build() {
   cd "$srcdir"/linux-v${pkgver}-lts
   
-  source /opt/retroroot/rr-env ${CARCH}
+  source ${RETROROOT_HOME}/bin/rr-env ${CARCH}
   yes "" | make $MAKEFLAGS ARCH="arm" CROSS_COMPILE=${RETROROOT_CROSS_PREFIX} \
     KBUILD_BUILD_VERSION="$((pkgrel + 0))-retroroot"
 }

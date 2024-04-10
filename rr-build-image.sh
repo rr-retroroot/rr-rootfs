@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# get root privileges
-[ "$UID" -eq 0 ] || exec sudo bash "$0" "$@"
+# get root privileges...
+#[ "$UID" -eq 0 ] || exec sudo bash "$0" "$@"
 
 # set default variables
 RR_ARCH=""
@@ -58,10 +58,9 @@ main() {
 
   # setup
   mkdir -p "${RR_ROOT_PATH}"/output
-  RR_OUTPUT_IMG="${RR_ROOT_PATH}"/output/retroroot-${RR_PLATFORM}-${RR_ARCH}.img
+  RR_OUTPUT_IMG="${RR_ROOT_PATH}"/output/retroroot-${RR_ARCH}-${RR_PLATFORM}.img
 
-  # let's go...
-  minfo "platform: ${RR_PLATFORM}, arch: ${RR_ARCH}, image: ${RR_OUTPUT_IMG}"
+  minfo "arch: ${RR_ARCH}, platform: ${RR_PLATFORM}, image: ${RR_OUTPUT_IMG}"
   
   if [ ! -z ${RR_PACKAGES+x} ]; then
     install_package "${RR_PACKAGES}"
@@ -69,25 +68,16 @@ main() {
   fi
 
   if [ "${RR_DO_CHROOT}" == 1 ]; then
+    # chroot image
     mount_image
-    arch-chroot ${MOUNT_ROOT} /bin/bash
+    minfo "chroot ${MOUNT_ROOT}"
+    sudo arch-chroot ${MOUNT_ROOT} /bin/bash
     umount_image
   else
-    # create and mount image
+    # create image and rootfs
     create_image
     mount_image
-    
-    # create minimal rootfs with pacstrap and specifed packages
-    minfo "rr: running pacstrap with specified packages: ${RR_PACKAGES}"
-		source "${RR_ROOT_PATH}"/configs/packages
-		pacstrap -c -K -M -C "${RR_ROOT_PATH}"/configs/pacman-"${RR_ARCH}".conf ${MOUNT_ROOT} ${RR_PACKAGES}
-		
-		# boostrap rootfs for custom platform packages and retroroot setup
-		minfo "rr: running bootstrap scripts..."
-		cp -f "${RR_ROOT_PATH}"/configs/pacman-"${RR_ARCH}".conf "${MOUNT_ROOT}"/etc/pacman.conf
-		arch-chroot ${MOUNT_ROOT} run-parts --exit-on-error -a "${RR_PLATFORM}" -a "${RR_ARCH}" /retroroot/bootstrap
-		
-		# all done
+    create_rootfs
 		umount_image
   fi
 }

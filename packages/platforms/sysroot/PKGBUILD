@@ -2,7 +2,7 @@
 
 pkgname=rr-base-sysroot
 pkgver=1
-pkgrel=2
+pkgrel=3
 pkgdesc="RetroRoot base system (sysroot)"
 arch=('x86_64' 'aarch64' 'armv7h')
 license=('GPL')
@@ -16,18 +16,19 @@ groups=('retroroot' 'system' 'sysroot')
 # the package should build and link a static library here.
 # "system" packages are specials...
 depends=('rr-base')
-if test "$CARCH" == x86_64; then
-  depends=("${depends[@]}" linux)
-elif test "$CARCH" == armv7h; then
-  depends=("${depends[@]}" linux-armv7)
-else
-  depends=("${depends[@]}" linux-aarch64)
-fi
 
-package() {
-  cd "$srcdir"
-  
-	# copy sysroot rootfs overlays
-  cp -r "$startdir"/overlay/. "${pkgdir}"
-}
+#if test "$CARCH" == x86_64; then
+#  depends=("${depends[@]}" linux)
+#elif test "$CARCH" == armv7h; then
+#  depends=("${depends[@]}" linux-armv7)
+#else
+#  depends=("${depends[@]}" linux-aarch64)
+#fi
+
+#package() {
+#  cd "$srcdir"
+#  
+#	# copy sysroot rootfs overlays
+#  cp -r "$startdir"/overlay/. "${pkgdir}"
+#}
 

@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.6.0)
 
+# TODO: update for latest changes
+
 if (NOT DEFINED ENV{RETROROOT_HOME})
   set(RETROROOT_HOME "/opt/retroroot")
   set(ENV{RETROROOT_HOME} ${RETROROOT_HOME})
@@ -8,19 +10,19 @@ else ()
 endif ()
 
 set(RETROROOT TRUE)
-set(RETROROOT_SYSROOT "${RETROROOT_HOME}/target/armv7h")
+set(RETROROOT_SYSROOT "${RETROROOT_HOME}/target/${CARCH}")
 
-set(TARGET armv7h-linux-gnu)
+set(TARGET ${CARCH}-linux-gnu)
 set(CMAKE_SYSTEM_NAME "Linux")
-set(CMAKE_SYSTEM_PROCESSOR "armv7h")
+set(CMAKE_SYSTEM_PROCESSOR "${CARCH}")
 set(CMAKE_SYSTEM_VERSION 12)
 set(CMAKE_CROSSCOMPILING 1)
-set(CMAKE_LIBRARY_ARCHITECTURE armv7h CACHE INTERNAL "abi")
+set(CMAKE_LIBRARY_ARCHITECTURE ${CARCH} CACHE INTERNAL "abi")
 set(CMAKE_SYSROOT ${RETROROOT_SYSROOT})
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # toolchain setup
-set(RETROROOT_HOST "${RETROROOT_HOME}/host/armv7h")
+set(RETROROOT_HOST "${RETROROOT_HOME}/host/${CARCH}")
 set(RETROROOT_CROSS_PREFIX "${RETROROOT_HOST}/bin")
 set(RETROROOT_TOOLS_COMPILER_PREFIX "${RETROROOT_CROSS_PREFIX}/${TARGET}-")
 # if toolset was not found in retroroot host, try from $PATH
@@ -54,7 +56,8 @@ set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Shared libs not available")
 
-find_program(PKG_CONFIG_EXECUTABLE NAMES armv7h-linux-gnu-pkg-config HINTS "${RETROROOT_SYSROOT}/usr/bin")
+find_program(PKG_CONFIG_EXECUTABLE NAMES ${CARCH}-linux-gnu-pkg-config HINTS "${RETROROOT_SYSROOT}/usr/bin")
 if (NOT PKG_CONFIG_EXECUTABLE)
-  message(WARNING "Could not find armv7h-linux-gnu-pkg-config: try installing rr-pkg-config")
+  message(WARNING "Could not find ${CARCH}-linux-gnu-pkg-config...")
 endif ()
+

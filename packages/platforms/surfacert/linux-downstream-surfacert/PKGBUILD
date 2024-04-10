@@ -1,10 +1,8 @@
 # Maintainer: cpasjuste <cpasjuste@gmail.com>
 
-# TODO: fixme: CONFIG_ARM_UNWIND is not set
-
 pkgname=linux-downstream-surfacert
 pkgver=3.4.113
-pkgrel=2
+pkgrel=3
 pkgdesc="RetroRoot surfacert kernel"
 arch=('armv7h')
 license=('GPL')
@@ -15,7 +13,6 @@ url="https://github.com/Open-Surface-RT/android_kernel_nvidia_tegra3/archive/${c
 groups=('retroroot' 'system' 'surfacert')
 
 depends=('coreutils' 'mkinitcpio>=0.7')
-makedepends=('base-devel')
 options=(!debug !strip)
 
 source=(
@@ -69,18 +66,25 @@ prepare() {
   
   # restore our custom config
   cp "$srcdir/config-surfacert" .config
+  
+  source ${RETROROOT_HOME}/bin/rr-env ${CARCH}
   make ARCH="arm" oldconfig
 }
 
 build() {
   cd "$srcdir"/android_kernel_nvidia_tegra3-${commit}
   
+  source ${RETROROOT_HOME}/bin/rr-env ${CARCH}
+  
   # gcc12 "fix"
   unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS
-  EXTRA_CFLAGS="-Wno-error -fno-pie" \
+  export EXTRA_CFLAGS="-Wno-error -fno-pie" \
     CFLAGS_KERNEL="-Wno-error -fno-pie" \
-    CFLAGS_MODULE="-Wno-error -fno-pie" \
-    make ARCH="arm" KBUILD_BUILD_VERSION="$((pkgrel + 0))-retroroot"
+    CFLAGS_MODULE="-Wno-error -fno-pie"
+  
+  # build
+  make ARCH="arm" CROSS_COMPILE=${RETROROOT_CROSS_PREFIX} \
+    KBUILD_BUILD_VERSION="$((pkgrel + 0))-retroroot"
 }
 
 package() {

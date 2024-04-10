@@ -1,0 +1,14 @@
+#!/bin/bash
+
+target=$1
+shift
+
+source rr-env $target
+
+./configure \
+  --build=${CHOST} \
+  --host=$target-linux-gnu \
+  --target=$target-linux-gnu \
+  --prefix=/usr \
+  "$@"
+

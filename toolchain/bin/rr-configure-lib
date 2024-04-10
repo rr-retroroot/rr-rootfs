@@ -3,7 +3,7 @@
 target=$1
 shift
 
-source "${RETROROOT_HOME}"/rr-env $target
+source rr-env $target
 
 ./configure \
   --host=$target-linux-gnu \

@@ -4,8 +4,8 @@
 # No warranty is given.
 
 export PKG_CONFIG_DIR=
-export PKG_CONFIG_SYSROOT_DIR="${RETROROOT_HOME}"/target/armv7h
-export PKG_CONFIG_LIBDIR="${RETROROOT_HOME}"/target/armv7h/usr/lib/pkgconfig:"${RETROROOT_HOME}"/target/armv7h/usr/share/pkgconfig
+export PKG_CONFIG_SYSROOT_DIR="${RETROROOT_SYSROOT}"
+export PKG_CONFIG_LIBDIR="${RETROROOT_SYSROOT}"/usr/lib/pkgconfig:"${RETROROOT_SYSROOT}"/usr/share/pkgconfig
 
 # You can use PKG_CONFIG_PATH_CUSTOM to tweak pkg-config behavior further
 export PKG_CONFIG_PATH=${PKG_CONFIG_PATH_CUSTOM}:${PKG_CONFIG_LIBDIR}
