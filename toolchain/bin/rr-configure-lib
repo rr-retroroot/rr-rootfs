@@ -1,18 +1,11 @@
 #!/bin/bash
 
-target=$1
-shift
-
-source rr-env $target
-
 ./configure \
-  --host=$target-linux-gnu \
-  --target=$target-linux-gnu \
-  --build=${CHOST} \
-  --prefix=${RETROROOT_PREFIX} \
-  --libdir=${RETROROOT_PREFIX_LIB} \
-  --includedir=${RETROROOT_PREFIX_INCLUDE} \
-  --disable-shared \
-  --enable-static \
+  --build="${CHOST}" \
+  --host=${CARCH}-linux-gnu \
+  --target=${CARCH}-linux-gnu \
+  --prefix="${RETROROOT_PREFIX}" \
+  --libdir="${RETROROOT_PREFIX_LIB}" \
+  --includedir="${RETROROOT_PREFIX_INCLUDE}"
   "$@"
 

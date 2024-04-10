@@ -1,13 +1,9 @@
 #!/bin/bash
 
-#target=${CARCH}
-#shift
-#source rr-env
-
 ./configure \
-  --build=${CHOST} \
+  --build="${CHOST}" \
   --host=${CARCH}-linux-gnu \
   --target=${CARCH}-linux-gnu \
-  --prefix=/usr \
+  --prefix="${RETROROOT_PREFIX}" \
   "$@"
 
