@@ -1,19 +1,47 @@
 # rr-rootfs
 
-**<ins>Building on arch linux</ins>**
+**<ins>Building on arch linux / ubuntu</ins>**
 
-- Install build dependencies:
+- Install build dependencies (arch linux):
+  ```
+  sudo pacman -S --needed git base-devel arch-install-scripts parted dosfstools e2fsprogs qemu-user-static qemu-user-static-binfmt
+  ```
+  - If dns resolution is not working and you are using systemd-resolved on your host:
+     ```
+     sudo rm -f /etc/resolv.conf
+     sudo ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+     ```
+
+- Install build dependencies (ubuntu):
   ```
   sudo pacman -S --needed git base-devel arch-install-scripts parted dosfstools e2fsprogs qemu-user-static qemu-user-static-binfmt
   ```
 
-- Fix sudo permissions for systemd-nspawn (optional, if chroot needed)
+- Get retroroot sources
   ```
-  sudo cp /usr/lib/binfmt.d/qemu-arm-static.conf /etc/binfmt.d/
-  sudo cp /usr/lib/binfmt.d/qemu-aarch64-static.conf /etc/binfmt.d/
-  sudo sed -i 's/:FP/:FPC/g' /etc/binfmt.d/qemu-arm-static.conf
-  sudo sed -i 's/:FP/:FPC/g' /etc/binfmt.d/qemu-aarch64-static.conf
-  sudo systemctl restart systemd-binfmt.service
+  git clone https://github.com/rr-retroroot/rr-rootfs.git
+  cd rr-rootfs
+  ```
+
+- Create the armv7h image for surface rt
+  ```
+  ./rr-build-image.sh -a armv7h -p surfacert
+  ```
+
+- Chroot to the armv7h image for surface rt (if needed...)
+  ```
+  ./rr-build-image.sh -a armv7h -p surfacert -c
+  ```
+  
+- Install some packages to the armv7h image for surface rt (if needed...)
+  ```
+  ./rr-build-image.sh -a armv7h -p surfacert -i "base-devel git"
+  ```
+
+- Cross compile specific armv7h packages for surface rt (if needed...)
+  ```
+  ./rr-build-image.sh -a armv7h -p sysroot
+  ./rr-build-packages.sh -p packages/platforms/surfacert
   ```
 
 ## OLD
