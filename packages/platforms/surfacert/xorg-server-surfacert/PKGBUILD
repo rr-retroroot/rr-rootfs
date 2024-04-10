@@ -61,8 +61,10 @@ prepare() {
 build() {
 	cd "${pkgbase}-${pkgver}"
 	
-	source ${RETROROOT_HOME}/bin/rr-env ${CARCH}
+	# setup retroroot cross compiler toolchain
+	source ${RETROROOT_HOME}/bin/rr-env
   
+  # use "rr-configure" configure wrapper
   rr-configure ${CARCH} \
       --prefix=/usr \
   		--enable-xorg \

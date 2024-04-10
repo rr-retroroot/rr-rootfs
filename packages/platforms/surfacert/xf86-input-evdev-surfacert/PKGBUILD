@@ -20,11 +20,14 @@ sha256sums=('750461749a83bdee7771592aa5c0db5e267b18d847078a4b8622f55b04797eb3')
 
 build() {
   cd "${srcdir}/xf86-input-evdev-${pkgver}"
-  
-  source ${RETROROOT_HOME}/bin/rr-env ${CARCH}
-  
+
+  # setup retroroot cross compiler toolchain
+  source ${RETROROOT_HOME}/bin/rr-env
+
   autoreconf -fi
-  rr-configure ${CARCH}
+  
+  # use "rr-configure" configure wrapper
+  rr-configure
   make
 }
 

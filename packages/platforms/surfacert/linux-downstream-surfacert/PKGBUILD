@@ -67,14 +67,17 @@ prepare() {
   # restore our custom config
   cp "$srcdir/config-surfacert" .config
   
-  source ${RETROROOT_HOME}/bin/rr-env ${CARCH}
+  # setup retroroot cross compiler toolchain
+  source ${RETROROOT_HOME}/bin/rr-env
+  
   make ARCH="arm" oldconfig
 }
 
 build() {
   cd "$srcdir"/android_kernel_nvidia_tegra3-${commit}
   
-  source ${RETROROOT_HOME}/bin/rr-env ${CARCH}
+  # setup retroroot cross compiler toolchain
+  source ${RETROROOT_HOME}/bin/rr-env
   
   # gcc12 "fix"
   unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS

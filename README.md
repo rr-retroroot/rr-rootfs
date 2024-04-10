@@ -4,7 +4,7 @@
 
 - Install build dependencies (arch linux):
   ```
-  sudo pacman -S --needed git base-devel arch-install-scripts parted dosfstools e2fsprogs qemu-user-static qemu-user-static-binfmt
+  sudo pacman -S --needed wget git base-devel arch-install-scripts parted dosfstools e2fsprogs qemu-user-static qemu-user-static-binfmt
   ```
   - If dns resolution is not working and you are using systemd-resolved on your host:
      ```
@@ -38,7 +38,7 @@
   ./rr-build-image.sh -a armv7h -p surfacert -i "base-devel git"
   ```
 
-- Cross compile specific armv7h packages for surface rt (if needed...)
+- Cross compile specific armv7h packages for surface rt (if needed...). Note: sysroot build is only required once...
   ```
   ./rr-build-image.sh -a armv7h -p sysroot
   ./rr-build-packages.sh -p packages/platforms/surfacert

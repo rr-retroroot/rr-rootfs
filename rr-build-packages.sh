@@ -117,7 +117,7 @@ function build_package() {
   done
   
   # install build dependencies to  sysroot image if needed
-  if [ ! -z "${deps}" ]; then
+  if [ ! -z ${deps} ]; then
     install_package "${deps}" || die "build_package: package deps installation failed"
   fi
   
