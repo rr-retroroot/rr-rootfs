@@ -20,14 +20,15 @@ export RR_PACKAGES=${RR_PACKAGES}" \
   less \
   openssh \
   strace \
+  unzip \
   vsftpd \
   inetutils \
-  wireless-regdb \
-  alsa-utils
+  wireless-regdb
 "
 
 # emulation stuff
 export RR_PACKAGES=${RR_PACKAGES}" \
+  alsa-utils alsa-lib alsa-ucm-conf alsa-topology-conf alsa-card-profiles alsa-plugins \
   mesa mesa-vdpau libva-mesa-driver libglvnd \
   retroarch \
   retroarch-assets-glui \
@@ -39,7 +40,6 @@ export RR_PACKAGES=${RR_PACKAGES}" \
   libretro-snes9x \
   libretro-mgba \
   libretro-picodrive \
-  libretro-genesis-plus-gx \
   libretro-beetle-pce
 "
 

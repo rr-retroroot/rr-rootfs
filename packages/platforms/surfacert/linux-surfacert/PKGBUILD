@@ -2,7 +2,7 @@
 
 pkgname=linux-surfacert
 pkgver=6.6.22
-pkgrel=6
+pkgrel=7
 pkgdesc="RetroRoot surfacert kernel"
 arch=('armv7h')
 license=('GPL')
@@ -11,8 +11,16 @@ url="https://gitlab.com/grate-driver/linux/-/archive/v${pkgver}-lts/linux-v${pkg
 # every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
 groups=('retroroot' 'system' 'surfacert')
 
-depends=('coreutils' 'mkinitcpio>=0.7')
-makedepends=('rr-environment' 'rr-toolchain-armv7h')
+depends=(
+  'coreutils' 'mkinitcpio>=0.7'
+  'systemd>230' 'systemd-sysvcompat>230' 'libsystemd>230'
+  'xorg-server>1.14.5' 'xf86-input-evdev>2.8.2'
+  'iwd'
+)
+
+conflicts=('linux-downstream-surfacert')
+replace=('linux-downstream-surfacert')
+
 options=(!debug !strip)
 
 source=("$url" "config-surfacert")
@@ -21,15 +29,22 @@ sha512sums=('SKIP' 'SKIP')
 prepare() {
   _builddir="$srcdir/linux-v${pkgver}-lts"
   cd "$_builddir"
+  
+  # restore our custom config
   cp "$srcdir/config-surfacert" .config
-  source ${RETROROOT_HOME}/bin/rr-env ${CARCH}
+  
+  # setup retroroot cross compiler toolchain
+  source ${RETROROOT_HOME}/bin/rr-env
+  
   make ARCH="arm" olddefconfig
 }
 
 build() {
   cd "$srcdir"/linux-v${pkgver}-lts
   
-  source ${RETROROOT_HOME}/bin/rr-env ${CARCH}
+  # setup retroroot cross compiler toolchain
+  source ${RETROROOT_HOME}/bin/rr-env
+  
   yes "" | make $MAKEFLAGS ARCH="arm" CROSS_COMPILE=${RETROROOT_CROSS_PREFIX} \
     KBUILD_BUILD_VERSION="$((pkgrel + 0))-retroroot"
 }

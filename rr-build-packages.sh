@@ -254,7 +254,7 @@ function build_packages() {
         if [ $RR_UPLOAD ]; then
           upload_pkg "$pkgpath" "$pkgname" "${ARCH}"
         fi
-        echo -e "${COL_G}rr_build:${COL_N} build sucess for ${COL_G}$pkgpath/$pkgname-$local_pkgver.pkg.tar.xz${COL_N}"
+        echo -e "${COL_G}rr_build:${COL_N} build sucess for ${COL_G}$pkgpath/$pkgname-$local_pkgver-$ARCH.pkg.tar.xz${COL_N}"
       else
         # package is up to date
         echo -e "${COL_G}rr_build: $pkgname${COL_N} (${COL_Y}${ARCH}${COL_N}) is up to date ($remote_pkgver => $local_pkgver)..."

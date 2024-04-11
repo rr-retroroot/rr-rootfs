@@ -6,6 +6,7 @@ build() {
   add_binary mke2fs
   #add_binary mkfs.exfat
   add_binary mkfs.vfat
+  add_binary resize2fs
   add_binary rev
   # splash screen
   # TODO: fix "add_binary" hang on qemu aarch64 image building (?!)

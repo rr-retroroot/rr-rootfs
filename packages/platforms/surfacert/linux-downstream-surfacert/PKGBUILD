@@ -2,7 +2,7 @@
 
 pkgname=linux-downstream-surfacert
 pkgver=3.4.113
-pkgrel=3
+pkgrel=4
 pkgdesc="RetroRoot surfacert kernel"
 arch=('armv7h')
 license=('GPL')
@@ -12,7 +12,17 @@ url="https://github.com/Open-Surface-RT/android_kernel_nvidia_tegra3/archive/${c
 # every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
 groups=('retroroot' 'system' 'surfacert')
 
-depends=('coreutils' 'mkinitcpio>=0.7')
+depends=(
+  'coreutils'
+  # downstream kernel (3.4.x) with tegra xorg hw acceleration doesn't work with latest systemd, use older version
+  'systemd=230-7' 'systemd-sysvcompat=230-7' 'libsystemd=230-7' 'systemd-libs-surfacert'
+  # downstream kernel (3.4.x) needs xorg-server ABI 14
+  'xorg-server-surfacert' 'xf86-video-tegra-surfacert' 'xf86-input-evdev-surfacert'
+  # downstream kernel (3.4.x) needs wpa_supplicant (iwd not working)
+  'wpa_supplicant' 'dhclient'
+  # don't remember why but it's needed...
+  'mkinitcpio=37.3-1' 'cryptsetup=2.7.0-1'
+)
 options=(!debug !strip)
 
 source=(

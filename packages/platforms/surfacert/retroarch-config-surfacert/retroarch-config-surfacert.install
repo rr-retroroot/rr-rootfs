@@ -1,0 +1,5 @@
+post_install() {
+  # enable automatic login to xorg/retroarch 
+  systemctl enable xlogin@root
+}
+
