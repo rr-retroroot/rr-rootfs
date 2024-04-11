@@ -27,7 +27,7 @@ export RR_PACKAGES=${RR_PACKAGES}" \
 "
 
 # emulation stuff
-export __RR_PACKAGES=${RR_PACKAGES}" \
+export RR_PACKAGES=${RR_PACKAGES}" \
   mesa mesa-vdpau libva-mesa-driver libglvnd \
   retroarch \
   retroarch-assets-glui \

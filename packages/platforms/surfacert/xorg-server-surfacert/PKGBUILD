@@ -6,7 +6,7 @@ pkgbase=xorg-server
 pkgname=('xorg-server-surfacert' 'xorg-server-common-surfacert' 'xorg-server-devel-surfacert'
 					'xorg-server-xnest-surfacert' 'xorg-server-xephyr-surfacert' 'xorg-server-xvfb-surfacert')
 pkgver=1.14.5
-pkgrel=1
+pkgrel=2
 arch=('armv7h')
 license=('LicenseRef-Adobe-Display-PostScript'
          'BSD-3-Clause' 
