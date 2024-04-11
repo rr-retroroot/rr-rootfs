@@ -14,8 +14,21 @@
 
 - Install build dependencies (ubuntu):
   ```
-  sudo pacman -S --needed git base-devel arch-install-scripts parted dosfstools e2fsprogs qemu-user-static qemu-user-static-binfmt
+  sudo apt install -y build-essential git parted dosfstools e2fsprogs qemu-user-static libarchive-tools
+  wget http://launchpadlibrarian.net/635385442/arch-install-scripts_28-1_all.deb
+  wget http://launchpadlibrarian.net/635298936/libalpm13_13.0.2-3_amd64.deb
+  wget http://launchpadlibrarian.net/635298938/pacman-package-manager_6.0.2-3_amd64.deb
+  wget http://launchpadlibrarian.net/635298937/makepkg_6.0.2-3_amd64.deb
+  sudo dpkg -i arch-install-scripts_28-1_all.deb libalpm13_13.0.2-3_amd64.deb pacman-package-manager_6.0.2-3_amd64.deb makepkg_6.0.2-3_amd64.deb
+  sudo apt-get -y -f install
   ```
+  - Tips:
+     ```
+     sudo nano /etc/makepkg.conf
+     ```
+     ```
+     #MAKEFLAGS="-j2" => MAKEFLAGS="-j16"
+     ```
 
 - Get retroroot sources
   ```
@@ -44,25 +57,3 @@
   ./rr-build-packages.sh -p packages/platforms/surfacert
   ```
 
-## OLD
-
-**<ins>Building on ubuntu</ins>**
-
-- Install build dependencies:
-    ```
-    sudo apt -yq update
-    sudo apt -yq install docker.io
-    ```
-- Fix docker permissions (reboot for changes to take effect):
-    ```
-    sudo groupadd docker
-    sudo usermod -aG docker ${USER}
-    ```
-- Build x86_64 desktop image:
-    ```
-    ./rr-rootfs.sh -a x86_64 -p desktop
-    ```
-- Run x86_64 desktop image:
-    ```
-    ./rr-rootfs.sh -r desktop
-    ```
