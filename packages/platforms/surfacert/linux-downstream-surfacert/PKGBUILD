@@ -2,7 +2,7 @@
 
 pkgname=linux-downstream-surfacert
 pkgver=3.4.113
-pkgrel=4
+pkgrel=5
 pkgdesc="RetroRoot surfacert kernel"
 arch=('armv7h')
 license=('GPL')
