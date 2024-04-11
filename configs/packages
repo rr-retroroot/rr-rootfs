@@ -35,7 +35,11 @@ export RR_PACKAGES=${RR_PACKAGES}" \
   retroarch-assets-xmb \
   libretro-overlays \
   libretro-shaders \
+  libretro-nestopia \
   libretro-snes9x \
-  libretro-flycast
+  libretro-mgba \
+  libretro-picodrive \
+  libretro-genesis-plus-gx \
+  libretro-beetle-pce
 "
 
