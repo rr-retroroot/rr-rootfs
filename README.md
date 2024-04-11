@@ -14,7 +14,7 @@
 
 - Install build dependencies (ubuntu):
   ```
-  sudo apt install -y build-essential git parted dosfstools e2fsprogs qemu-user-static libarchive-tools
+  sudo apt install -y build-essential autoconf git parted dosfstools e2fsprogs qemu-user-static libarchive-tools
   wget http://launchpadlibrarian.net/635385442/arch-install-scripts_28-1_all.deb
   wget http://launchpadlibrarian.net/635298936/libalpm13_13.0.2-3_amd64.deb
   wget http://launchpadlibrarian.net/635298938/pacman-package-manager_6.0.2-3_amd64.deb
