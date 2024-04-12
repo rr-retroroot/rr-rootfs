@@ -4,6 +4,18 @@
 PID=$(pidof rr-splash)
 kill -INT $PID &>/dev/null
 
+# set brightness to max if never done
+if [ ! -f "/root/.config/.retroroot-brightness" ]; then
+  echo 255 > /sys/devices/platform/pwm-backlight/backlight/pwm-backlight/brightness
+  echo done > "/root/.config/.retroroot-brightness"
+fi
+
+# set audio volume if never done
+if [ ! -f "/root/.config/.retroroot-audio-volume" ]; then
+  amixer sset 'Speaker' 80%
+  echo done > "/root/.config/.retroroot-audio-volume"
+fi
+
 # Disable all energy save features, and leave the monitor always on
 xset s off         # don't activate screensaver
 xset -dpms         # disable DPMS (Energy Star) features.

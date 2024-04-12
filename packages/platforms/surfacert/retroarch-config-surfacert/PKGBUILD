@@ -2,7 +2,7 @@
 
 pkgname=retroarch-config-surfacert
 pkgver=1
-pkgrel=2
+pkgrel=3
 pkgdesc="RetroRoot retroarch configuration for surfacert"
 arch=('armv7h')
 license=('GPL')
