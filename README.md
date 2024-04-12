@@ -1,4 +1,6 @@
-# rr-rootfs
+# RetroRoot
+
+RetroRoot is an ArchLinux based image with retrogaming capabilities (retroarch)
 
 **<ins>Building on arch linux / ubuntu</ins>**
 
