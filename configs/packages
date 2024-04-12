@@ -28,7 +28,7 @@ export RR_PACKAGES=${RR_PACKAGES}" \
 
 # emulation stuff
 export RR_PACKAGES=${RR_PACKAGES}" \
-  alsa-utils alsa-lib alsa-ucm-conf alsa-topology-conf alsa-card-profiles alsa-plugins \
+  alsa-utils \
   mesa mesa-vdpau libva-mesa-driver libglvnd \
   retroarch \
   retroarch-assets-glui \

@@ -2,7 +2,7 @@
 
 pkgname=linux-downstream-surfacert
 pkgver=3.4.113
-pkgrel=5
+pkgrel=6
 pkgdesc="RetroRoot surfacert kernel"
 arch=('armv7h')
 license=('GPL')
@@ -34,9 +34,10 @@ source=(
   "003-fix-gcc12-noreturn.patch"
   "004-fix-gcc12-asm.patch"
   "005-fix-gcc12-return_address.patch"
+  "006-revert-stock-wm8962-codec.patch"
 )
 sha512sums=(
-  'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP'
+  'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP'
 )
 
 prepare() {
@@ -63,6 +64,10 @@ prepare() {
   echo "gcc12: patching (return_address)..."
   patch -Np1 < "../005-fix-gcc12-return_address.patch"
   
+  # fix randomly not working audio
+  echo "audio: patching wm8962 codec..."
+  patch -Np1 < "../006-revert-stock-wm8962-codec.patch"
+
   # gcc12 "fix"
   cp include/linux/compiler-gcc5.h include/linux/compiler-gcc12.h
   

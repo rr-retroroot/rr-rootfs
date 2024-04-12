@@ -14,7 +14,7 @@ echo "rr-run-parts: $(basename "$0")"
 pacman --noconfirm -Rdd systemd-libs
 
 # fix for systemd 230 (which use dbus-daemon-units)
-pacman --noconfirm -Rdd dbus-broker-units
+pacman --noconfirm -Rdd dbus-broker dbus-broker-units
 
 # systemd-230-7 and mkinitcpio-38.1-1 are in conflict (systemd<255.4-2)
 #pacman --noconfirm -S mkinitcpio=37.3-1
