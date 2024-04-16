@@ -1,8 +1,10 @@
 # Maintainer: cpasjuste <cpasjuste@gmail.com>
 
+# TODO: systemctl enable wpa_supplicant@mlan0.service
+
 pkgname=rr-base-surfacert
 pkgver=1
-pkgrel=4
+pkgrel=5
 pkgdesc="RetroRoot base system (surfacert)"
 arch=('armv7h')
 license=('GPL')
