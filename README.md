@@ -6,7 +6,7 @@ RetroRoot is an ArchLinux based image with retrogaming capabilities (retroarch)
 
 - Install build dependencies (arch linux):
   ```
-  sudo pacman -S --needed wget git base-devel arch-install-scripts parted dosfstools e2fsprogs qemu-user-static qemu-user-static-binfmt
+  sudo pacman -S --needed wget git base-devel cmake arch-install-scripts parted dosfstools e2fsprogs qemu-user-static qemu-user-static-binfmt
   ```
   - If dns resolution is not working and you are using systemd-resolved on your host:
      ```
@@ -16,7 +16,7 @@ RetroRoot is an ArchLinux based image with retrogaming capabilities (retroarch)
 
 - Install build dependencies (ubuntu):
   ```
-  sudo apt install -y build-essential autoconf libtool git parted dosfstools e2fsprogs qemu-user-static libarchive-tools
+  sudo apt install -y build-essential cmake autoconf libtool git parted dosfstools e2fsprogs qemu-user-static libarchive-tools
   wget http://launchpadlibrarian.net/635385442/arch-install-scripts_28-1_all.deb
   wget http://launchpadlibrarian.net/635298936/libalpm13_13.0.2-3_amd64.deb
   wget http://launchpadlibrarian.net/635298938/pacman-package-manager_6.0.2-3_amd64.deb

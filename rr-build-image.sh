@@ -24,6 +24,20 @@ show_usage() {
   echo "       $(basename "$0") -a x86_64 -p desktop -i \"base-devel git\"  | install specified packages into image"
 }
 
+run() {
+  if [ "$1" == "desktop" ]; then
+    qemu-img resize -f raw "output/retroroot-x86_64-desktop.img" 4G
+    qemu-system-x86_64 -m 2G -smp 4 \
+      -serial stdio \
+      -device virtio-vga-gl -display sdl,gl=on \
+      -device e1000,netdev=net0 -netdev user,id=net0,hostfwd=tcp::5555-:22 \
+      -usbdevice mouse \
+      -drive format=raw,file="output/retroroot-x86_64-desktop.img"
+  else
+    echo "TODO"
+  fi
+}
+
 main() {
   # parse args
   test $# -eq 0 && set -- "-h"

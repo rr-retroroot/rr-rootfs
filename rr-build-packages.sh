@@ -109,7 +109,6 @@ function build_package() {
     die "build_package: sysroot image doesn't exist... (${RR_OUTPUT_IMG})"
   fi
   
-  # -d: we don't want to install deps ("cross-compilation") - TODO: use "rr-build-image.sh" install_packages
   # get package build depds
   local deps=""
   local makedepends=$(echo "${SRCINFO}" | grep makedepends)

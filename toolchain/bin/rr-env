@@ -40,10 +40,10 @@ export AR="${RETROROOT_AR}"
 export NM="${RETROROOT_NM}"
 export RANLIB="${RETROROOT_RANLIB}"
 export STRIP="${RETROROOT_STRIP}"
-export CFLAGS="-I${RETROROOT_SYSROOT}/usr/include -O2 -pipe -fno-plt -D__RETROROOT__"
-export CPPFLAGS="${CFLAGS} ${CPPFLAGS} -fexceptions"
-export CXXFLAGS="${CFLAGS} ${CXXFLAGS} -fexceptions"
-export LDFLAGS="-L${RETROROOT_SYSROOT}/usr/lib ${LDFLAGS}" # -Wl,-O1,--sort-common,--as-needed
+export CFLAGS="-I${RETROROOT_SYSROOT}/usr/include -D__RETROROOT__"
+export CPPFLAGS="${CFLAGS} -fexceptions"
+export CXXFLAGS="${CFLAGS} -fexceptions"
+export LDFLAGS="-L${RETROROOT_SYSROOT}/usr/lib"
 
 # arch specific
 if [ ${_arch} == "x86_64" ]; then
