@@ -166,8 +166,6 @@ function check_install_toolchain() {
       done
       popd &> /dev/null
     fi
-    # copy custom tools to mounted image
-    #sudo cp -rf "${RR_ROOT_PATH}/toolchain/overlay_${ARCH}/." "${RETROROOT_HOST}/"
   else
     echo -e "${COL_G}rr_build${COL_N}: ${ARCH} toolchain already installed..."
   fi

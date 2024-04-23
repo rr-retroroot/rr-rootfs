@@ -41,8 +41,8 @@ export NM="${RETROROOT_NM}"
 export RANLIB="${RETROROOT_RANLIB}"
 export STRIP="${RETROROOT_STRIP}"
 export CFLAGS="-I${RETROROOT_SYSROOT}/usr/include -D__RETROROOT__"
-export CPPFLAGS="${CFLAGS} -fexceptions"
-export CXXFLAGS="${CFLAGS} -fexceptions"
+export CPPFLAGS="${CFLAGS}"
+export CXXFLAGS="${CFLAGS}"
 export LDFLAGS="-L${RETROROOT_SYSROOT}/usr/lib"
 
 # arch specific
