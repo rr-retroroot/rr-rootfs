@@ -24,6 +24,11 @@ locale-gen
 # install retroroot and platform specific packages
 pacman --noconfirm -S --needed --overwrite "*" rr-base-"${RR_PLATFORM}"
 
+# install retroroot emulation stuff
+if [ "${RR_PLATFORM}" != "sysroot" ]; then
+  pacman --noconfirm -S --needed rr-emulation-base
+fi
+
 # set root passwd
 echo "root:${RR_ROOT_PASSWORD}" | chpasswd
 
@@ -36,6 +41,7 @@ done
 for GRP in adm dialout cdrom audio users video games input tty gpio spi i2c netdev; do
   usermod -aG $GRP "${RR_USERNAME}"
 done
+
 echo "
 root ALL=(ALL) ALL
 ${RR_USERNAME} ALL=(ALL) ALL

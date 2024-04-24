@@ -1,0 +1,29 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=rr-emulation-base
+pkgver=1
+pkgrel=1
+pkgdesc="RetroRoot base system"
+arch=('x86_64' 'aarch64' 'armv7h')
+license=('GPL')
+options=(!debug !strip)
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulation", "app" or "system" group
+groups=('retroroot' 'emulation')
+
+# a retroroot package should not depends on anything as required libraries
+# are in "retroroot-sysroot-*arch*" toolchain package. If not present in sysroot,
+# the package should build and link a static library here.
+# "system" packages are specials...
+depends=(
+  'mesa' 'mesa-vdpau' 'libva-mesa-driver' 'libglvnd'
+  'retroarch' 'retroarch-assets-glui' 'retroarch-assets-ozone' 'retroarch-assets-xmb'
+  'libretro-overlays'
+  'libretro-shaders'
+  'libretro-nestopia'
+  'libretro-snes9x'
+  'libretro-mgba'
+  'libretro-picodrive'
+  'libretro-beetle-pce'
+)
+

@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# get root privileges...
-#[ "$UID" -eq 0 ] || exec sudo bash "$0" "$@"
+set -e
 
 # set default variables
 RR_ARCH=""
@@ -55,7 +54,7 @@ main() {
   done
   shift $(($OPTIND - 1))
 
-  if [ -z ${RR_PLATFORM+x} ]; then
+  if [ -z $RR_PLATFORM ]; then
     RR_PLATFORM="sysroot"
   fi
 

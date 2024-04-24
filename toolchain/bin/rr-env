@@ -47,17 +47,17 @@ export LDFLAGS="-L${RETROROOT_SYSROOT}/usr/lib"
 
 # arch specific
 if [ ${_arch} == "x86_64" ]; then
-  export CFLAGS="${CFLAGS} -march=x86-64 -mtune=generic"
-  export CPPFLAGS="${CPPFLAGS} -march=x86-64 -mtune=generic"
-  export CXXFLAGS="${CXXFLAGS} -march=x86-64 -mtune=generic"
+  export CFLAGS="${CFLAGS} -march=x86-64 -mtune=generic -O2"
+  export CPPFLAGS="${CPPFLAGS} -march=x86-64 -mtune=generic -O2"
+  export CXXFLAGS="${CXXFLAGS} -march=x86-64 -mtune=generic -O2"
 elif [ ${_arch} == "armv7h" ]; then
-  export CFLAGS="${CFLAGS} -march=armv7-a -mfloat-abi=hard -mfpu=neon"
-  export CPPFLAGS="${CPPFLAGS} -march=armv7-a -mfloat-abi=hard -mfpu=neon"
-  export CXXFLAGS="${CXXFLAGS} -march=armv7-a -mfloat-abi=hard -mfpu=neon"
+  export CFLAGS="${CFLAGS} -march=armv7-a -mfloat-abi=hard -mfpu=neon -O2"
+  export CPPFLAGS="${CPPFLAGS} -march=armv7-a -mfloat-abi=hard -mfpu=neon -O2"
+  export CXXFLAGS="${CXXFLAGS} -march=armv7-a -mfloat-abi=hard -mfpu=neon -O2"
 elif [ ${_arch} == "aarch64" ]; then
-  export CFLAGS="${CFLAGS} -march=armv8-a -mcpu=cortex-a35"
-  export CPPFLAGS="${CPPFLAGS} -march=armv8-a -mcpu=cortex-a35"
-  export CXXFLAGS="${CXXFLAGS} -march=armv8-a -mcpu=cortex-a35"
+  export CFLAGS="${CFLAGS} -march=armv8-a -mcpu=cortex-a35 -O2"
+  export CPPFLAGS="${CPPFLAGS} -march=armv8-a -mcpu=cortex-a35 -O2"
+  export CXXFLAGS="${CXXFLAGS} -march=armv8-a -mcpu=cortex-a35 -O2"
 fi
 
 # autconf/autoreconf
