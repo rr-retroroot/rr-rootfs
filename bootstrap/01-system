@@ -28,7 +28,8 @@ pacman --noconfirm -S --needed --overwrite "*" rr-base-"${RR_PLATFORM}"
 echo "root:${RR_ROOT_PASSWORD}" | chpasswd
 
 # create local user and groups
-useradd -m "${RR_USERNAME}" -p "${RR_USERNAME}"
+useradd -m "${RR_USERNAME}"
+echo "${RR_USERNAME}:${RR_USERNAME}" | chpasswd
 for GRP in autologin dialout cdrom spi i2c gpio netdev; do
   groupadd -r --system $GRP
 done
