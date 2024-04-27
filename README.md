@@ -14,7 +14,7 @@ RetroRoot is an ArchLinux based image with retrogaming capabilities (retroarch)
      sudo ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
      ```
 
-- Install build dependencies (ubuntu):
+- Install build dependencies (ubuntu 22.04):
   ```
   sudo apt install -y build-essential autoconf libtool git parted dosfstools e2fsprogs qemu-user-static libarchive-tools
   wget http://launchpadlibrarian.net/635385442/arch-install-scripts_28-1_all.deb
