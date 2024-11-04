@@ -14,6 +14,11 @@ RetroRoot is an ArchLinux based image with retrogaming capabilities (retroarch)
      sudo ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
      ```
 
+- Install build dependencies (ubuntu 24.04):
+  ```
+  sudo apt install -y build-essential cmake autoconf libtool git parted dosfstools e2fsprogs qemu-user-static libarchive-tools pacman-package-manager arch-install-scripts makepkg
+  sudo pacman-key --init
+  ```
 - Install build dependencies (ubuntu 22.04):
   ```
   sudo apt install -y build-essential cmake autoconf libtool git parted dosfstools e2fsprogs qemu-user-static libarchive-tools
@@ -25,13 +30,13 @@ RetroRoot is an ArchLinux based image with retrogaming capabilities (retroarch)
   sudo apt-get -y -f install
   sudo pacman-key --init
   ```
-  - Tips:
-     ```
-     sudo nano /etc/makepkg.conf
-     ```
-     ```
-     #MAKEFLAGS="-j2" => MAKEFLAGS="-j16"
-     ```
+- Tips:
+  ```
+  sudo nano /etc/makepkg.conf
+  ```
+  ```
+  #MAKEFLAGS="-j2" => MAKEFLAGS="-j16"
+  ```
 
 - Get retroroot sources
   ```
