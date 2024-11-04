@@ -109,7 +109,6 @@ function build_package() {
     die "build_package: sysroot image doesn't exist... (${RR_OUTPUT_IMG})"
   fi
   
-  # -d: we don't want to install deps ("cross-compilation") - TODO: use "rr-build-image.sh" install_packages
   # get package build depds
   local deps=""
   local makedepends=$(echo "${SRCINFO}" | grep makedepends)
@@ -167,8 +166,6 @@ function check_install_toolchain() {
       done
       popd &> /dev/null
     fi
-    # copy custom tools to mounted image
-    #sudo cp -rf "${RR_ROOT_PATH}/toolchain/overlay_${ARCH}/." "${RETROROOT_HOST}/"
   else
     echo -e "${COL_G}rr_build${COL_N}: ${ARCH} toolchain already installed..."
   fi

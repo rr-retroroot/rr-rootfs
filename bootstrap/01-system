@@ -24,17 +24,24 @@ locale-gen
 # install retroroot and platform specific packages
 pacman --noconfirm -S --needed --overwrite "*" rr-base-"${RR_PLATFORM}"
 
+# install retroroot emulation stuff
+if [ "${RR_PLATFORM}" != "sysroot" ]; then
+  pacman --noconfirm -S --needed rr-emulation-base
+fi
+
 # set root passwd
 echo "root:${RR_ROOT_PASSWORD}" | chpasswd
 
 # create local user and groups
-useradd -m "${RR_USERNAME}" -p "${RR_USERNAME}"
+useradd -m "${RR_USERNAME}"
+echo "${RR_USERNAME}:${RR_USERNAME}" | chpasswd
 for GRP in autologin dialout cdrom spi i2c gpio netdev; do
   groupadd -r --system $GRP
 done
 for GRP in adm dialout cdrom audio users video games input tty gpio spi i2c netdev; do
   usermod -aG $GRP "${RR_USERNAME}"
 done
+
 echo "
 root ALL=(ALL) ALL
 ${RR_USERNAME} ALL=(ALL) ALL

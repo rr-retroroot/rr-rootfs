@@ -1,8 +1,9 @@
 # Maintainer: cpasjuste <cpasjuste@gmail.com>
 
-pkgname=linux-downstream-surfacert
+pkgbase=linux-downstream-surfacert
+pkgname=('linux-downstream-surfacert' 'linux-downstream-headers-surfacert')
 pkgver=3.4.113
-pkgrel=7
+pkgrel=8
 pkgdesc="RetroRoot surfacert kernel"
 arch=('armv7h')
 license=('GPL')
@@ -86,6 +87,8 @@ prepare() {
   source ${RETROROOT_HOME}/bin/rr-env
   
   make ARCH="arm" oldconfig
+  #make -s kernelrelease > version
+  echo "${pkgver}" > version
 }
 
 build() {
@@ -105,7 +108,9 @@ build() {
     KBUILD_BUILD_VERSION="$((pkgrel + 0))-retroroot"
 }
 
-package() {
+package_linux-downstream-surfacert() {
+  provides=('linux')
+  
   cd "$srcdir"/android_kernel_nvidia_tegra3-${commit}
   
   # install kernel image and dtb
@@ -122,5 +127,90 @@ package() {
   
   # copy surfacert rootfs overlays
   cp -r "$startdir"/overlay/. "${pkgdir}"
+}
+
+package_linux-downstream-headers-surfacert() {
+  pkgdesc="Headers and scripts for building modules for the $pkgdesc kernel (surfacert)"
+  depends=(pahole)
+  provides=('linux-headers')
+
+  _srcname="$srcdir"/android_kernel_nvidia_tegra3-${commit}
+  cd $_srcname
+  local builddir="$pkgdir/usr/lib/modules/${pkgver}/build"
+
+  echo "Installing build files..."
+  install -Dt "$builddir" -m644 .config Makefile Module.symvers System.map \
+    version
+    #localversion.* version vmlinux tools/bpf/bpftool/vmlinux.h
+  install -Dt "$builddir/kernel" -m644 kernel/Makefile
+  install -Dt "$builddir/arch/arm" -m644 arch/arm/Makefile
+  cp -t "$builddir" -a scripts
+
+  # required when STACK_VALIDATION is enabled
+  #install -Dt "$builddir/tools/objtool" tools/objtool/objtool
+
+  # required when DEBUG_INFO_BTF_MODULES is enabled
+  #install -Dt "$builddir/tools/bpf/resolve_btfids" tools/bpf/resolve_btfids/resolve_btfids
+
+  echo "Installing headers..."
+  cp -t "$builddir" -a include
+  cp -t "$builddir/arch/arm" -a arch/arm/include
+  install -Dt "$builddir/arch/arm/kernel" -m644 arch/arm/kernel/asm-offsets.s
+
+  install -Dt "$builddir/drivers/md" -m644 drivers/md/*.h
+  install -Dt "$builddir/net/mac80211" -m644 net/mac80211/*.h
+
+  # https://bugs.archlinux.org/task/13146
+  #install -Dt "$builddir/drivers/media/i2c" -m644 drivers/media/i2c/msp3400-driver.h
+
+  # https://bugs.archlinux.org/task/20402
+  #install -Dt "$builddir/drivers/media/usb/dvb-usb" -m644 drivers/media/usb/dvb-usb/*.h
+  #install -Dt "$builddir/drivers/media/dvb-frontends" -m644 drivers/media/dvb-frontends/*.h
+  #install -Dt "$builddir/drivers/media/tuners" -m644 drivers/media/tuners/*.h
+
+  # https://bugs.archlinux.org/task/71392
+  #install -Dt "$builddir/drivers/iio/common/hid-sensors" -m644 drivers/iio/common/hid-sensors/*.h
+
+  echo "Installing KConfig files..."
+  find . -name 'Kconfig*' -exec install -Dm644 {} "$builddir/{}" \;
+
+  echo "Removing unneeded architectures..."
+  local arch
+  for arch in "$builddir"/arch/*/; do
+    [[ $arch = */arm/ ]] && continue
+    echo "Removing $(basename "$arch")"
+    rm -r "$arch"
+  done
+
+  #echo "Removing documentation..."
+  #rm -r "$builddir/Documentation"
+
+  echo "Removing broken symlinks..."
+  find -L "$builddir" -type l -printf 'Removing %P\n' -delete
+
+  echo "Removing loose objects..."
+  find "$builddir" -type f -name '*.o' -printf 'Removing %P\n' -delete
+
+  #echo "Stripping build tools..."
+  #local file
+  #while read -rd '' file; do
+  #  case "$(file -Sib "$file")" in
+  #    application/x-sharedlib\;*)      # Libraries (.so)
+  #      ${STRIP} -v $STRIP_SHARED "$file" ;;
+  #    application/x-archive\;*)        # Libraries (.a)
+  #      ${STRIP} -v $STRIP_STATIC "$file" ;;
+  #    application/x-executable\;*)     # Binaries
+  #      ${STRIP} -v $STRIP_BINARIES "$file" ;;
+  #    application/x-pie-executable\;*) # Relocatable binaries
+  #      ${STRIP} -v $STRIP_SHARED "$file" ;;
+  #  esac
+  #done < <(find "$builddir" -type f -perm -u+x ! -name vmlinux -print0)
+
+  #echo "Stripping vmlinux..."
+  #strip -v $STRIP_STATIC "$builddir/vmlinux"
+
+  echo "Adding symlink..."
+  mkdir -p "$pkgdir/usr/src"
+  ln -sr "$builddir" "$pkgdir/usr/src/linux"
 }
 

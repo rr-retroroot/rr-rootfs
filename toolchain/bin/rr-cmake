@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-source "${RETROROOT_HOME}/bin/rr-env" ${CARCH}
+source ${RETROROOT_HOME}/bin/rr-env
 
-exec cmake -DCMAKE_TOOLCHAIN_FILE=${RETROROOT_SYSROOT}/usr/lib/cmake/rr-toolchain.cmake "$@"
+exec cmake -DCMAKE_TOOLCHAIN_FILE=${RETROROOT_HOME}/bin/rr-toolchain.cmake "$@"
 

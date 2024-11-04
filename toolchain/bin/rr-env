@@ -40,24 +40,24 @@ export AR="${RETROROOT_AR}"
 export NM="${RETROROOT_NM}"
 export RANLIB="${RETROROOT_RANLIB}"
 export STRIP="${RETROROOT_STRIP}"
-export CFLAGS="-I${RETROROOT_SYSROOT}/usr/include -O2 -pipe -fno-plt -D__RETROROOT__"
-export CPPFLAGS="${CFLAGS} ${CPPFLAGS} -fexceptions"
-export CXXFLAGS="${CFLAGS} ${CXXFLAGS} -fexceptions"
-export LDFLAGS="-L${RETROROOT_SYSROOT}/usr/lib ${LDFLAGS}" # -Wl,-O1,--sort-common,--as-needed
+export CFLAGS="-I${RETROROOT_SYSROOT}/usr/include -D__RETROROOT__"
+export CPPFLAGS="${CFLAGS}"
+export CXXFLAGS="${CFLAGS}"
+export LDFLAGS="-L${RETROROOT_SYSROOT}/usr/lib"
 
 # arch specific
 if [ ${_arch} == "x86_64" ]; then
-  export CFLAGS="${CFLAGS}"
-  export CPPFLAGS="${CPPFLAGS}"
-  export CXXFLAGS="${CXXFLAGS}"
+  export CFLAGS="${CFLAGS} -march=x86-64 -mtune=generic -O2"
+  export CPPFLAGS="${CPPFLAGS} -march=x86-64 -mtune=generic -O2"
+  export CXXFLAGS="${CXXFLAGS} -march=x86-64 -mtune=generic -O2"
 elif [ ${_arch} == "armv7h" ]; then
-  export CFLAGS="${CFLAGS} -march=armv7-a -mfloat-abi=hard -mfpu=neon"
-  export CPPFLAGS="${CPPFLAGS} -march=armv7-a -mfloat-abi=hard -mfpu=neon"
-  export CXXFLAGS="${CXXFLAGS} -march=armv7-a -mfloat-abi=hard -mfpu=neon"
+  export CFLAGS="${CFLAGS} -march=armv7-a -mfloat-abi=hard -mfpu=neon -O2"
+  export CPPFLAGS="${CPPFLAGS} -march=armv7-a -mfloat-abi=hard -mfpu=neon -O2"
+  export CXXFLAGS="${CXXFLAGS} -march=armv7-a -mfloat-abi=hard -mfpu=neon -O2"
 elif [ ${_arch} == "aarch64" ]; then
-  export CFLAGS="${CFLAGS} -march=armv8-a -mcpu=cortex-a35"
-  export CPPFLAGS="${CPPFLAGS} -march=armv8-a -mcpu=cortex-a35"
-  export CXXFLAGS="${CXXFLAGS} -march=armv8-a -mcpu=cortex-a35"
+  export CFLAGS="${CFLAGS} -march=armv8-a -mcpu=cortex-a35 -O2"
+  export CPPFLAGS="${CPPFLAGS} -march=armv8-a -mcpu=cortex-a35 -O2"
+  export CXXFLAGS="${CXXFLAGS} -march=armv8-a -mcpu=cortex-a35 -O2"
 fi
 
 # autconf/autoreconf
