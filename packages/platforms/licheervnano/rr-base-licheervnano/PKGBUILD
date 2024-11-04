@@ -1,26 +1,27 @@
 # Maintainer: cpasjuste <cpasjuste@gmail.com>
 
-pkgname=rr-base
+pkgname=rr-base-licheervnano
 pkgver=1
-pkgrel=4
-pkgdesc="RetroRoot base system"
-arch=('x86_64' 'aarch64' 'armv7h' 'riscv64')
+pkgrel=1
+pkgdesc="RetroRoot base system (licheervnano)"
+arch=('riscv64')
 license=('GPL')
 options=(!debug !strip)
 
 # every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
-groups=('retroroot' 'system')
+groups=('retroroot' 'system' 'licheervnano')
 
 # a retroroot package should not depends on anything as required libraries
 # are in "retroroot-sysroot-*arch*" toolchain package. If not present in sysroot,
 # the package should build and link a static library here.
 # "system" packages are specials...
-depends=('rr-initramfs-hook')
+
+depends=(
+  'rr-base'
+)
 
 package() {
-  cd "$srcdir"
-  
-	# copy common rootfs overlays
+  # copy surfacert rootfs overlays
   cp -r "$startdir"/overlay/. "${pkgdir}"
 }
 

@@ -4,7 +4,7 @@ pkgname=rr-initramfs-hook
 pkgver=1
 pkgrel=17
 pkgdesc="RetroRoot initramfs hook"
-arch=('x86_64' 'armv7h' 'aarch64')
+arch=('x86_64' 'armv7h' 'aarch64' 'riscv64')
 license=('GPL')
 
 # every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group

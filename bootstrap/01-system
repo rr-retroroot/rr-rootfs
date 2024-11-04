@@ -22,12 +22,14 @@ echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
 locale-gen
 
 # install retroroot and platform specific packages
-pacman --noconfirm -S --needed --overwrite "*" rr-base-"${RR_PLATFORM}"
+if [ "${RR_PLATFORM}" != "sysroot" ]; then
+  pacman --noconfirm -S --needed --overwrite "*" rr-base-"${RR_PLATFORM}"
+fi
 
 # install retroroot emulation stuff
-if [ "${RR_PLATFORM}" != "sysroot" ]; then
-  pacman --noconfirm -S --needed rr-emulation-base
-fi
+#if [ "${RR_PLATFORM}" != "sysroot" ]; then
+#  pacman --noconfirm -S --needed rr-emulation-base
+#fi
 
 # set root passwd
 echo "root:${RR_ROOT_PASSWORD}" | chpasswd

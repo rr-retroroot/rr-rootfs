@@ -11,6 +11,7 @@ RR_ROOT_PATH=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 # toolchains
 RR_TOOLCHAIN_LINK_ARMV7H="https://snapshots.linaro.org/gnu-toolchain/12.3-2023.06-1/arm-linux-gnueabihf/gcc-linaro-12.3.1-2023.06-x86_64_arm-linux-gnueabihf.tar.xz"
 RR_TOOLCHAIN_LINK_AARCH64="https://snapshots.linaro.org/gnu-toolchain/12.3-2023.06-1/aarch64-linux-gnu/gcc-linaro-12.3.1-2023.06-x86_64_aarch64-linux-gnu.tar.xz"
+RR_TOOLCHAIN_LINK_RISCV64="http://retroroot.mydedibox.fr/toolchains/gcc-archlinux-14.2.0-x86_64_riscv64-linux-gnu.tar.xz"
 
 COL_R='\033[0;31m'
 COL_G='\033[0;32m'
@@ -54,7 +55,7 @@ function upload_pkg() {
   echo -e "${COL_G}upload_pkg:${COL_N} uploading ${COL_G}$pkgname${COL_N} ($pkgarch) to retroroot repo"
   scp "$pkgpath/$pkgfile" "$RR_SSH_USER@$RR_SSH_HOST:/var/www/retroroot/packages/$pkgarch" || die "upload_pkg: scp to $RR_SSH_HOST failed"
   echo -e "${COL_G}upload_pkg:${COL_N} adding ${COL_G}$pkgname${COL_N} ($pkgarch) to retroroot repo"
-  ssh "$RR_SSH_USER@$RR_SSH_HOST" pacbrew-repo-add \
+  ssh "$RR_SSH_USER@$RR_SSH_HOST" repo-add \
     /var/www/retroroot/packages/$pkgarch/retroroot-$pkgarch.db.tar.gz \
     /var/www/retroroot/packages/$pkgarch/$pkgfile \
     || die "upload_pkg: repo-add failed"
@@ -88,9 +89,7 @@ function get_local_pkg_arch() {
 
 # get_remote_pkg_version ARCH PKGNAME
 function get_remote_pkg_ver() {
-  #local remote_pkgname=$(echo "$RR_REMOTE_PACKAGES" | grep "retroroot-$1" | grep -E "(^| )$2( |$)" | awk '{print $2}')
-  #local remote_pkgverrel=$(echo "$RR_REMOTE_PACKAGES" | grep "retroroot-$1" | grep -E "(^| )$2( |$)" | awk '{print $3}')
-  local remote_pkgverrel=$(echo "$RR_REMOTE_PACKAGES" | grep "retroroot-$1" | grep -E "$2" | awk '{print $3}' | head -1)
+  local remote_pkgverrel=$(echo "$RR_REMOTE_PACKAGES" | grep "retroroot-$1" | grep -E "$2( |$)" | awk '{print $3}' | head -1)
   if [ -z "$remote_pkgverrel" ]; then
     remote_pkgverrel="n/a"
   fi
@@ -131,7 +130,7 @@ function build_package() {
   export CARCH=${RR_ARCH}
   
   # let's go...
-  makepkg -Cfd || die "build_package: makepkg failed"
+  PKGEXT='.pkg.tar.xz' makepkg -Cfd || die "build_package: makepkg failed"
   
   # umount sysroot image
   umount_image || die "build_package: umount_image failed"
@@ -151,10 +150,10 @@ function check_install_toolchain() {
   if [ ! -f "${RR_ROOT_PATH}/output/toolchains/${ARCH}/bin/${ARCH}-linux-gnu-gcc" ]; then
     echo -e "${COL_G}rr_build${COL_N}: ${ARCH} toolchain not found, installing..."
     mkdir -p "${RR_ROOT_PATH}/output/toolchains/${ARCH}"
-    if [ ! -f "${RR_ROOT_PATH}/output/toolchains/gcc-linaro-${ARCH}.tar.xz" ]; then
-      wget "${URL}" -O "${RR_ROOT_PATH}/output/toolchains/gcc-linaro-${ARCH}.tar.xz"
+    if [ ! -f "${RR_ROOT_PATH}/output/toolchains/gcc-${ARCH}.tar.xz" ]; then
+      wget "${URL}" -O "${RR_ROOT_PATH}/output/toolchains/gcc-${ARCH}.tar.xz"
     fi
-    tar xJf "${RR_ROOT_PATH}/output/toolchains/gcc-linaro-${ARCH}.tar.xz" --strip-components=1 -C "${RR_ROOT_PATH}/output/toolchains/${ARCH}"
+    tar xJf "${RR_ROOT_PATH}/output/toolchains/gcc-${ARCH}.tar.xz" --strip-components=1 -C "${RR_ROOT_PATH}/output/toolchains/${ARCH}"
     # create symlinks for conveniance (arm-linux-gnueabihf > armv7h-linux-gnu)
     if [ ! -f "${RR_ROOT_PATH}/output/toolchains/${ARCH}/bin/${ARCH}-linux-gnu-gcc" ]; then
       pushd "${RR_ROOT_PATH}/output/toolchains/${ARCH}/bin" &> /dev/null
@@ -166,6 +165,7 @@ function check_install_toolchain() {
       done
       popd &> /dev/null
     fi
+    rm -f "${RR_ROOT_PATH}/output/toolchains/gcc-${ARCH}.tar.xz"
   else
     echo -e "${COL_G}rr_build${COL_N}: ${ARCH} toolchain already installed..."
   fi
@@ -209,6 +209,7 @@ function build_packages() {
   # check for toolchains installation
   check_install_toolchain armv7h ${RR_TOOLCHAIN_LINK_ARMV7H}
   check_install_toolchain aarch64 ${RR_TOOLCHAIN_LINK_AARCH64}
+  check_install_toolchain riscv64 ${RR_TOOLCHAIN_LINK_RISCV64}
   
   # sync pacman packages
   pacman_sync
@@ -230,7 +231,7 @@ function build_packages() {
 
     # build a "target" package
     if [ -z ${RR_BUILD_ARCH+x} ]; then
-      ARCHS="x86_64 armv7h aarch64"
+      ARCHS="x86_64 armv7h aarch64 riscv64"
     else
       ARCHS="$RR_BUILD_ARCH"
     fi

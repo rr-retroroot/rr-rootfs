@@ -4,7 +4,7 @@ pkgname=rr-recovery
 pkgver=1
 pkgrel=1
 pkgdesc="RetroRoot Recovery"
-arch=('x86_64' 'armv7h' 'aarch64')
+arch=('x86_64' 'armv7h' 'aarch64' 'riscv64')
 license=('GPL')
 url='https://github.com/rr-retroroot/rr-recovery'
 

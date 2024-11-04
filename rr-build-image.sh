@@ -14,7 +14,7 @@ source scripts/utility.sh
 
 show_usage() {
   echo ""
-  echo "usage: $(basename "$0") [-a x86_64|armv7h|aarch64] [-p desktop|rpi|rg353|surfacert|sysroot] [-i packages] [-c]"
+  echo "usage: $(basename "$0") [-a x86_64|armv7h|aarch64|riscv64] [-p desktop|rpi|rg353|surfacert|licheervnano|sysroot] [-i packages] [-c]"
   echo ""
   echo "examples:"
   echo "       $(basename "$0") -a x86_64 -p desktop                      | build x86_64 desktop image"
@@ -59,12 +59,13 @@ main() {
   fi
 
   # shellcheck disable=SC2086
-  if [ "$RR_ARCH" != "x86_64" ] && [ "$RR_ARCH" != "armv7h" ] && [ $RR_ARCH != "aarch64" ]; then
-    echo "error: supported arch: x86_64, armv7h, aarch64"
+  if [ "$RR_ARCH" != "x86_64" ] && [ "$RR_ARCH" != "armv7h" ] && [ $RR_ARCH != "aarch64" ] && [ $RR_ARCH != "riscv64" ]; then
+    echo "error: supported arch: x86_64, armv7h, aarch64, riscv64"
     return 1
   fi
 
-  if [ $RR_PLATFORM != "desktop" ] && [ $RR_PLATFORM != "rpi" ] && [ $RR_PLATFORM != "rg353" ] && [ $RR_PLATFORM != "surfacert" ] && [ $RR_PLATFORM != "sysroot" ]; then
+  if [ $RR_PLATFORM != "desktop" ] && [ $RR_PLATFORM != "rpi" ] && [ $RR_PLATFORM != "rg353" ] \
+    && [ $RR_PLATFORM != "surfacert" ] && [ $RR_PLATFORM != "licheervnano" ] && [ $RR_PLATFORM != "sysroot" ]; then
     echo "error: supported platform: sysroot, desktop, rpi, rg353, surfacert"
     return 1
   fi

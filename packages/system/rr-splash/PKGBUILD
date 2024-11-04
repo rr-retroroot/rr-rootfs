@@ -4,7 +4,7 @@ pkgname=rr-splash
 pkgver=1
 pkgrel=1
 pkgdesc="RetroRoot splash screen utility"
-arch=('x86_64' 'armv7h' 'aarch64')
+arch=('x86_64' 'armv7h' 'aarch64' 'riscv64')
 license=('GPL')
 
 commit=6239336c4685aaa13b038a13efd8807fd886cc15
@@ -25,9 +25,9 @@ sha512sums=('SKIP')
 build() {
   cd rr-splash
 
-  source /opt/retroroot/rr-env ${CARCH}
+  source ${RETROROOT_HOME}/bin/rr-env
 
-  retroroot-cmake \
+  rr-cmake \
     -Bbuild \
     -DCMAKE_INSTALL_PREFIX=${RETROROOT_PREFIX}
 
