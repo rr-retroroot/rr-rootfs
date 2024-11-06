@@ -40,12 +40,16 @@ run() {
 main() {
   # parse args
   test $# -eq 0 && set -- "-h"
-  while getopts "a:p:i:ch" ARG; do
+  while getopts "a:p:i:c:rh" ARG; do
     case "$ARG" in
     a) RR_ARCH=$OPTARG ;;
     p) RR_PLATFORM=$OPTARG ;;
     i) RR_PACKAGES=$OPTARG ;;
     c) RR_DO_CHROOT=1 ;;
+    r)
+      run $RR_PLATFORM
+      return 0
+      ;;
     *)
       show_usage
       return 0

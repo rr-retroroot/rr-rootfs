@@ -1,0 +1,61 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=linux-licheervnano
+pkgver=6.12
+pkgrel=1
+pkgdesc="RetroRoot licheerv nano kernel"
+arch=('riscv64')
+license=('GPL')
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'system' 'licheervnano')
+#depends=()
+options=(!debug !strip)
+
+commit=('dc0bf9c8fd7c859a8470968760f29ff4312ecbd0')
+source=("https://github.com/Taumille/linux/archive/${commit}.tar.gz")
+#source=("https://github.com/Cpasjuste/licheerv-nano_linux_5.10/archive/${commit}.tar.gz")
+#source=("git+file:///home/cpasjuste/dev/microcontrollers/licheerv-nano/licheerv-nano_linux_5.10")
+sha512sums=('SKIP')
+
+prepare() {
+  cd "$srcdir/linux-${commit}"
+  
+  # restore our custom config
+  cp "$srcdir/../licheervnano_defconfig" .config
+  
+  # setup retroroot cross compiler toolchain
+  source ${RETROROOT_HOME}/bin/rr-env
+  
+  make ARCH=riscv olddefconfig
+}
+
+build() {
+  cd "$srcdir/linux-${commit}"
+  
+  # setup retroroot cross compiler toolchain
+  source ${RETROROOT_HOME}/bin/rr-env
+  
+  yes "" | make $MAKEFLAGS ARCH=riscv CROSS_COMPILE=${RETROROOT_CROSS_PREFIX} \
+    KBUILD_BUILD_VERSION="$((pkgrel + 0))-retroroot"
+}
+
+package() {
+  cd "$srcdir/linux-${commit}"
+
+  # install kernel image and dtb
+  install -d "$pkgdir"/boot
+  cp arch/riscv/boot/Image.gz "$pkgdir"/boot/zImage
+  cp arch/riscv/boot/dts/sophgo/sg2002-licheerv-nano-b.dtb "$pkgdir"/boot
+
+  # install kernel modules
+  make ARCH=riscv INSTALL_MOD_PATH="$pkgdir"/usr modules_install
+  # remove build and source links
+  rm -rf "$pkgdir"/usr/lib/modules/${pkgver}/{source,build}
+
+  # TODO: install kernel headers
+  #make INSTALL_HDR_PATH="$pkgdir"/usr header_install
+
+  # copy surfacert rootfs overlays
+  cp -r "$startdir"/overlay/. "${pkgdir}"
+}
+
