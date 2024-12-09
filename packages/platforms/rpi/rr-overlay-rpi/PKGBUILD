@@ -2,7 +2,7 @@
 
 pkgname=rr-overlay-rpi
 pkgver=1
-pkgrel=2
+pkgrel=6
 pkgdesc="RetroRoot rootfs overlay (rpi)"
 arch=('aarch64')
 license=('GPL')
@@ -14,10 +14,10 @@ groups=('retroroot' 'system' 'rpi')
 # are in "retroroot-sysroot-*arch*" toolchain package. If not present in sysroot,
 # the package should build and link a static library here.
 # "system" packages are specials...
-depends=('rr-overlay')
+depends=('rr-overlay' 'linux-rpi' 'firmware-raspberrypi' 'raspberrypi-bootloader')
 
 package() {
   # copy rpi rootfs overlays
-  cp -r "$startdir"/overlay/etc "${pkgdir}"
+  cp -r "$startdir"/overlay/. "${pkgdir}"
 }
 

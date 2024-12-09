@@ -23,7 +23,8 @@ export RR_PACKAGES=${RR_PACKAGES}" \
   unzip \
   vsftpd \
   inetutils \
-  wireless-regdb  \
+  iwd \
+  wireless-regdb \
   alsa-utils
 "
 

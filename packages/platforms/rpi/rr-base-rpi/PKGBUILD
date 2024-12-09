@@ -2,7 +2,7 @@
 
 pkgname=rr-base-rpi
 pkgver=1
-pkgrel=1
+pkgrel=3
 pkgdesc="RetroRoot base system (rpi)"
 arch=('aarch64')
 license=('GPL')
@@ -14,5 +14,9 @@ groups=('retroroot' 'system')
 # are in "retroroot-sysroot-*arch*" toolchain package. If not present in sysroot,
 # the package should build and link a static library here.
 # "system" packages are specials...
-depends=('rr-base' 'rr-overlay-rpi')
+depends=(
+  'rr-base' 'rr-overlay-rpi'
+  'mesa' 'mesa-vdpau' 'libva-mesa-driver'
+  'linux-rpi' 'firmware-raspberrypi' 'raspberrypi-bootloader'
+)
 

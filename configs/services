@@ -3,13 +3,17 @@
 source /retroroot/configs/vars
 
 export RR_SERVICES=" \
-  systemd-networkd \
-  systemd-resolved \
-  systemd-timesyncd \
-  sshd
+  retroroot
 "
-#  retroroot iwd \
+
+# we want minimal set of services, this can be activated manually for now if needed...
+# systemd-networkd \
+# systemd-resolved \
+# systemd-timesyncd \
+# iwd \
+# sshd
 
 if [ -f "/retroroot/configs/services-${RR_PLATFORM}" ]; then
   source "/retroroot/configs/services-${RR_PLATFORM}"
 fi
+

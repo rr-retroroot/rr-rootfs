@@ -1,0 +1,15 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=rr-base-sysroot
+pkgver=1
+pkgrel=4
+pkgdesc="RetroRoot base system (sysroot)"
+arch=('x86_64' 'aarch64' 'armv7h' 'riscv64')
+license=('GPL')
+options=(!debug !strip)
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'system' 'sysroot')
+
+depends=('rr-base')
+

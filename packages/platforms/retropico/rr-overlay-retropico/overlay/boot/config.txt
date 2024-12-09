@@ -1,0 +1,36 @@
+camera_auto_detect=0
+display_auto_detect=0
+disable_fw_kms_setup=1
+disable_overscan=1
+hdmi_force_hotplug=0
+
+initramfs initramfs-linux.img followkernel
+
+[all]
+arm_boost=1
+arm_64bit=1
+
+dtoverlay=vc4-kms-v3d
+max_framebuffers=2
+gpu_mem_256=64
+gpu_mem_512=64
+gpu_mem_1024=256
+
+# debug uart
+enable_uart=1
+dtoverlay=disable-bt
+dtparam=spi=on
+dtparam=i2c1=on
+dtparam=i2c_arm=on
+dtoverlay=mipi-dbi-spi,spi0-0,speed=120000000
+dtparam=compatible=st7789_drm\0panel-mipi-dbi-spi
+dtparam=width=240,height=320
+#,width-mm=49,height-mm=37
+dtparam=dc-gpio=17,reset-gpio=27,backlight-gpio=22
+dtparam=write-only
+
+dtparam=audio=off
+dtoverlay=max98357a,no-sdmode
+
+include usercfg.txt
+

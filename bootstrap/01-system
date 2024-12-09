@@ -48,9 +48,11 @@ echo "
 root ALL=(ALL) ALL
 ${RR_USERNAME} ALL=(ALL) ALL
 #includedir /etc/sudoers.d
-" >/etc/sudoers
+" > /etc/sudoers
 
 # enable services
-source /retroroot/configs/services
-systemctl enable ${RR_SERVICES}
+if [ "${RR_PLATFORM}" != "sysroot" ]; then
+  source /retroroot/configs/services
+  systemctl enable ${RR_SERVICES}
+fi
 

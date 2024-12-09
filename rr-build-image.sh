@@ -26,7 +26,7 @@ show_usage() {
 run() {
   if [ "$1" == "desktop" ]; then
     qemu-img resize -f raw "output/retroroot-x86_64-desktop.img" 4G
-    qemu-system-x86_64 -m 2G -smp 4 \
+    qemu-system-x86_64 -enable-kvm -m 2G -smp 4 \
       -serial stdio \
       -device virtio-vga-gl -display sdl,gl=on \
       -device e1000,netdev=net0 -netdev user,id=net0,hostfwd=tcp::5555-:22 \
@@ -40,7 +40,7 @@ run() {
 main() {
   # parse args
   test $# -eq 0 && set -- "-h"
-  while getopts "a:p:i:c:rh" ARG; do
+  while getopts "a:p:i:crh" ARG; do
     case "$ARG" in
     a) RR_ARCH=$OPTARG ;;
     p) RR_PLATFORM=$OPTARG ;;
@@ -68,9 +68,9 @@ main() {
     return 1
   fi
 
-  if [ $RR_PLATFORM != "desktop" ] && [ $RR_PLATFORM != "rpi" ] && [ $RR_PLATFORM != "rg353" ] \
-    && [ $RR_PLATFORM != "surfacert" ] && [ $RR_PLATFORM != "licheervnano" ] && [ $RR_PLATFORM != "sysroot" ]; then
-    echo "error: supported platform: sysroot, desktop, rpi, rg353, surfacert"
+  # check if platform exists
+  if [ ! -d "packages/platforms/$RR_PLATFORM" ]; then
+    echo "error: platform not found: packages/platforms/$RR_PLATFORM"
     return 1
   fi
 

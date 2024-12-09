@@ -19,7 +19,6 @@ depends=(
   'rr-base'
   'syslinux' 'gptfdisk' 'mtools'
   'linux' 'linux-firmware' 'amd-ucode' 'intel-ucode'
-  'iwd'
 )
 
 package() {
