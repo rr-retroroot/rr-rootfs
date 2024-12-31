@@ -52,9 +52,9 @@ function upload_pkg() {
   local pkgarch=$3
   local pkgfile=$(find $pkgpath/$pkgname-*-$pkgarch.pkg.tar.xz  -printf "%f\n")
   echo -e "${COL_G}upload_pkg:${COL_N} uploading ${COL_G}$pkgname${COL_N} ($pkgarch) to retroroot repo"
-  scp -P 2222 "$pkgpath/$pkgfile" "$RR_SSH_USER@$RR_SSH_HOST:/home/pacman/retroroot/packages/$pkgarch" || die "upload_pkg: scp to $RR_SSH_HOST failed"
+  scp "$pkgpath/$pkgfile" "$RR_SSH_USER@$RR_SSH_HOST:/home/pacman/retroroot/packages/$pkgarch" || die "upload_pkg: scp to $RR_SSH_HOST failed"
   echo -e "${COL_G}upload_pkg:${COL_N} adding ${COL_G}$pkgname${COL_N} ($pkgarch) to retroroot repo"
-  ssh -p 2222 "$RR_SSH_USER@$RR_SSH_HOST" repo-add \
+  ssh "$RR_SSH_USER@$RR_SSH_HOST" repo-add \
     /home/pacman/retroroot/packages/$pkgarch/retroroot-$pkgarch.db.tar.gz \
     /home/pacman/retroroot/packages/$pkgarch/$pkgfile \
     || die "upload_pkg: repo-add failed"
