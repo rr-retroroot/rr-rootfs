@@ -26,9 +26,9 @@ if [ "${RR_PLATFORM}" != "sysroot" ]; then
   pacman --noconfirm -S --needed --overwrite "*" rr-base-"${RR_PLATFORM}"
 fi
 
-# install retroroot emulation stuff
+# TODO: install retroroot frontend
 #if [ "${RR_PLATFORM}" != "sysroot" ]; then
-#  pacman --noconfirm -S --needed rr-emulation-base
+  #pacman --noconfirm -S --needed retropico
 #fi
 
 # set root passwd

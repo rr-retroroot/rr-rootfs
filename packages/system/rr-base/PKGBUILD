@@ -2,7 +2,7 @@
 
 pkgname=rr-base
 pkgver=1
-pkgrel=5
+pkgrel=6
 pkgdesc="RetroRoot base system"
 arch=('x86_64' 'aarch64' 'armv7h' 'riscv64')
 license=('GPL')

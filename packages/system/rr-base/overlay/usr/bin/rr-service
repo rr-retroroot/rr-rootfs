@@ -24,11 +24,10 @@ kill_splah() {
 # stop splash
 kill_splah
 
-# run recovery if needed, else rr-launcher
+# run recovery if needed, else retropico
 if need_recovery; then
   /usr/bin/rr-recovery
 else
-  # TODO
-  echo TODO
+  /usr/bin/retropico
 fi
 
