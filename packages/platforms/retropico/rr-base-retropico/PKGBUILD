@@ -2,7 +2,7 @@
 
 pkgname=rr-base-retropico
 pkgver=1
-pkgrel=2
+pkgrel=3
 pkgdesc="RetroRoot base system (retropico)"
 arch=('aarch64')
 license=('GPL')
@@ -10,5 +10,12 @@ license=('GPL')
 # every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
 groups=('retroroot' 'system' 'rpi' 'retropico')
 
-depends=('rr-base-rpi' 'rr-overlay-retropico')
+depends=('rr-base-rpi')
+
+package() {
+  cd "$srcdir"
+  
+	# copy rootfs overlays
+  cp -r "$startdir"/overlay/. "${pkgdir}"
+}
 

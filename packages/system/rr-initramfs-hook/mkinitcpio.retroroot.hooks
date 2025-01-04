@@ -1,15 +1,78 @@
 #!/usr/bin/ash
 
+get_root_partition() {
+  local partition="`basename $(blkid -L "RR-BOOT")`" || launch_interactive_shell
+  echo $partition
+}
+
+get_root_device() {
+  local partition=$ROOT_PARTITION
+  local device="/dev/`basename $(readlink -f "/sys/class/block/$partition/..")`" || launch_interactive_shell
+  echo $device
+}
+
+get_root_device_size() {
+  local size=$(parted -s $ROOT_DEVICE 'unit MiB print' | sed -n '2p' | rev | cut -d' ' -f1 | rev) \
+    || launch_interactive_shell
+  echo ${size::-3}
+}
+
+get_size_percent() {
+  local wanted_size=$1
+  local disk_size=$ROOT_DEVICE_SIZE
+  echo $((wanted_size * 100 / disk_size))
+}
+
+create_root_overlay_partition() {
+  local wanted_size_percent=$(get_size_percent 2048)
+  echo "Creating overlay partition \"${OVERLAY_PARTITION}\" on \"${ROOT_DEVICE}\", please wait..."
+  parted -f -a optimal -s ${ROOT_DEVICE} \
+    mkpart primary ext4 ${wanted_size_percent}% 100% \
+    || launch_interactive_shell
+  partprobe
+  echo "Formating overlay partition \"${OVERLAY_PARTITION}\", please wait..."
+  mke2fs -F -t ext4 -L "RR-OVERLAY" ${OVERLAY_PARTITION} || launch_interactive_shell
+}
+
 run_latehook() {
+  # umount "new_root"
+  umount /new_root || launch_interactive_shell
+
   if [ "${recovery}" != "1" ]; then
    if [ -n "${splash}" ]; then
       # not in recovery and splash screen requested, show splash screen
       rr-splash /dev/fb0 /logo.png &
     fi
-    # umount "new_root"
-    umount /new_root || launch_interactive_shell
-    mount -L RR-ROOT -o rw,defaults /new_root || launch_interactive_shell
-    mount -L RR-BOOT -o rw,defaults /new_root/boot || launch_interactive_shell
- fi
+    
+    # get "RR-ROOT" device informations
+    ROOT_PARTITION=$(get_root_partition)
+    ROOT_DEVICE=$(get_root_device)
+    ROOT_DEVICE_SIZE=$(get_root_device_size)
+    OVERLAY_PARTITION="/dev/${ROOT_PARTITION%?}3"
+
+    # now create root overlay partition if needed
+    blkid | grep "RR-OVERLAY"
+    if [ $? -ne 0 ]; then
+      create_root_overlay_partition
+    fi
+  fi
+  
+  # retroroot rootfs overlay
+  mkdir -p /overlay || launch_interactive_shell
+
+  # mount data partition
+  if [ "${recovery}" = "1" ]; then
+    mount -t tmpfs -o size=128M tmpfs /overlay || launch_interactive_shell
+  else
+    mount -L "RR-OVERLAY" -o rw,defaults /overlay || launch_interactive_shell
+  fi
+
+  # create directories
+  mkdir -p /overlay/lower /overlay/upper /overlay/work || launch_interactive_shell
+
+  # mount root overlay
+  mount -L "RR-ROOT" -o ro,defaults /overlay/lower || launch_interactive_shell
+  mount -t overlay overlay -o lowerdir=/overlay/lower,upperdir=/overlay/upper,workdir=/overlay/work /new_root \
+    || launch_interactive_shell
 }
 

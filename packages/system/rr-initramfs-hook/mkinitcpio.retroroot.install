@@ -1,7 +1,7 @@
 #!/bin/bash
 
 build() {
-  # "RR-DATA" partition creation
+  # "RR-OVERLAY" partition creation
   add_binary parted
   add_binary mke2fs
   #add_binary mkfs.exfat

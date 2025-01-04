@@ -2,7 +2,7 @@
 
 pkgname=rr-base
 pkgver=1
-pkgrel=6
+pkgrel=7
 pkgdesc="RetroRoot base system"
 arch=('x86_64' 'aarch64' 'armv7h' 'riscv64')
 license=('GPL')
@@ -16,6 +16,9 @@ groups=('retroroot' 'system')
 # the package should build and link a static library here.
 # "system" packages are specials...
 depends=('rr-initramfs-hook')
+
+# we don't want ~800mb of firmwares files
+provides=('linux-firmware')
 
 package() {
   cd "$srcdir"

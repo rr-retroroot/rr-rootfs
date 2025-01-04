@@ -61,6 +61,12 @@ function umount_image() {
 # create_image
 function create_image() {
   minfo "create_image: ${RR_OUTPUT_IMG}"
+  
+  if [ "${RR_PLATFORM}" == "desktop" ]; then
+    # so we can (re)create rootfs overlay partition from initramfs
+    # even after expending the image for testing
+    rm -f "${RR_OUTPUT_IMG}"
+  fi
 
   if [ ! -f "${RR_OUTPUT_IMG}" ]; then
     minfo "create_image: creating image with dd (${RR_OUTPUT_IMG})"

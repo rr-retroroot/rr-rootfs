@@ -14,7 +14,7 @@ source scripts/utility.sh
 
 show_usage() {
   echo ""
-  echo "usage: $(basename "$0") [-a x86_64|armv7h|aarch64|riscv64] [-p desktop|rpi|rg353|surfacert|licheervnano|sysroot] [-i packages] [-c]"
+  echo "usage: $(basename "$0") [-a x86_64|armv7h|aarch64|riscv64] [-p desktop|rpi|rg353|surfacert|retropico|sysroot] [-i packages] [-c]"
   echo ""
   echo "examples:"
   echo "       $(basename "$0") -a x86_64 -p desktop                      | build x86_64 desktop image"

@@ -4,7 +4,7 @@ set -xe
 
 source /retroroot/configs/vars "$@"
 
-if [ "${RR_PLATFORM}" != "rpi" ]; then
+if [ "${RR_PLATFORM}" != "retropico" ]; then
   exit 0;
 fi
 
