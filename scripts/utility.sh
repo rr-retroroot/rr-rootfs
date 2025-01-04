@@ -68,18 +68,19 @@ function create_image() {
       # "sysroot" platform is used for cross compilation of packages, use a bigger image
       dd if=/dev/zero of="${RR_OUTPUT_IMG}" bs=1M count=4096 >/dev/null 2>&1 || :
     else
-      dd if=/dev/zero of="${RR_OUTPUT_IMG}" bs=1M count=3072 >/dev/null 2>&1 || :
+      dd if=/dev/zero of="${RR_OUTPUT_IMG}" bs=1M count=2048 >/dev/null 2>&1 || :
     fi
   fi
   
   # create "RR-BOOT" partition
-  parted -a optimal -s "${RR_OUTPUT_IMG}" mklabel msdos
-  # TODO: revert this for rg353v
-  #parted -a optimal -s "${RR_OUTPUT_IMG}" mklabel gpt
-  #parted -a optimal -s ${RR_OUTPUT_IMG} unit s mkpart uboot 16384 24575
-  #parted -a optimal -s ${RR_OUTPUT_IMG} unit s mkpart resource 24576 32767
+  if [ "${RR_PLATFORM}" == "surfacert" ]; then
+    parted -a optimal -s "${RR_OUTPUT_IMG}" mklabel gpt
+  else
+    parted -a optimal -s "${RR_OUTPUT_IMG}" mklabel msdos
+  fi
   parted -a optimal -s "${RR_OUTPUT_IMG}" mkpart primary fat32 0% 256MiB
-  
+  parted -a optimal -s "${RR_OUTPUT_IMG}" set 1 boot on
+
   # create "RR-ROOT" partition
   if [ "${RR_PLATFORM}" == "surfacert" ]; then
     # TODO: fix ext4 on surfacert
