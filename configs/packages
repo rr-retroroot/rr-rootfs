@@ -25,6 +25,7 @@ export RR_PACKAGES=${RR_PACKAGES}" \
   inetutils \
   iwd \
   wireless-regdb \
-  alsa-utils
+  alsa-utils \
+  fbset
 "
 

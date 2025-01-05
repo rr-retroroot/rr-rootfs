@@ -2,7 +2,7 @@
 
 pkgname=rr-base-retropico
 pkgver=1
-pkgrel=3
+pkgrel=7
 pkgdesc="RetroRoot base system (retropico)"
 arch=('aarch64')
 license=('GPL')

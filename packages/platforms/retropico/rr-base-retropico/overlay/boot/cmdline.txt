@@ -1,5 +1,7 @@
-root=LABEL=RR-BOOT usb-storage.quirks=152d:0578:u audit=0 console=serial0,115200 consoleblank=0 vt.global_cursor_default=0 loglevel=3
-# console=tty3 quiet splash
+root=LABEL=RR-BOOT usb-storage.quirks=152d:0578:u audit=0 console=serial0,115200 consoleblank=0 vt.global_cursor_default=0 loglevel=3 splash platform=retropico
+# console=tty3 quiet
+
+# root=LABEL=RR-BOOT
 
 # debug
 # loglevel=3

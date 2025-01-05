@@ -3,22 +3,32 @@ display_auto_detect=0
 disable_fw_kms_setup=1
 disable_overscan=1
 hdmi_force_hotplug=0
+enable_tvout=0
 
 initramfs initramfs-linux.img followkernel
+
+# boot speed-up
+disable_splash=1
+boot_delay=0
+dtoverlay=disable-bt
+
+# don't try to read HDMI eeprom
+hdmi_blanking=2
+hdmi_ignore_edid=0xa5000080
+hdmi_ignore_cec_init=1
+hdmi_ignore_cec=1
 
 [all]
 arm_boost=1
 arm_64bit=1
 
-dtoverlay=vc4-kms-v3d
+dtoverlay=vc4-kms-v3d,nohdmi
 max_framebuffers=2
 gpu_mem_256=64
 gpu_mem_512=64
 gpu_mem_1024=256
 
-# debug uart
 enable_uart=1
-dtoverlay=disable-bt
 dtparam=spi=on
 dtparam=i2c1=on
 dtparam=i2c_arm=on
@@ -33,4 +43,3 @@ dtparam=audio=off
 dtoverlay=max98357a,no-sdmode
 
 include usercfg.txt
-

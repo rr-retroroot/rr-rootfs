@@ -41,9 +41,17 @@ run_latehook() {
   if [ "${recovery}" != "1" ]; then
    if [ -n "${splash}" ]; then
       # not in recovery and splash screen requested, show splash screen
-      rr-splash /dev/fb0 /logo.png &
+      if [ "${platform}" == "retropico" ]; then
+        echo 0 > /sys/class/backlight/backlight_gpio/bl_power
+        echo 1 > /sys/class/backlight/backlight_gpio/brightness
+        # TODO: fix rr-splash to correctly init framebuffer device
+        fbset -fb /dev/fb1 -g 240 320 240 320 24
+        rr-splash /dev/fb1 /logo.png &
+      else
+        rr-splash /dev/fb0 /logo.png &
+      fi
     fi
-    
+
     # get "RR-ROOT" device informations
     ROOT_PARTITION=$(get_root_partition)
     ROOT_DEVICE=$(get_root_device)

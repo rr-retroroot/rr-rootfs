@@ -2,7 +2,7 @@
 
 pkgname=rr-base-rpi
 pkgver=1
-pkgrel=6
+pkgrel=7
 pkgdesc="RetroRoot base system (rpi)"
 arch=('aarch64')
 license=('GPL')

@@ -7,8 +7,7 @@ source /retroroot/configs/vars "$@"
 echo "rr-run-parts: $(basename "$0")"
 
 # update fstab
-#echo "LABEL=RR-ROOT   /           ext4    defaults  0 1" >> /etc/fstab
-echo "LABEL=RR-BOOT   /boot       vfat    ro,defaults  0 0" >> /etc/fstab
+echo "LABEL=RR-BOOT   /boot       vfat    defaults  0 0" >> /etc/fstab
 
 # set hostname
 echo "retroroot" > /etc/hostname
