@@ -26,12 +26,12 @@ show_usage() {
 run() {
   if [ "$1" == "desktop" ]; then
     qemu-img resize -f raw "output/retroroot-x86_64-desktop.img" 4G
-    qemu-system-x86_64 -enable-kvm -m 2G -smp 4 \
+    qemu-system-x86_64 -enable-kvm -m 1G -smp 4 \
       -serial stdio \
-      -device virtio-vga-gl -display sdl,gl=on \
-      -device e1000,netdev=net0 -netdev user,id=net0,hostfwd=tcp::5555-:22 \
+      -device e1000,netdev=net0 -netdev user,id=net0,hostfwd=tcp::2222-:22 \
       -usbdevice mouse \
       -drive format=raw,file="output/retroroot-x86_64-desktop.img"
+    #-device virtio-vga-gl -display sdl,gl=on \
   else
     echo "TODO"
   fi
@@ -40,12 +40,14 @@ run() {
 main() {
   # parse args
   test $# -eq 0 && set -- "-h"
-  while getopts "a:p:i:crh" ARG; do
+  while getopts "a:p:i:cmurh" ARG; do
     case "$ARG" in
     a) RR_ARCH=$OPTARG ;;
     p) RR_PLATFORM=$OPTARG ;;
     i) RR_PACKAGES=$OPTARG ;;
     c) RR_DO_CHROOT=1 ;;
+    m) RR_DO_MOUNT=1 ;;
+    u) RR_DO_UMOUNT=1 ;;
     r)
       run $RR_PLATFORM
       return 0
@@ -90,6 +92,10 @@ main() {
     mount_image
     minfo "chroot ${MOUNT_ROOT}"
     sudo arch-chroot ${MOUNT_ROOT} /bin/bash
+    umount_image
+  elif [ "${RR_DO_MOUNT}" == 1 ]; then
+    mount_image
+  elif [ "${RR_DO_UMOUNT}" == 1 ]; then
     umount_image
   else
     # create image and rootfs

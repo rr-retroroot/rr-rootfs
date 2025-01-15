@@ -2,7 +2,7 @@
 
 pkgname=rr-base
 pkgver=1
-pkgrel=8
+pkgrel=17
 pkgdesc="RetroRoot base system"
 arch=('x86_64' 'aarch64' 'armv7h' 'riscv64')
 license=('GPL')
@@ -15,10 +15,24 @@ groups=('retroroot' 'system')
 # are in "retroroot-sysroot-*arch*" toolchain package. If not present in sysroot,
 # the package should build and link a static library here.
 # "system" packages are specials...
-depends=('rr-initramfs-hook')
+depends=(
+  'base'
+  'run-parts' 'mkinitcpio' 'dosfstools'
+  'net-tools' 'fakeroot'
+  'bash-completion' 'sudo' 'nano'
+  'unzip' 'wget' 'less' 'strace'
+  'openssh' 'vsftpd'
+  'inetutils' 'iwd' 'wireless-regdb'
+  'sdl2' 'mesa' 'fbset' 'alsa-utils'
+  'rr-initramfs-hook'
+  'retropico'
+)
 
 # we don't want ~800mb of firmwares files
 provides=('linux-firmware')
+
+# system setup
+install=rr-base.install
 
 package() {
   cd "$srcdir"

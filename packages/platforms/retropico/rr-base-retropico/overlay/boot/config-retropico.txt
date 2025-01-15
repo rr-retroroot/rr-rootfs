@@ -11,35 +11,48 @@ initramfs initramfs-linux.img followkernel
 disable_splash=1
 boot_delay=0
 dtoverlay=disable-bt
-
+#dtoverlay=disable-wifi
 # don't try to read HDMI eeprom
 hdmi_blanking=2
 hdmi_ignore_edid=0xa5000080
 hdmi_ignore_cec_init=1
 hdmi_ignore_cec=1
 
+[pi02]
+arm_freq=1000
+# for 90mhz spi clock
+core_freq=360
+core_freq_min=360
+
 [all]
 arm_boost=1
 arm_64bit=1
+force_turbo=1
 
+# debug
+enable_uart=1
+
+# 3d driver
 dtoverlay=vc4-kms-v3d,nohdmi
 max_framebuffers=2
 gpu_mem_256=64
 gpu_mem_512=64
 gpu_mem_1024=256
 
-enable_uart=1
+# display
 dtparam=spi=on
-dtparam=i2c1=on
-dtparam=i2c_arm=on
-dtoverlay=mipi-dbi-spi,spi0-0,speed=120000000
+dtoverlay=mipi-dbi-spi,spi0-0,speed=90000000
 dtparam=compatible=st7789_drm\0panel-mipi-dbi-spi
 dtparam=width=240,height=320
 #,width-mm=49,height-mm=37
 dtparam=dc-gpio=17,reset-gpio=27,backlight-gpio=22
 dtparam=write-only
 
+# audio
 dtparam=audio=off
+dtparam=i2c1=on
+dtparam=i2c_arm=on
 dtoverlay=max98357a,no-sdmode
 
 include usercfg.txt
+

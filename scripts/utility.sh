@@ -13,6 +13,10 @@ function minfo() {
 
 # cleanup on exit
 function image_cleanup {
+  if [ "${RR_DO_MOUNT}" == 1 ]; then
+    return 0
+  fi
+
   if [ $? -ne 0 ]; then
     merror 'something went wrong...'
   fi
@@ -118,16 +122,15 @@ function create_image() {
 
 function create_rootfs() {
   # create minimal rootfs with pacstrap and specifed packages
-  source "${RR_ROOT_PATH}"/configs/packages
-  minfo "create_rootfs: creating rootfs with specified packages: ${RR_PACKAGES}"
-  sudo pacstrap -c -K -M -C "${RR_ROOT_PATH}"/configs/pacman-"${RR_ARCH}".conf ${MOUNT_ROOT} ${RR_PACKAGES}
+  minfo "create_rootfs: running pacstrap"
+  sudo pacstrap -c -K -M -G -C "${RR_ROOT_PATH}"/packages/system/rr-base/overlay/etc/pacman-"${RR_ARCH}".conf ${MOUNT_ROOT} rr-base-${RR_PLATFORM}
   # TODO: https://gitlab.archlinux.org/archlinux/arch-install-scripts/-/issues/56
   sudo killall gpg-agent
 
   # boostrap rootfs for custom platform packages and retroroot setup
-  minfo "create_rootfs: running bootstrap scripts..."
-  sudo cp -f "${RR_ROOT_PATH}"/configs/pacman-"${RR_ARCH}".conf "${MOUNT_ROOT}"/etc/pacman.conf
-  sudo arch-chroot ${MOUNT_ROOT} run-parts --exit-on-error -a "${RR_PLATFORM}" -a "${RR_ARCH}" /retroroot/bootstrap
+  #minfo "create_rootfs: running bootstrap scripts..."
+  #sudo cp -f "${RR_ROOT_PATH}"/configs/pacman-"${RR_ARCH}".conf "${MOUNT_ROOT}"/etc/pacman.conf
+  #sudo arch-chroot ${MOUNT_ROOT} run-parts --exit-on-error -a "${RR_PLATFORM}" -a "${RR_ARCH}" /retroroot/bootstrap
 }
 
 function install_package() {

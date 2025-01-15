@@ -1,0 +1,14 @@
+# custom desktop stuff
+
+post_install () {
+  post_upgrade
+}
+
+post_upgrade() {
+  # install desktop bootloader (todo: uefi)
+  syslinux-install_update -iam
+
+  # cleanup boot partition
+  rm -f /boot/initramfs-linux-fallback.img
+}
+

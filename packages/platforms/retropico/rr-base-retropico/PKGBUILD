@@ -2,7 +2,7 @@
 
 pkgname=rr-base-retropico
 pkgver=1
-pkgrel=8
+pkgrel=14
 pkgdesc="RetroRoot base system (retropico)"
 arch=('aarch64')
 license=('GPL')
@@ -10,12 +10,19 @@ license=('GPL')
 # every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
 groups=('retroroot' 'system' 'rpi' 'retropico')
 
-depends=('rr-base-rpi')
+depends=('rr-base-rpi' 'sdl2-kms-rgb565')
+
+# overwrite "rr-base-rpi" cmdline.txt and config.txt
+install=rr-base-retropico.install
 
 package() {
-  cd "$srcdir"
-  
+  cd "$startdir"
+
 	# copy rootfs overlays
-  cp -r "$startdir"/overlay/. "${pkgdir}"
+  cp -r overlay/. "${pkgdir}"
+  
+  # build and copy st7789 mipi-dbi-spi drm "firmware"
+  mkdir -p ${pkgdir}/usr/lib/firmware
+  ./mipi-dbi-cmd ${pkgdir}/usr/lib/firmware/st7789_drm.bin ${pkgdir}/usr/lib/firmware/st7789_drm.txt
 }
 

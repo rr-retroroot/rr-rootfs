@@ -1,37 +1,59 @@
-# ST7789 LCD
-# width=240,height=320
+# ST7789 LCD 240x320
 
-command 0x01  # _SWRESET and Delay 150ms
+command 0x01  # _SWRESET
 delay 150
 
-command 0x11  # _SLPOUT and Delay 10ms
+command 0x11  # _SLPOUT
 delay 10
 
-command 0x3A 0x55  # _COLMOD and Delay 10ms
+#command 0x3A 0x55  # _COLMOD
+command 0x3A 0x05  # _COLMOD
 delay 10
 
-#command 0x36 0x08  # _MADCTL Botton->Top Refresh
-
-command 0x21  # _INVON Hack and Delay 10ms > ST7789 2.0"
-#command 0x20  # _INVON Hack and Delay 10ms > ST7789 2.4"
+# ST7789V Frame rate setting
+command 0xB2 0x0c 0x0c 0x00 0x33 0x33 # ST7789_PORCTRL
+delay 10
+command 0xB7 0x35 # ST7789_GCTRL, 0x35  # VGH / VGL voltages
 delay 10
 
-#command 0x26 0x01 # _GAMSET (2.2)
+# ST7789V Power setting
+command 0xBB 0x28 # ST7789_VCOMS, 0x28 # 
+delay 10
+#command 0xC0 0x0C # ST7789_LCMCTRL, 0x0C
+#delay 10
+#command 0xC2 0x01 0xFF # ST7789_VDVVRHEN, 0x01, 0xFF
+#delay 10
+command 0xC3 0x10 # ST7789_VRHS, 0x10     // voltage VRHS
+delay 10
+command 0xC4 0x20 # ST7789_VDVSET, 0x20
+delay 10
+command 0xC6 0x0f # ST7789_FRCTR2, 0x0f
+delay 10
+command 0xD0 0xa4 0x81 # ST7789_PWCTRL1, 0xa4, 0xa1
+delay 10
+
+# ST7789V gamma setting
+#command 0xE0 0xf0 0x7 0xf 0x0 0x0 0x30 0x28 0x54 0x56 0x3e 0x1e 0x1f 0x37 0x38  # ST7789_PVGAMCTRL
+#delay 10
+#command 0xE1 0xf0 0x7 0xf 0x0 0x0 0x30 0x28 0x54 0x56 0x3e 0x1e 0x1f 0x37 0x38 # ST7789_NVGAMCTRL
 #delay 10
 
-command 0xc6 0x0f # _FRCTR2 (0x0f => 60fps, 0x1a => ...)
+# Gamma curve (G2.5)
+# command 0x26 0x04 # ST7789_GAMSET
+
+#command 0x20  # _INVOFF
+command 0x21  # _INVON
 delay 10
 
 command 0x13  # _NORON and Delay 10ms
 delay 10
 
-# Command 36h sets the read order from frame memory to the display panel
-# Remember to swap width/height on 90/270 rotations if required
+# rotation
 command 0x36 0x00 # rotation 0
 #command 0x36 0xA0 # rotation 90
 #command 0x36 0xC0 # rotation 180
 #command 0x36 0x60 # rotation 270
 
-command 0x29  # _DISPON and Delay 500ms
+command 0x29  # _DISPON
 delay 250
-delay 250
+

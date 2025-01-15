@@ -2,7 +2,7 @@
 
 pkgname=rr-initramfs-hook
 pkgver=1
-pkgrel=36
+pkgrel=39
 pkgdesc="RetroRoot initramfs hook"
 arch=('x86_64' 'armv7h' 'aarch64' 'riscv64')
 license=('GPL')
@@ -18,7 +18,7 @@ depends=('rr-splash' 'parted' 'e2fsprogs' 'util-linux')
 # 'exfatprogs'
 
 source=(
-  'mkinitcpio.conf'
+  'retroroot.conf'
   'mkinitcpio.retroroot.hooks'
   'mkinitcpio.retroroot.install'
   '90-rr-base.hook'
@@ -29,7 +29,7 @@ package() {
   cd "$srcdir"
 
   # mkinitcpio hook (custom initramfs)
-  install -Dm644 mkinitcpio.conf -t "$pkgdir/etc/"
+  install -Dm644 retroroot.conf -t "$pkgdir/etc/mkinitcpio.conf.d"
   install -Dm755 mkinitcpio.retroroot.hooks "$pkgdir/usr/lib/initcpio/hooks/retroroot"
   install -Dm755 mkinitcpio.retroroot.install "$pkgdir/usr/lib/initcpio/install/retroroot"
 

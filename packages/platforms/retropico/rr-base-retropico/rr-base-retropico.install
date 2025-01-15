@@ -1,0 +1,26 @@
+# overwrite "rr-base-rpi" cmdline.txt and config.txt
+
+post_install () {
+  post_upgrade
+}
+
+post_upgrade() {
+  cat <<END
+>>> retropico: replacing cmdline.txt and config.txt...
+END
+
+  # backup
+  if [ -f /boot/cmdline.txt ]; then
+    mv /boot/cmdline.txt /boot/cmdline.txt.bak
+  fi
+  # overwrite with file from current package
+  cp /boot/cmdline-retropico.txt /boot/cmdline.txt
+  
+  # backup
+  if [ -f /boot/config.txt ]; then
+    mv /boot/config.txt /boot/config.txt.bak
+  fi
+  # overwrite with file from current package
+  cp /boot/config-retropico.txt /boot/config.txt
+}
+

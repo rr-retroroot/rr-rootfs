@@ -65,3 +65,16 @@ RetroRoot is an ArchLinux based image with retrogaming capabilities (retroarch)
   ./rr-build-packages.sh -p packages/platforms/surfacert
   ```
 
+- Use with CLion IDE:
+ - Mount sysroot image
+  ```
+  ./rr-build-image.sh -a aarch64 -p sysroot -m
+  ```
+ - File | Settings | Build, Execution, Deployment | CMake | CMake options:
+  ```
+  -DCMAKE_TOOLCHAIN_FILE=/CHANGE_ME/rr-rootfs/toolchain/bin/rr-toolchain.cmake
+  ```
+ - File | Settings | Build, Execution, Deployment | CMake | Environment:
+  ```
+  CARCH=aarch64;RETROROOT_HOME=/CHANGE_ME/rr-rootfs/toolchain;RETROROOT_HOST=/CHANGE_ME/rr-rootfs/output/toolchains/aarch64;RETROROOT_SYSROOT=/CHANGE_ME/rr-rootfs/output/rootfs
+  ```
