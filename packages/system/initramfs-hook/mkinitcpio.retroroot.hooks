@@ -42,11 +42,9 @@ run_hook() {
         echo 0 > /sys/class/backlight/backlight_gpio/bl_power
         echo 1 > /sys/class/backlight/backlight_gpio/brightness
         # TODO: fix rr-splash to correctly init framebuffer device
-        fbset -fb /dev/fb1 -g 240 320 240 320 24
-        rr-splash /dev/fb1 /logo.png &
-      else
-        rr-splash /dev/fb0 /logo.png &
+        fbset -fb /dev/fb0 -g 240 320 240 320 16
       fi
+      rr-splash /dev/fb0 /logo.png &
     fi
   fi
 }
