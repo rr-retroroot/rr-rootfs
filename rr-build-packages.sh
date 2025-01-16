@@ -17,8 +17,8 @@ COL_G='\033[0;32m'
 COL_Y='\033[0;33m'
 COL_N='\033[0m'
 
-# source build scripts
-source scripts/utility.sh
+# source helper script
+source rr-build-helper.sh
 
 # cleanup on exit
 function cleanup_repo {
@@ -104,9 +104,8 @@ function build_package() {
   export CARCH="$2"
   export RR_ARCH="$2"
   export RR_PLATFORM="sysroot"
-  export RETROROOT_HOME="${RR_ROOT_PATH}/toolchain"
-  export RETROROOT_HOST="${RR_ROOT_PATH}/output/toolchains/${RR_ARCH}"
-  export RETROROOT_SYSROOT="${RR_ROOT_PATH}/output/retroroot-${RR_ARCH}-${RR_PLATFORM}"
+  export RETROROOT_HOME="${RR_ROOT_PATH}"
+  export RETROROOT_SYSROOT="${RR_ROOT_PATH}/output/retroroot-${RR_ARCH}-sysroot"
   if [ ! -d "${RETROROOT_SYSROOT}" ]; then
     die "build_package: sysroot doesn't exist... (${RETROROOT_SYSROOT})"
   fi
@@ -115,11 +114,11 @@ function build_package() {
   local deps=""
   local makedepends=$(echo "${SRCINFO}" | grep makedepends)
   for dep in "${makedepends}"; do
-    deps="$deps $(echo "$dep" | cut -d' ' -f 3)"
+    deps="$(echo "$dep" | cut -d' ' -f 3)"
   done
   
-  # install build dependencies to  sysroot image if needed
-  if [ ! -z "${deps}" ]; then
+  # install build dependencies to sysroot image if needed
+  if [ -n "${deps}" ]; then
     install_package "${deps}" || die "build_package: package deps installation failed"
   fi
 
@@ -202,7 +201,7 @@ function build_packages() {
   pacman_sync
 
   # loop through packages, ignore "pkg" and "src"
-  pkgs=$(find "${RR_PACKAGES_PATH}" \( -path "*/pkg" -o -path "*/src" \) -prune -o -name PKGBUILD -print)
+  pkgs=$(find "${RR_PACKAGES_PATH}" \( -path "*/pkg" -o -path "*/src" -o -path "*/platforms-disabled" \) -prune -o -name PKGBUILD -print)
   for pkg in $pkgs; do
     # get pkgbuild basename
     local pkgpath=$(dirname "$pkg")

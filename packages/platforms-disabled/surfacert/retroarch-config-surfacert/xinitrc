@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# kill retroroot splash utility if needed
+PID=$(pidof rr-splash)
+kill -INT $PID &>/dev/null
+
+# set brightness to max if never done
+if [ ! -f "/root/.config/.retroroot-brightness" ]; then
+  echo 255 > /sys/devices/platform/pwm-backlight/backlight/pwm-backlight/brightness
+  echo done > "/root/.config/.retroroot-brightness"
+fi
+
+# set audio volume if never done
+if [ ! -f "/root/.config/.retroroot-audio-volume" ]; then
+  amixer sset 'Speaker' 80%
+  echo done > "/root/.config/.retroroot-audio-volume"
+fi
+
+# Disable all energy save features, and leave the monitor always on
+xset s off         # don't activate screensaver
+xset -dpms         # disable DPMS (Energy Star) features.
+xset s noblank     # don't blank the video device
+
+# Hide mouse cursor
+unclutter -display :0.0 -root &
+
+# Autostart Retroarch
+exit_code=1
+while [ "$exit_code" -ne "0" ]
+do
+  /usr/bin/retroarch --appendconfig=/etc/retroarch-retroroot.cfg --fullscreen
+  # we dont want retroarch to return...
+  #exit_code=$?
+done
+

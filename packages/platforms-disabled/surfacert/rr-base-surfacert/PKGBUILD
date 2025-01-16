@@ -1,0 +1,32 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+# TODO: systemctl enable wpa_supplicant@mlan0.service
+
+pkgname=rr-base-surfacert
+pkgver=1
+pkgrel=5
+pkgdesc="RetroRoot base system (surfacert)"
+arch=('armv7h')
+license=('GPL')
+options=(!debug !strip)
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'system' 'surfacert')
+
+# a retroroot package should not depends on anything as required libraries
+# are in "retroroot-sysroot-*arch*" toolchain package. If not present in sysroot,
+# the package should build and link a static library here.
+# "system" packages are specials...
+
+depends=(
+  'rr-base'
+  'linux-downstream-surfacert' 'linux-firmware'
+  # retroarch custom surfacert stuff
+  'xlogin' 'retroarch-config-surfacert'
+)
+
+package() {
+  # copy surfacert rootfs overlays
+  cp -r "$startdir"/overlay/. "${pkgdir}"
+}
+

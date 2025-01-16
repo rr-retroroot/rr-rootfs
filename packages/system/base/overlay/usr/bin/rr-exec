@@ -1,0 +1,37 @@
+#!/bin/bash
+
+RR_USER="rr"
+RR_HOME="/home/${RR_USER}"
+
+if [ -z "$1" ]
+then
+    echo "error: missing app name"
+    exit 1
+fi
+
+APP_NAME="$1"
+EXEC_PATH="${RR_HOME}/apps/${APP_NAME}/rr-run"
+DATA_PATH="${RR_HOME}/data"
+
+echo "rr-exec: running ${APP_NAME} (home: ${RR_HOME}, data: ${DATA_PATH})"
+
+if [ ! -d "${DATA_PATH}" ]
+then
+  mkdir -p "${DATA_PATH}"
+  chown ${RR_USER}:${RR_USER} "${DATA_PATH}"
+fi
+
+# cache and such
+export XDG_CACHE_HOME=${RR_HOME}/.cache
+export XDG_RUNTIME_DIR=${RR_HOME}/.runtime
+
+# app data
+export XDG_DATA_HOME="${DATA_PATH}"
+export XDG_CONFIG_HOME="${DATA_PATH}"
+export HOME="${RR_HOME}"
+
+export SDL_VIDEODRIVER="kmsdrm"
+export SDL_AUDIODRIVER="pulse"
+
+sudo -E -u ${RR_USER} bash -c ${EXEC_PATH}
+

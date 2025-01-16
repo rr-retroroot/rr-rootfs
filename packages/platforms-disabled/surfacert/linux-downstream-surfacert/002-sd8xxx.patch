@@ -1,0 +1,249 @@
+diff --git a/drivers/net/wireless/sd8xxx/Makefile b/drivers/net/wireless/sd8xxx/Makefile
+index 1fbed29..4a44b1e 100755
+--- a/drivers/net/wireless/sd8xxx/Makefile
++++ b/drivers/net/wireless/sd8xxx/Makefile
+@@ -41,13 +41,13 @@ CONFIG_PROC_DEBUG=y
+ CONFIG_STA_SUPPORT=y
+ 
+ # Enable uAP mode support
+-CONFIG_UAP_SUPPORT=y
++CONFIG_UAP_SUPPORT=n
+ 
+ # Enable WIFIDIRECT support
+-CONFIG_WIFI_DIRECT_SUPPORT=y
++CONFIG_WIFI_DIRECT_SUPPORT=n
+ 
+ # Enable WIFIDISPLAY support
+-CONFIG_WIFI_DISPLAY_SUPPORT=y
++CONFIG_WIFI_DISPLAY_SUPPORT=n
+ 
+ # Re-association in driver
+ CONFIG_REASSOCIATION=y
+@@ -73,7 +73,7 @@ CONFIG_DFS_TESTING_SUPPORT=y
+ 
+ 
+ 
+-CONFIG_ANDROID_KERNEL=y
++CONFIG_ANDROID_KERNEL=n
+ 
+ # Use static link for app build
+ export CONFIG_STATIC_LINK=y
+diff --git a/drivers/net/wireless/sd8xxx/mlinux/moal_main.c b/drivers/net/wireless/sd8xxx/mlinux/moal_main.c
+index c36cf10..30eb903 100755
+--- a/drivers/net/wireless/sd8xxx/mlinux/moal_main.c
++++ b/drivers/net/wireless/sd8xxx/mlinux/moal_main.c
+@@ -66,8 +66,8 @@ char driver_version[] =
+ #endif
+ 	" ";
+ 
+-/** SD8787 Card */
+-#define CARD_SD8787     "SD8787"
++/** SD8797 Card */
++#define CARD_SD8797     "SD8797"
+ /** SD8777 Card */
+ #define CARD_SD8777     "SD8777"
+ 
+@@ -195,19 +195,19 @@ static mlan_callbacks woal_callbacks = {
+ };
+ 
+ /** Default Driver mode */
+-#if defined(STA_SUPPORT) && defined(UAP_SUPPORT)
+-#if defined(WIFI_DIRECT_SUPPORT)
+-int drv_mode = (DRV_MODE_STA | DRV_MODE_UAP | DRV_MODE_WIFIDIRECT);
+-#else
+-int drv_mode = (DRV_MODE_STA | DRV_MODE_UAP);
+-#endif
+-#else
+-#ifdef STA_SUPPORT
++//#if defined(STA_SUPPORT) && defined(UAP_SUPPORT)
++//#if defined(WIFI_DIRECT_SUPPORT)
++//int drv_mode = (DRV_MODE_STA | DRV_MODE_UAP | DRV_MODE_WIFIDIRECT);
++//#else
++//int drv_mode = (DRV_MODE_STA | DRV_MODE_UAP);
++//#endif
++//#else
++//#ifdef STA_SUPPORT
+ int drv_mode = DRV_MODE_STA;
+-#else
+-int drv_mode = DRV_MODE_UAP;
+-#endif /* STA_SUPPORT */
+-#endif /* STA_SUPPORT & UAP_SUPPORT */
++//#else
++//int drv_mode = DRV_MODE_UAP;
++//#endif /* STA_SUPPORT */
++//#endif /* STA_SUPPORT & UAP_SUPPORT */
+ 
+ /********************************************************
+ 		Global Variables
+@@ -663,19 +663,19 @@ woal_update_drv_tbl(moal_handle * handle, int drv_mode_local)
+ 		handle->drv_mode.fw_name = fw_name;
+ 	} else {
+ #if defined(UAP_SUPPORT) && defined(STA_SUPPORT)
+-		if (handle->card_type == CARD_TYPE_SD8787)
+-			handle->drv_mode.fw_name = DEFAULT_AP_STA_FW_NAME_8787;
++		if (handle->card_type == CARD_TYPE_SD8797)
++			handle->drv_mode.fw_name = DEFAULT_AP_STA_FW_NAME_8797;
+ 		else
+ 			handle->drv_mode.fw_name = DEFAULT_AP_STA_FW_NAME;
+ #else
+ #ifdef UAP_SUPPORT
+-		if (handle->card_type == CARD_TYPE_SD8787)
+-			handle->drv_mode.fw_name = DEFAULT_AP_FW_NAME_8787;
++		if (handle->card_type == CARD_TYPE_SD8797)
++			handle->drv_mode.fw_name = DEFAULT_AP_FW_NAME_8797;
+ 		else
+ 			handle->drv_mode.fw_name = DEFAULT_AP_FW_NAME;
+ #else
+-		if (handle->card_type == CARD_TYPE_SD8787)
+-			handle->drv_mode.fw_name = DEFAULT_FW_NAME_8787;
++		if (handle->card_type == CARD_TYPE_SD8797)
++			handle->drv_mode.fw_name = DEFAULT_FW_NAME_8797;
+ 		else
+ 			handle->drv_mode.fw_name = DEFAULT_FW_NAME;
+ #endif /* UAP_SUPPORT */
+@@ -725,8 +725,8 @@ woal_init_sw(moal_handle * handle)
+ #endif /* STA_SUPPORT */
+ 
+ 	/* Update driver version */
+-	if (handle->card_type == CARD_TYPE_SD8787)
+-		memcpy(driver_version, CARD_SD8787, strlen(CARD_SD8787));
++	if (handle->card_type == CARD_TYPE_SD8797)
++		memcpy(driver_version, CARD_SD8797, strlen(CARD_SD8797));
+ 	else if (handle->card_type == CARD_TYPE_SD8777)
+ 		memcpy(driver_version, CARD_SD8777, strlen(CARD_SD8777));
+ 	memcpy(handle->driver_version, driver_version, strlen(driver_version));
+@@ -1475,19 +1475,19 @@ woal_request_fw(moal_handle * handle)
+ 	if (req_fw_nowait) {
+ #if LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 32)
+ 		err = request_firmware_nowait(THIS_MODULE, FW_ACTION_HOTPLUG,
+-					      handle->drv_mode.fw_name,
++					      "sd8797_uapsta.bin",
+ 					      handle->hotplug_device,
+ 					      GFP_KERNEL, handle,
+ 					      woal_request_fw_callback);
+ #else
+ #if LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 13)
+ 		err = request_firmware_nowait(THIS_MODULE, FW_ACTION_HOTPLUG,
+-					      handle->drv_mode.fw_name,
++					      "sd8797_uapsta.bin",
+ 					      handle->hotplug_device, handle,
+ 					      woal_request_fw_callback);
+ #else
+ 		err = request_firmware_nowait(THIS_MODULE,
+-					      handle->drv_mode.fw_name,
++					      "sd8797_uapsta.bin",
+ 					      handle->hotplug_device, handle,
+ 					      woal_request_fw_callback);
+ #endif
+@@ -1500,11 +1500,11 @@ woal_request_fw(moal_handle * handle)
+ 		}
+ 	} else {
+ 		err = request_firmware(&handle->firmware,
+-				       handle->drv_mode.fw_name,
++				       "sd8797_uapsta.bin",
+ 				       handle->hotplug_device);
+ 		if (err < 0) {
+ 			PRINTM(MFATAL,
+-			       "WLAN: request_firmware() failed, error code = %d\n",
++			       "WLAN: request_firmware() name %s failed, error code = %d\n",fw_name,
+ 			       err);
+ 			ret = MLAN_STATUS_FAILURE;
+ 		} else {
+@@ -3903,7 +3903,7 @@ woal_send_disconnect_to_system(moal_private * priv)
+ #define SQRAM_SIZE                        0x33000
+ #define MAX_POLL_TRIES                    100
+ #define DTCM_SIZE                         0x14000
+-#define SD8787_DTCM_SIZE                  0xA700
++#define SD8797_DTCM_SIZE                  0xA700
+ /**
+  *  @brief This function dump firmware memory to file
+  *
+@@ -3947,8 +3947,8 @@ woal_dump_firmware_info(moal_handle * phandle)
+ 		PRINTM(MERROR, "Error: vmalloc ITCM buffer failed!!!\n");
+ 		goto done;
+ 	}
+-	if (phandle->card_type == CARD_TYPE_SD8787)
+-		dtcm_size = SD8787_DTCM_SIZE;
++	if (phandle->card_type == CARD_TYPE_SD8797)
++		dtcm_size = SD8797_DTCM_SIZE;
+ 	else
+ 		dtcm_size = DTCM_SIZE;
+ 	PRINTM(MMSG, "DTCM_SIZE=0x%x\n", dtcm_size);
+diff --git a/drivers/net/wireless/sd8xxx/mlinux/moal_main.h b/drivers/net/wireless/sd8xxx/mlinux/moal_main.h
+index 62f8acc..4592f4c 100755
+--- a/drivers/net/wireless/sd8xxx/mlinux/moal_main.h
++++ b/drivers/net/wireless/sd8xxx/mlinux/moal_main.h
+@@ -1491,8 +1491,8 @@ typedef struct _HostCmd_DS_802_11_CFG_DATA {
+ 	t_u8 data[1];
+ } __ATTRIB_PACK__ HostCmd_DS_802_11_CFG_DATA;
+ 
+-/** SD8787 card type */
+-#define CARD_TYPE_SD8787   0x01
++/** SD8797 card type */
++#define CARD_TYPE_SD8797   0x01
+ /** SD8777 card type */
+ #define CARD_TYPE_SD8777   0x02
+ 
+diff --git a/drivers/net/wireless/sd8xxx/mlinux/moal_sdio.h b/drivers/net/wireless/sd8xxx/mlinux/moal_sdio.h
+index 2bd1bc5..269395e 100755
+--- a/drivers/net/wireless/sd8xxx/mlinux/moal_sdio.h
++++ b/drivers/net/wireless/sd8xxx/mlinux/moal_sdio.h
+@@ -50,7 +50,7 @@ Change log:
+ #endif
+ 
+ #define DEFAULT_FW_NAME	"mrvl/sd8777_uapsta.bin"
+-#define DEFAULT_FW_NAME_8787 "mrvl/sd8787_uapsta.bin"
++#define DEFAULT_FW_NAME_8797 "mrvl/sd8797_uapsta.bin"
+ 
+ #ifdef STA_SUPPORT
+ /** Default firmware name */
+@@ -64,7 +64,7 @@ Change log:
+ /** Default firmware name */
+ 
+ #define DEFAULT_AP_FW_NAME "mrvl/sd8777_uapsta.bin"
+-#define DEFAULT_AP_FW_NAME_8787 "mrvl/sd8787_uapsta.bin"
++#define DEFAULT_AP_FW_NAME_8797 "mrvl/sd8797_uapsta.bin"
+ 
+ #ifndef DEFAULT_AP_FW_NAME
+ #define DEFAULT_AP_FW_NAME ""
+@@ -74,7 +74,7 @@ Change log:
+ /** Default firmaware name */
+ 
+ #define DEFAULT_AP_STA_FW_NAME "mrvl/sd8777_uapsta.bin"
+-#define DEFAULT_AP_STA_FW_NAME_8787 "mrvl/sd8787_uapsta.bin"
++#define DEFAULT_AP_STA_FW_NAME_8797 "mrvl/sd8797_uapsta.bin"
+ 
+ #ifndef DEFAULT_AP_STA_FW_NAME
+ #define DEFAULT_AP_STA_FW_NAME ""
+diff --git a/drivers/net/wireless/sd8xxx/mlinux/moal_sdio_mmc.c b/drivers/net/wireless/sd8xxx/mlinux/moal_sdio_mmc.c
+index 5935545..61dd12e 100755
+--- a/drivers/net/wireless/sd8xxx/mlinux/moal_sdio_mmc.c
++++ b/drivers/net/wireless/sd8xxx/mlinux/moal_sdio_mmc.c
+@@ -47,13 +47,13 @@ extern int pm_keep_power;
+ 
+ /** Device ID for SD8777 */
+ #define SD_DEVICE_ID_8777   (0x9131)
+-/** Device ID for SD8787 */
+-#define SD_DEVICE_ID_8787   (0x9129)
++/** Device ID for SD8797 */
++#define SD_DEVICE_ID_8797   (0x9129)
+ 
+ /** WLAN IDs */
+ static const struct sdio_device_id wlan_ids[] = {
+ 	{SDIO_DEVICE(MARVELL_VENDOR_ID, SD_DEVICE_ID_8777)},
+-	{SDIO_DEVICE(MARVELL_VENDOR_ID, SD_DEVICE_ID_8787)},
++	{SDIO_DEVICE(MARVELL_VENDOR_ID, SD_DEVICE_ID_8797)},
+ 	{},
+ };
+ 
+@@ -150,8 +150,8 @@ woal_sdio_update_card_type(moal_handle * handle, t_void * card)
+ 	/* Update card type */
+ 	if (cardp->func->device == SD_DEVICE_ID_8777)
+ 		handle->card_type = CARD_TYPE_SD8777;
+-	else if (cardp->func->device == SD_DEVICE_ID_8787)
+-		handle->card_type = CARD_TYPE_SD8787;
++	else if (cardp->func->device == SD_DEVICE_ID_8797)
++		handle->card_type = CARD_TYPE_SD8797;
+ }
+ 
+ /**

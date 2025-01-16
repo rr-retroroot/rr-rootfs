@@ -9,8 +9,8 @@ RR_ROOT_PATH=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 RR_OUTPUT_IMG=""
 RR_DO_CHROOT=0
 
-# source build scripts
-source scripts/utility.sh
+# source helper script
+source rr-build-helper.sh
 
 show_usage() {
   echo ""

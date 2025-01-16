@@ -1,0 +1,43 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=rr-base
+pkgver=1
+pkgrel=17
+pkgdesc="RetroRoot base system"
+arch=('x86_64' 'aarch64' 'armv7h' 'riscv64')
+license=('GPL')
+options=(!debug !strip)
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'system')
+
+# a retroroot package should not depends on anything as required libraries
+# are in "retroroot-sysroot-*arch*" toolchain package. If not present in sysroot,
+# the package should build and link a static library here.
+# "system" packages are specials...
+depends=(
+  'base'
+  'run-parts' 'mkinitcpio' 'dosfstools'
+  'net-tools' 'fakeroot'
+  'bash-completion' 'sudo' 'nano'
+  'unzip' 'wget' 'less' 'strace'
+  'openssh' 'vsftpd'
+  'inetutils' 'iwd' 'wireless-regdb'
+  'sdl2' 'mesa' 'fbset' 'alsa-utils'
+  'rr-initramfs-hook'
+  'retropico'
+)
+
+# we don't want ~800mb of firmwares files
+provides=('linux-firmware')
+
+# system setup
+install=rr-base.install
+
+package() {
+  cd "$srcdir"
+  
+	# copy common rootfs overlays
+  cp -r "$startdir"/overlay/. "${pkgdir}"
+}
+

@@ -1,26 +1,25 @@
 #!/bin/bash
 
-_arch=${CARCH}
-
-if [ -z "${_arch}" ]; then
-    _arch=x86_64
+if [ -z "${CARCH}" ]; then
+    CARCH=x86_64
 fi
 
+# home path
 if [ -z "${RETROROOT_HOME}" ]; then
     export RETROROOT_HOME=/opt/retroroot
 fi
 
 # sysroot path
 if [ -z "${RETROROOT_SYSROOT}" ]; then
-    export RETROROOT_SYSROOT=${RETROROOT_HOME}/target/${_arch}
+    export RETROROOT_SYSROOT=${RETROROOT_HOME}/output/retroroot-${CARCH}-sysroot
 fi
 
 # toolchain setup
 if [ -z "${RETROROOT_HOST}" ]; then
-    export RETROROOT_HOST=${RETROROOT_HOME}/host/${_arch}
+    export RETROROOT_HOST=${RETROROOT_HOME}/output/toolchains/${CARCH}
 fi
 
-export RETROROOT_CROSS_PREFIX=${_arch}-linux-gnu-
+export RETROROOT_CROSS_PREFIX=${CARCH}-linux-gnu-
 
 export RETROROOT_CC=${RETROROOT_CROSS_PREFIX}gcc
 export RETROROOT_CXX=${RETROROOT_CROSS_PREFIX}g++
@@ -46,19 +45,19 @@ export CXXFLAGS="${CFLAGS}"
 export LDFLAGS="-L${RETROROOT_SYSROOT}/usr/lib"
 
 # arch specific
-if [ ${_arch} == "x86_64" ]; then
+if [ ${CARCH} == "x86_64" ]; then
   export CFLAGS="${CFLAGS} -O2 -march=x86-64 -mtune=generic"
   export CPPFLAGS="${CPPFLAGS} -O2 -march=x86-64 -mtune=generic"
   export CXXFLAGS="${CXXFLAGS} -O2 -march=x86-64 -mtune=generic"
-elif [ ${_arch} == "armv7h" ]; then
+elif [ ${CARCH} == "armv7h" ]; then
   export CFLAGS="${CFLAGS} -O2 -march=armv7-a -mfloat-abi=hard -mfpu=neon"
   export CPPFLAGS="${CPPFLAGS} -O2 -march=armv7-a -mfloat-abi=hard -mfpu=neon"
   export CXXFLAGS="${CXXFLAGS} -O2 -march=armv7-a -mfloat-abi=hard -mfpu=neon"
-elif [ ${_arch} == "aarch64" ]; then
+elif [ ${CARCH} == "aarch64" ]; then
   export CFLAGS="${CFLAGS} -O2 -march=armv8-a -mcpu=cortex-a35"
   export CPPFLAGS="${CPPFLAGS} -O2 -march=armv8-a -mcpu=cortex-a35"
   export CXXFLAGS="${CXXFLAGS} -O2 -march=armv8-a -mcpu=cortex-a35"
-elif [ ${_arch} == "riscv64" ]; then
+elif [ ${CARCH} == "riscv64" ]; then
   export CFLAGS="${CFLAGS} -O2 -march=rv64gc -mabi=lp64d"
   export CPPFLAGS="${CPPFLAGS} -O2 -march=rv64gc -mabi=lp64d"
   export CXXFLAGS="${CXXFLAGS} -O2 -march=rv64gc -mabi=lp64d"
@@ -82,5 +81,5 @@ export RETROROOT_PREFIX_LIB=${RETROROOT_PREFIX}/lib
 export RETROROOT_PREFIX_ETC=${RETROROOT_PREFIX}/etc
 export RETROROOT_PREFIX_SHARE=${RETROROOT_PREFIX}/share
 
-export PATH="${RETROROOT_HOME}/bin:${RETROROOT_HOST}/bin:$PATH"
+export PATH="${RETROROOT_HOME}/toolchain/bin:${RETROROOT_HOST}/bin:$PATH"
 

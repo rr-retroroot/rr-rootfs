@@ -1,0 +1,24 @@
+# Maintainer : cpasjuste 
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=xf86-video-tegra-surfacert
+pkgver=1
+pkgrel=4
+pkgdesc="X.Org video driver for NVIDIA Tegra"
+arch=('armv7h')
+url="http://github.com/grate-driver/"
+license=('GPL')
+depends=('xorg-server')
+#conflicts=('xorg-server<1.20' 'X-ABI-VIDEODRV_VERSION<24' 'X-ABI-VIDEODRV_VERSION>=25', 'xf86-video-opentegra')
+#conflicts=('libglvnd')
+#provides=('libglvnd' 'libgl' 'libegl' 'libgles')
+#provides+=(libEGL.so libGLESv2.so libGL.so libGLX.so libGLdispatch.so libOpenGL.so)
+groups=('xorg-drivers' 'xorg')
+#source=('tegra114_linux_r17.1.0_armhf.tar.xz')
+#sha256sums=('2eaa7eb9d7a86fdd58cf746f68b368484b838916493c9d5de4f1302fbaa72e06')
+options=(!debug !strip)
+
+package() {
+  tar -xf ../tegra114_linux_r17.1.0_armhf.tar.xz -C "${pkgdir}"
+}
+

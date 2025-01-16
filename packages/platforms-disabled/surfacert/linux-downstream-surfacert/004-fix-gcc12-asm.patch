@@ -1,0 +1,13 @@
+diff -urpN android_kernel_nvidia_tegra3-6d33401a6d36e954593b6bc07c29f1eedeaf240f/arch/arm/include/asm/uaccess.h android_kernel_nvidia_tegra3-new/arch/arm/include/asm/uaccess.h
+--- android_kernel_nvidia_tegra3-6d33401a6d36e954593b6bc07c29f1eedeaf240f/arch/arm/include/asm/uaccess.h	2023-04-18 15:42:27.000000000 +0200
++++ android_kernel_nvidia_tegra3-new/arch/arm/include/asm/uaccess.h	2024-04-02 23:13:40.929983761 +0200
+@@ -159,7 +159,7 @@ extern int __put_user_8(void *, unsigned
+ 	({								\
+ 		unsigned long __limit = current_thread_info()->addr_limit - 1; \
+ 		const typeof(*(p)) __user *__tmp_p = (p);		\
+-		register const typeof(*(p)) __r2 asm("r2") = (x);	\
++		register typeof(*(p)) __r2 asm("r2") = (x);             \
+ 		register const typeof(*(p)) __user *__p asm("r0") = __tmp_p; \
+ 		register unsigned long __l asm("r1") = __limit;		\
+ 		register int __e asm("r0");				\
+

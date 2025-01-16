@@ -1,0 +1,28 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=retroarch-config-surfacert
+pkgver=1
+pkgrel=3
+pkgdesc="RetroRoot retroarch configuration for surfacert"
+arch=('armv7h')
+license=('GPL')
+options=(!debug !strip)
+install='retroarch-config-surfacert.install'
+source=('xinitrc' 'retroarch-retroroot.cfg')
+md5sums=('SKIP' 'SKIP')
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'system' 'surfacert')
+
+# a retroroot package should not depends on anything as required libraries
+# are in "retroroot-sysroot-*arch*" toolchain package. If not present in sysroot,
+# the package should build and link a static library here.
+# "system" packages are specials...
+
+depends=('xlogin' 'unclutter' 'retroarch')
+
+package() {
+  install -Dm644 ${srcdir}/xinitrc "$pkgdir/root/.xinitrc"
+  install -Dm644 ${srcdir}/retroarch-retroroot.cfg "$pkgdir/etc/retroarch-retroroot.cfg"
+}
+

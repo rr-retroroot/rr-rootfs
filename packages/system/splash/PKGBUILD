@@ -1,0 +1,40 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=rr-splash
+pkgver=1
+pkgrel=1
+pkgdesc="RetroRoot splash screen utility"
+arch=('x86_64' 'armv7h' 'aarch64' 'riscv64')
+license=('GPL')
+
+commit=6239336c4685aaa13b038a13efd8807fd886cc15
+url='https://github.com/rr-retroroot/rr-splash'
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'system')
+
+# a retroroot package should not depends on anything as required libraries
+# are in "retroroot-sysroot-*arch*" toolchain package. If not present in sysroot,
+# the package should build and link a static library here..
+# this package is a special case...
+#depends=()
+
+source=("git+$url.git#commit=$commit")
+sha512sums=('SKIP')
+
+build() {
+  cd rr-splash
+
+  source ${RETROROOT_HOME}/toolchain/bin/rr-env
+
+  rr-cmake \
+    -Bbuild \
+    -DCMAKE_INSTALL_PREFIX=${RETROROOT_PREFIX}
+
+  make $MAKEFLAGS -C build
+}
+
+package() {
+  cd rr-splash
+  DESTDIR="$pkgdir" make -C build install
+}

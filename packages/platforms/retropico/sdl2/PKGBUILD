@@ -18,7 +18,6 @@ sha512sums=(
 )
 
 provides=('sdl2')
-#replaces=('sdl2')
 conflicts=('sdl2')
 
 prepare() {
@@ -29,7 +28,7 @@ prepare() {
 build() {
   cd "SDL2-${pkgver}"
 
-  source ${RETROROOT_HOME}/bin/rr-env
+  source ${RETROROOT_HOME}/toolchain/bin/rr-env
   
   CFLAGS+=" -ffat-lto-objects"
   rr-configure ${CARCH} \
@@ -52,7 +51,8 @@ build() {
 
 package() {
   cd "SDL2-${pkgver}"
-  source ${RETROROOT_HOME}/bin/rr-env
+
+  source ${RETROROOT_HOME}/toolchain/bin/rr-env
   
   make DESTDIR="${pkgdir}" install
 }

@@ -17,7 +17,7 @@ endif ()
 message(STATUS "rr-toolchain.cmake: RETROROOT_HOME: ${RETROROOT_HOME}")
 
 if (NOT DEFINED ENV{RETROROOT_SYSROOT})
-  set(RETROROOT_SYSROOT "${RETROROOT_HOME}/target/${CARCH}")
+  set(RETROROOT_SYSROOT "${RETROROOT_HOME}/output/retroroot-${CARCH}-sysroot")
   set(ENV{RETROROOT_SYSROOT} ${RETROROOT_SYSROOT})
 else ()
   set(RETROROOT_SYSROOT $ENV{RETROROOT_SYSROOT})
@@ -39,7 +39,7 @@ set(RETROROOT TRUE)
 
 # toolchain setup
 if (NOT DEFINED ENV{RETROROOT_HOST})
-  set(RETROROOT_HOST "${RETROROOT_HOME}/host/${CARCH}")
+  set(RETROROOT_HOST "${RETROROOT_HOME}/output/toolchains/${CARCH}")
   set(ENV{RETROROOT_HOST} ${RETROROOT_HOST})
 else ()
   set(RETROROOT_HOST $ENV{RETROROOT_HOST})
@@ -83,6 +83,6 @@ set(CMAKE_FIND_PACKAGE_PREFER_CONFIG FALSE)
 set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Shared libs not available")
 
 # pkg-config
-set(PKG_CONFIG_EXECUTABLE "${RETROROOT_HOME}/bin/${CARCH}-linux-gnu-pkg-config" CACHE PATH "")
+set(PKG_CONFIG_EXECUTABLE "${RETROROOT_HOME}/toolchain/bin/${CARCH}-linux-gnu-pkg-config" CACHE PATH "")
 message(STATUS "rr-toolchain.cmake: PKG_CONFIG_EXECUTABLE: ${PKG_CONFIG_EXECUTABLE}")
 

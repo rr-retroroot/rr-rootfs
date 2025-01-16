@@ -1,0 +1,22 @@
+get_root_partition() {
+  local partition="`basename $(blkid -L "RR-BOOT")`" || exit 1
+  echo $partition
+}
+
+get_root_device() {
+  local partition="$1"
+  local device="/dev/`basename $(readlink -f "/sys/class/block/$partition/..")`" || exit 1
+  echo $device
+}
+
+post_install() {
+  local ROOT_PARTITION=$(get_root_partition)
+  local ROOT_DEVICE=$(get_root_device "$ROOT_PARTITION")
+  dd if=/boot/idbloader.img of="$ROOT_DEVICE" bs=512 seek=64 conv=sync,noerror,notrunc 2>&1 || exit 1
+  dd if=/boot/uboot.img of="$ROOT_DEVICE" bs=512 seek=16384 conv=sync,noerror,notrunc 2>&1 || exit 1
+}
+
+post_upgrade() {
+  post_install $1
+}
+

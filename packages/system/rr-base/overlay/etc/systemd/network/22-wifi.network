@@ -1,6 +1,0 @@
-[Match]
-Name=wl*
-
-[Network]
-DHCP=yes
-

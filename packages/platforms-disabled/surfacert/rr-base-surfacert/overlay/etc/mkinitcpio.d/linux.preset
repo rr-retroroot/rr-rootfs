@@ -1,0 +1,9 @@
+# mkinitcpio preset file for the 'linux-surfacert' package
+
+ALL_config="/etc/mkinitcpio.conf"
+ALL_kver="none"
+
+PRESETS=('default')
+
+default_image="/boot/initramfs-linux.img"
+
