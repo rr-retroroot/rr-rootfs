@@ -1,0 +1,40 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=rr-libretro-beetle-pce
+pkgver=1243
+pkgrel=1
+pkgdesc='NEC PC Engine/SuperGrafx/CD core'
+arch=('x86_64' 'armv7h' 'aarch64' 'riscv64')
+url=https://github.com/libretro/beetle-pce-libretro
+license=(GPL2)
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'system' 'cores')
+
+provides=('libretro-beetle-pce')
+conflicts=('libretro-beetle-pce')
+
+#depends=('zlib')
+#makedepends=('git')
+
+_commit=af28fb0385d00e0292c4703b3aa7e72762b564d2
+source=(libretro-beetle-pce::git+https://github.com/libretro/beetle-pce-libretro.git#commit=${_commit})
+sha256sums=('SKIP')
+
+pkgver() {
+  cd libretro-beetle-pce
+  git rev-list --count HEAD
+}
+
+build() {
+  source ${RETROROOT_HOME}/toolchain/bin/rr-env
+  make \
+    SYSTEM_LIBCHDR=0 \
+    SYSTEM_ZLIB=1 \
+    -C libretro-beetle-pce
+}
+
+package() {
+  install -Dm 644 libretro-beetle-pce/mednafen_pce_libretro.so -t "${pkgdir}"/usr/lib/libretro/
+}
+

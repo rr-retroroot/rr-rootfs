@@ -1,0 +1,38 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=rr-libretro-mgba
+pkgver=9650
+pkgrel=1
+pkgdesc='NEC PC Engine/SuperGrafx/CD core'
+arch=('x86_64' 'armv7h' 'aarch64' 'riscv64')
+url=https://github.com/libretro/mgba
+license=(custom:MPL2)
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'system' 'cores')
+
+provides=('libretro-mgba')
+conflicts=('libretro-mgba')
+
+#depends=('zlib')
+#makedepends=('git')
+
+_commit=792e9f33ccfdaeac691a53e3d0fb083fa5ebcb15
+source=(libretro-mgba::git+https://github.com/libretro/mgba.git#commit=${_commit})
+sha256sums=('SKIP')
+
+pkgver() {
+  cd libretro-mgba
+  git rev-list --count HEAD
+}
+
+build() {
+  source ${RETROROOT_HOME}/toolchain/bin/rr-env
+  make -C libretro-mgba -f Makefile.libretro
+}
+
+package() {
+  install -Dm 644 libretro-mgba/mgba_libretro.so -t "${pkgdir}"/usr/lib/libretro/
+  install -Dm 644 libretro-mgba/LICENSE -t "${pkgdir}"/usr/share/licenses/libretro-mgba/
+}
+

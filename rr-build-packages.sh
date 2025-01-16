@@ -112,8 +112,8 @@ function build_package() {
 
   # get package build depds
   local deps=""
-  local makedepends=$(echo "${SRCINFO}" | grep makedepends)
-  for dep in "${makedepends}"; do
+  local depends=$(echo "${SRCINFO}" | grep depends)
+  for dep in "${depends}"; do
     deps="$(echo "$dep" | cut -d' ' -f 3)"
   done
   
@@ -201,7 +201,7 @@ function build_packages() {
   pacman_sync
 
   # loop through packages, ignore "pkg" and "src"
-  pkgs=$(find "${RR_PACKAGES_PATH}" \( -path "*/pkg" -o -path "*/src" -o -path "*/platforms-disabled" \) -prune -o -name PKGBUILD -print)
+  pkgs=$(find "${RR_PACKAGES_PATH}" \( -path "*/pkg" -o -path "*/src" \) -prune -o -name PKGBUILD -print)
   for pkg in $pkgs; do
     # get pkgbuild basename
     local pkgpath=$(dirname "$pkg")

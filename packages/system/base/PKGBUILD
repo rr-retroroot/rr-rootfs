@@ -2,7 +2,7 @@
 
 pkgname=rr-base
 pkgver=1
-pkgrel=17
+pkgrel=20
 pkgdesc="RetroRoot base system"
 arch=('x86_64' 'aarch64' 'armv7h' 'riscv64')
 license=('GPL')
@@ -23,7 +23,8 @@ depends=(
   'unzip' 'wget' 'less' 'strace'
   'openssh' 'vsftpd'
   'inetutils' 'iwd' 'wireless-regdb'
-  'sdl2' 'mesa' 'fbset' 'alsa-utils'
+  'libglvnd' 'mesa' 'fbset'
+  'sdl2' 'alsa-utils'
   'rr-initramfs-hook'
   'retropico'
 )
@@ -37,7 +38,7 @@ install=rr-base.install
 package() {
   cd "$srcdir"
   
-	# copy common rootfs overlays
+  # copy common rootfs overlays
   cp -r "$startdir"/overlay/. "${pkgdir}"
 }
 

@@ -2,7 +2,7 @@
 
 pkgname=retropico
 pkgver=1
-pkgrel=2
+pkgrel=3
 pkgdesc="RetroRoot Launcher"
 arch=('x86_64' 'armv7h' 'aarch64' 'riscv64')
 license=('GPL')
@@ -12,8 +12,9 @@ url='https://github.com/retropico-dev/retropico2'
 groups=('retroroot' 'system')
 
 # deps
-depends=('freetype2' 'libpng' 'libconfig' 'sdl2' 'libzip' 'glm')
-makedepends=('freetype2' 'libpng' 'libconfig' 'sdl2' 'libzip' 'glm')
+depends=(
+  'freetype2' 'libpng' 'libconfig' 'sdl2' 'libzip' 'glm'
+)
 
 source=("git+$url.git")
 sha512sums=('SKIP')

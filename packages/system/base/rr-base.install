@@ -71,7 +71,11 @@ END
 ==> retropico: setting up pacman.conf ...
 END
   # use specific arch config
-  cp /etc/pacman-$(uname -m).conf /etc/pacman.conf
+  ARCH=$(uname -m)
+  if [ "${ARCH}" == "armv7l" ]; then
+    ARCH=armv7h
+  fi
+  cp /etc/pacman-${ARCH}.conf /etc/pacman.conf
 
   # enable back pacman CheckSpace option
   sed -i 's/#CheckSpace/CheckSpace/g' /etc/pacman.conf

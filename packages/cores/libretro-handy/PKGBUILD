@@ -1,0 +1,37 @@
+# Maintainer: cpasjuste <cpasjuste@gmail.com>
+
+pkgname=rr-libretro-handy
+pkgver=296
+pkgrel=1
+pkgdesc='Atari Lynx core'
+arch=('x86_64' 'armv7h' 'aarch64' 'riscv64')
+url=https://github.com/libretro/libretro-handy
+license=(BSD LGPL2.1)
+
+# every retroroot pkg must be a member of "retroroot" AND "game", "emulator", "app" or "system" group
+groups=('retroroot' 'system' 'cores')
+
+provides=('libretro-handy')
+conflicts=('libretro-handy')
+
+#depends=('')
+#makedepends=('git')
+
+_commit=4e9e072796e5552a9d57f6ab83b3f85f27b17fb6
+source=(libretro-handy::git+https://github.com/libretro/libretro-handy.git#commit=${_commit})
+sha256sums=('SKIP')
+
+pkgver() {
+  cd libretro-handy
+  git rev-list --count HEAD
+}
+
+build() {
+  source ${RETROROOT_HOME}/toolchain/bin/rr-env
+  make -C libretro-handy
+}
+
+package() {
+  install -Dm 644 libretro-handy/handy_libretro.so -t "${pkgdir}"/usr/lib/libretro/
+}
+

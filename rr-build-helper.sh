@@ -4,11 +4,11 @@ set -e
 
 # messages
 function merror() {
-  printf '\033[1;31mERROR:\033[0m %s\n' "$@" >&2 # bold red
+  printf '\033[1;31m%s\033[0m\n' "$@" >&2 # bold red
 }
 
 function minfo() {
-  printf '\033[1;92m%s\033[0m\n' "$@" >&2 # bold cyan
+  printf '\033[1;92m%s\033[0m\n' "$@" >&2 # bold green
 }
 
 # cleanup on exit
@@ -139,9 +139,15 @@ function create_rootfs() {
   # create minimal rootfs with pacstrap and specifed packages
   minfo "create_rootfs: running pacstrap"
 
-  sudo pacstrap -c -K -M -G -C "${RR_ROOT_PATH}"/packages/system/rr-base/overlay/etc/pacman-"${RR_ARCH}".conf ${MOUNT_ROOT} rr-base-${RR_PLATFORM}
+  sudo pacstrap -c -K -M -G -C "${RR_ROOT_PATH}"/packages/system/base/overlay/etc/pacman-"${RR_ARCH}".conf ${MOUNT_ROOT} rr-base-${RR_PLATFORM}
+  
   # TODO: https://gitlab.archlinux.org/archlinux/arch-install-scripts/-/issues/56
-  sudo killall gpg-agent
+  sudo killall gpg-agent >/dev/null 2>&1 || :
+
+  if [ "${RR_PLATFORM}" == "sysroot" ]; then
+    # we want to keep pacman.conf "CheckSpace" disabled on sysroot
+    sudo sed -i 's/CheckSpace/#CheckSpace/g' ${MOUNT_ROOT}/etc/pacman.conf
+  fi
 }
 
 function install_package() {
@@ -152,8 +158,12 @@ function install_package() {
   else
     minfo "install_package: installing packages to $(basename -- ${RR_OUTPUT_IMG}): ${RR_PACKAGES}"
   fi
-
-  sudo arch-chroot ${MOUNT_ROOT} pacman -S --noconfirm --needed $1
+  
+  if [ -f "${MOUNT_ROOT}/usr/bin/pacman" ]; then
+    sudo arch-chroot ${MOUNT_ROOT} pacman -S --noconfirm --needed $1
+  else
+    merror "install_package: pacman not found in sysroot (${MOUNT_ROOT}/usr/bin/pacman)"
+  fi
 
   umount_image
 }
