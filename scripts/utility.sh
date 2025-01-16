@@ -126,11 +126,6 @@ function create_rootfs() {
   sudo pacstrap -c -K -M -G -C "${RR_ROOT_PATH}"/packages/system/rr-base/overlay/etc/pacman-"${RR_ARCH}".conf ${MOUNT_ROOT} rr-base-${RR_PLATFORM}
   # TODO: https://gitlab.archlinux.org/archlinux/arch-install-scripts/-/issues/56
   sudo killall gpg-agent
-
-  # boostrap rootfs for custom platform packages and retroroot setup
-  #minfo "create_rootfs: running bootstrap scripts..."
-  #sudo cp -f "${RR_ROOT_PATH}"/configs/pacman-"${RR_ARCH}".conf "${MOUNT_ROOT}"/etc/pacman.conf
-  #sudo arch-chroot ${MOUNT_ROOT} run-parts --exit-on-error -a "${RR_PLATFORM}" -a "${RR_ARCH}" /retroroot/bootstrap
 }
 
 function install_package() {
