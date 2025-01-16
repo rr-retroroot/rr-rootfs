@@ -7,7 +7,7 @@ need_recovery() {
     return 0;
   fi
   
-  # if we are not in recovery mode but data partition doesn't exist, enter recovery
+  # if we are not in recovery mode but overlay partition doesn't exist, enter recovery
   blkid | grep "RR-OVERLAY" &>/dev/null
   if [ $? -ne 0 ]; then
     return 0;
@@ -28,6 +28,11 @@ kill_splah
 if need_recovery; then
   /usr/bin/rr-recovery
 else
-  /usr/bin/retropico
+  cat /proc/cmdline | grep rotate &>/dev/null
+  if [ $? -eq 0 ]; then
+    /usr/bin/retropico -r
+  else
+    /usr/bin/retropico
+  fi
 fi
 

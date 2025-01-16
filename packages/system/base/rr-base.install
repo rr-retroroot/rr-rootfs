@@ -7,10 +7,6 @@ RR_SERVICES=" \
 "
 
 post_install () {
-  post_upgrade
-}
-
-post_upgrade() {
   cat <<END
 ==> retropico: running post install script...
 END
@@ -84,4 +80,7 @@ END
   # cleanup pkg cache
   rm -rf /var/cache/pacman/pkg
 }
+
+# nothing for now
+#post_upgrade() {}
 
