@@ -40,14 +40,12 @@ run() {
 main() {
   # parse args
   test $# -eq 0 && set -- "-h"
-  while getopts "a:p:i:cmurh" ARG; do
+  while getopts "a:p:i:crh" ARG; do
     case "$ARG" in
     a) RR_ARCH=$OPTARG ;;
     p) RR_PLATFORM=$OPTARG ;;
     i) RR_PACKAGES=$OPTARG ;;
     c) RR_DO_CHROOT=1 ;;
-    m) RR_DO_MOUNT=1 ;;
-    u) RR_DO_UMOUNT=1 ;;
     r)
       run $RR_PLATFORM
       return 0
@@ -92,10 +90,6 @@ main() {
     mount_image
     minfo "chroot ${MOUNT_ROOT}"
     sudo arch-chroot ${MOUNT_ROOT} /bin/bash
-    umount_image
-  elif [ "${RR_DO_MOUNT}" == 1 ]; then
-    mount_image
-  elif [ "${RR_DO_UMOUNT}" == 1 ]; then
     umount_image
   else
     # create image and rootfs

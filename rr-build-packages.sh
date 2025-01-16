@@ -100,13 +100,17 @@ function build_package() {
   pushd "$1" &> /dev/null || die "build_package: pushd $1 failed"
   rm -rf *-$2.pkg.tar.* &> /dev/null
   
-  RR_ARCH="$2"
-  RR_PLATFORM="sysroot"
-  RR_OUTPUT_IMG="${RR_ROOT_PATH}"/output/retroroot-${RR_ARCH}-${RR_PLATFORM}.img
-  if [ ! -f "${RR_OUTPUT_IMG}" ]; then
-    die "build_package: sysroot image doesn't exist... (${RR_OUTPUT_IMG})"
+  # setup variables
+  export CARCH="$2"
+  export RR_ARCH="$2"
+  export RR_PLATFORM="sysroot"
+  export RETROROOT_HOME="${RR_ROOT_PATH}/toolchain"
+  export RETROROOT_HOST="${RR_ROOT_PATH}/output/toolchains/${RR_ARCH}"
+  export RETROROOT_SYSROOT="${RR_ROOT_PATH}/output/retroroot-${RR_ARCH}-${RR_PLATFORM}"
+  if [ ! -d "${RETROROOT_SYSROOT}" ]; then
+    die "build_package: sysroot doesn't exist... (${RETROROOT_SYSROOT})"
   fi
-  
+
   # get package build depds
   local deps=""
   local makedepends=$(echo "${SRCINFO}" | grep makedepends)
@@ -118,26 +122,10 @@ function build_package() {
   if [ ! -z "${deps}" ]; then
     install_package "${deps}" || die "build_package: package deps installation failed"
   fi
-  
-  # mount sysroot image
-  mount_image || die "build_package: mount_image failed"
 
-  # setup toolchain variables
-  export RETROROOT_HOME="${RR_ROOT_PATH}/toolchain"
-  export RETROROOT_SYSROOT="${RR_ROOT_PATH}/output/rootfs"
-  export RETROROOT_HOST="${RR_ROOT_PATH}/output/toolchains/${ARCH}"
-  export CARCH=${RR_ARCH}
-  
   # let's go...
   PKGEXT='.pkg.tar.xz' makepkg -Cfd || die "build_package: makepkg failed"
-  
-  # umount sysroot image
-  umount_image || die "build_package: umount_image failed"
-  
-  #if [ $3 ]; then
-  #  echo -e "${COL_G}build_package:${COL_N} installing ${COL_G}$pkgname${COL_N} ($local_pkgver)..."
-  #  sudo pacman --noconfirm -U *-$2.pkg.tar.* || die "build_package: pkg installation failed"
-  #fi
+
   popd &> /dev/null || die "build_package: popd failed"
 }
 

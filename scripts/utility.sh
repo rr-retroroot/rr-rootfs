@@ -13,7 +13,8 @@ function minfo() {
 
 # cleanup on exit
 function image_cleanup {
-  if [ "${RR_DO_MOUNT}" == 1 ]; then
+  if [ "${RR_PLATFORM}" == "sysroot" ]; then
+    # we want a "flat" sysroot for cross compilation
     return 0
   fi
 
@@ -30,6 +31,13 @@ trap image_cleanup EXIT
 
 # mount_image
 function mount_image() {
+  if [ "${RR_PLATFORM}" == "sysroot" ]; then
+    # set mount paths
+    MOUNT_ROOT="${RR_ROOT_PATH}"/output/retroroot-${RR_ARCH}-${RR_PLATFORM}
+    sudo mkdir -p ${MOUNT_ROOT}
+    return 0
+  fi
+
   minfo "mount_image: ${RR_OUTPUT_IMG}"
   
   if [ ! -f "${RR_OUTPUT_IMG}" ]; then
@@ -44,26 +52,33 @@ function mount_image() {
   # set mount paths
   MOUNT_ROOT="${RR_ROOT_PATH}"/output/rootfs
   MOUNT_BOOT="${RR_ROOT_PATH}"/output/rootfs/boot
-  MOUNT_RR="${RR_ROOT_PATH}"/output/rootfs/retroroot
 
   # mount partitions
   mkdir -p "${MOUNT_ROOT}"
   sudo mount --make-private "${ROOT_DEV}" "${MOUNT_ROOT}"
   sudo mkdir -p "${MOUNT_BOOT}"
   sudo mount --make-private "${BOOT_DEV}" "${MOUNT_BOOT}"
-  # mount retroroot build stuff
-  sudo mkdir -p "${MOUNT_RR}"
-  sudo mount --make-private --bind "${RR_ROOT_PATH}" "${MOUNT_RR}"
 }
 
 function umount_image() {
+  if [ "${RR_PLATFORM}" == "sysroot" ]; then
+    # we want a "flat" sysroot for cross compilation
+    return 0
+  fi
+
   minfo "umount_image: ${RR_OUTPUT_IMG} (mounted on ${LOOP_DEV})"
+
   sudo umount -lfR "${MOUNT_ROOT}" >/dev/null 2>&1 || :
   sudo losetup -d "${LOOP_DEV}" >/dev/null 2>&1 || :
 }
 
 # create_image
 function create_image() {
+  if [ "${RR_PLATFORM}" == "sysroot" ]; then
+    # we want a "flat" sysroot for cross compilation
+    return 0
+  fi
+
   minfo "create_image: ${RR_OUTPUT_IMG}"
   
   if [ "${RR_PLATFORM}" == "desktop" ]; then
@@ -123,15 +138,20 @@ function create_image() {
 function create_rootfs() {
   # create minimal rootfs with pacstrap and specifed packages
   minfo "create_rootfs: running pacstrap"
+
   sudo pacstrap -c -K -M -G -C "${RR_ROOT_PATH}"/packages/system/rr-base/overlay/etc/pacman-"${RR_ARCH}".conf ${MOUNT_ROOT} rr-base-${RR_PLATFORM}
   # TODO: https://gitlab.archlinux.org/archlinux/arch-install-scripts/-/issues/56
   sudo killall gpg-agent
 }
 
 function install_package() {
-  minfo "install_package: installing packages to $(basename -- ${RR_OUTPUT_IMG}): ${RR_PACKAGES}"
+  if [ "${RR_PLATFORM}" == "sysroot" ]; then
+    minfo "install_package: installing packages to $(basename -- ${MOUNT_ROOT}): ${RR_PACKAGES}"
+  else
+    minfo "install_package: installing packages to $(basename -- ${RR_OUTPUT_IMG}): ${RR_PACKAGES}"
+  fi
+
   mount_image
-  minfo "install_package: chroot..."
   sudo arch-chroot ${MOUNT_ROOT} pacman -S --noconfirm --needed $1
   umount_image
 }
