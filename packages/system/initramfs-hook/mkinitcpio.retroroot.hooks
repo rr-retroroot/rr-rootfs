@@ -44,7 +44,11 @@ run_hook() {
         # TODO: fix rr-splash to correctly init framebuffer device
         fbset -fb /dev/fb0 -g 240 320 240 320 16
       fi
-      rr-splash /dev/fb0 /logo.png &
+      if [ -n "${rotate}" ]; then
+        rr-splash /dev/fb0 /logo-270.png &
+      else
+        rr-splash /dev/fb0 /logo.png &
+      fi
     fi
   fi
 }
